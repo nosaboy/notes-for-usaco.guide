@@ -1,8 +1,8 @@
 # Introduction to Prefix Sums
 ### Usage
 Given integer array a, query the sum of any range(l,r) [l...r] 
-precomputation: O(n)
-processing: O(1)
+- O(n) precomputing
+- O(1) query
 
 
 ### Example 1
