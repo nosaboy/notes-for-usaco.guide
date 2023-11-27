@@ -116,7 +116,51 @@ void solve(){
 
 **Problem 2:** http://www.usaco.org/index.php?page=viewproblem2&cpid=416
 We want to brute force the problem where we check the number of grass for every (x,y). The range of which Bessie can travel with k steps form a diamond square with center (x,y) and 4 corners at (x-k,y), (x+k,y), (x,y-k), (x,y+k). We can use a similar "prefix sum/dp" approach but instead of rectangles we have triangles. Let $pre[i][j]$ be the sum of all values in an upside down right isosceles triangle with the point(right angle) at (i,j) where the base is the very top. Its like all the values above (i,j) inclosed by y = x and y = -x. To compute the prefix at (x,y), we assume we know This means we can first find the prefix of the bottom corner of our diamond square at (x,y+k), then we want to subtract the triangles on either side with corners (x-k,y), (x+k,y) to eliminate the values on the side. However, we have eliminated the triangle with corner (x,y-k) twice, so we have to add it back once to get the value of the diamond square. So, the values with center (x,y) is $pre[x][y+k] - pre[x-k][y] - pre[x+k][y] + pre[x][y-k]$. We then iterate through all (x,y) and take the maximum.
+**HAVENT SOLVED YET***
 ```cpp
 
-
+void solve(){
+    ll n,k; cin>>n>>k;
+    ll pre[1505][1505]={0};
+    ll arr[1505][1505]={0};
+    ll left[1505][1505]={0};
+    ll right[1505][1505]={0};
+    rep(i,0,1505){
+        rep(j,0,1505){
+            pre[i][j] = 0;
+        }
+    }
+    
+    //constructing prefix sums
+    rep(i,0,n){
+        rep(j,0,n){
+            cin>>arr[i+1000][j+1000]; //shift by 400 to prevent out of bounds
+        }
+    }
+    
+    //precomputation (adding values together)
+    rep(i,2,1500){
+        rep(j,2,1500){
+            pre[i][j] = pre[i-1][j-1] + pre[i-1][j+1] - pre[i-2][j] + arr[i-1][j] + arr[i][j];
+        }
+    }
+    //cout<<pre[1000][1000]<<endl;
+    // left and right line y = x and y = -x
+    rep(i,1,1500){
+        rep(j,1,1500){
+            left[i][j] = arr[i][j] + left[i-1][j-1];
+            right[i][j] = arr[i][j] + right[i-1][j+1];
+        }
+    }
+    // count values with exacty k
+    ll ans = 0;
+    rep(i,1000,1000+n){
+        rep(j,1000,1000+n){
+            //cout<<i<<" "<<j<<" "<<pre[i+k][j]<<" "<<pre[i+k][j] + left[i-1][j-k-1] + right[i-1][j+k+1] - pre[i-1][j-k] + pre[i-1][j+k] + pre[i-k-1][j]<<endl;
+            ans = max(ans, pre[i+k][j] - left[i-1][j-k-1] - right[i-1][j+k+1] - pre[i-1][j-k] - pre[i-1][j+k] + pre[i-k-1][j]);
+        }
+    }
+    
+    cout<<ans<<endl;
+}
 ```
