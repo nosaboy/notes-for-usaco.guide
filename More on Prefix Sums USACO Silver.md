@@ -1,6 +1,6 @@
 ### Maximum Subarray Sums
 Find the maximum sum over all subarrays(there may be negative values) 
-- O(n) processing
+- O(n) precomputing
 - O(1) query
 #### Example 1 
 https://cses.fi/problemset/task/1643
@@ -29,7 +29,7 @@ void solve(){
 
 ### 2D Prefix Sums
 Find the sum of 
-- O(nm) processing
+- O(nm) precomputing
 - O(1) query
 #### Example 1
 https://cses.fi/problemset/task/1652
