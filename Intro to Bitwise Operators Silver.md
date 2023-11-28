@@ -121,6 +121,38 @@ rep(i,0,two[n]){
   cout<<endl;
 }
 ```
+### Arithmetic Operations using Bits
+#### Addition
+We add the bits that don't need a carry, then we carry all digits 1 + 1 over to the next digit and repeat the process.
+```cpp
+int add(int a, int b) {
+	while (b > 0) {
+		int carry = a & b; // for all bits such that both a and b have 1, we must carry it over
+		a ^= b; // we add all bits where only one of them have 1, so we dont carry
+		b = carry << 1; // since we carried 1 + 1 = 2, we must multiply by 2
+    // repeat this process until we don't have to carry anymore
+	}
+	return a;
+}
+```
+
+#### Multiplication
+Let the binary representation of $b$ be $b_nb_{n-1}...b_2b_1b_0$ where $b_i$ is a bit that is either 0 or 1. We can then split $b$ into its binary form to get $a \cdot b = a \cdot (1^{b_0} + 2^{b_1} + 4^{b_2} + ... + 2^{nb_n}) = a1^{b_0} + a2^{b_1} + ... + a2^{nb_n}.$ We can now just find the sum of each bit added together to get product.
+```cpp
+int prod(int a, int b) {
+	int c = 0;
+	while (b > 0) {
+		if ((b & 1) == 1) { // if at the kth position of b has 1
+			c = add(c, a);  // Use the addition function we coded previously
+		}
+		a <<= 1; // since we are moving onto k+1th position where we multiply a * 2^{k+1}, we must multiply a by 2
+		b >>= 1; // move onto the k+1th position by deleting the kth position
+	}
+	return c;
+}
+```
+
+
 ### Problems
 **Problem 1:** https://codeforces.com/contest/1338/problem/A
 I took a brute force approach.
