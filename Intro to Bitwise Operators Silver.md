@@ -85,6 +85,28 @@ cout << __builtin_clz(x) << "\n"; // 19
 cout << __builtin_ctz(x) << "\n"; // 4
 cout << __builtin_popcount(x) << "\n"; // 5
 ```
+### Counting All $2^n$ Subsets of array length n
+We can have a number with n binary digits/bits. 
+- 1 represents the value is in the subset
+- 0 represents the value is not in the subset
+We can check every subset by iterating over 0 to $2^{n-1}$ inclusive.
+This contains every possible 1 placements from 000... n 0s to 111... n 1s.
+```cpp
+vi v[n] = {1,2,3,...};
+rep(i,0,two[n]){
+  vi subst;
+  rep(j,0,n){
+    if(i & (1 << j)){
+        subst.pb(v[j]); // it is in this subset
+    }
+  }
+  // prints subset
+  rep(j,0,subst.size()){
+    cout<<subst[j]<<" ";
+  }
+  cout<<endl;
+}
+```
 ### Problems
 **Problem 1:** https://codeforces.com/contest/1338/problem/A
 I took a brute force approach.
