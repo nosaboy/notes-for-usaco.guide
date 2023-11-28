@@ -12,6 +12,9 @@ st.insert(2); // [1, 2] in arbitrary order
 #### Unordered Maps
 Map but it is not sorted by key(mp[key] = value) so we don't know the next highest key. Works by hashing, meaning **high constant factor**.
 - Every operation is O(1) instead of O(logn)
-- 
+- Supports insert: mp[key] = value, erase: mp.erase(key), count: mp.count(key)
+
+**Can use unordered in USACO. Don't use unordered in codeforces**
+
 #### Iterators
 
