@@ -1,4 +1,4 @@
-### Basic operators
+### Basic operations
 #### AND operator
 a & b: for every bit, returns 1 if there is a 1 in both **a and b** and returns 0 if both are not 1s for that bit position.
 ```cpp
@@ -32,5 +32,59 @@ a ^ b: for every bit, return 1 if there is **exactly one** 1 in a or b and retur
 so bit position a = bit position b. 
 
 #### NOT operator
-~x: **Invert** all bits, always satisfies the formula(in binary form of cpp 32/64 ints)
-$~x = -x-1$
+~x: **Invert** all bits, always satisfies the formula $~x = -x-1$ (in binary form of cpp 32/64 ints).
+
+#### Bit shifts
+
+
+### Problems
+**Problem 1:** https://codeforces.com/contest/1338/problem/A
+I took a brute force approach.
+```cpp
+void solve(){
+    ll n;
+    cin>>n;
+    vector <ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+        
+    }
+    bool zero = true;
+    rep(i,0,n-1){
+        if(v[i] > v[i+1]){
+            zero = false;
+        }
+    }
+    if(zero){
+        cout<<0<<endl;
+        return;
+    }
+    ll two[63];
+    two[0]=1;
+    rep(i,1,63){
+        two[i] = two[i-1] * 2;
+    }
+    rep(l,0,63){
+        //cout<<two[i]<<endl;
+        ll last = v[n-1] + two[l+1]-1;
+        bool yn = true;
+        //cout<<last<<endl;
+        for(int i = n-2;i>=0;i--){
+            bool lo = false;
+            if(v[i] > last){
+                yn = false;
+            }
+            last = min(v[i] + two[l+1]-1, last);
+            
+            
+        }
+       
+        
+        
+        if(yn){
+            cout<<l+1<<endl;
+            return;
+        }
+    }
+}
+```
