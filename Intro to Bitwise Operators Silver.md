@@ -1,4 +1,5 @@
-### Basic operations
+### Basic operations on Bits
+- All operations are O(1)
 #### AND operator
 a & b: for every bit, returns 1 if there is a 1 in both **a and b** and returns 0 if both are not 1s for that bit position.
 ```cpp
@@ -35,8 +36,55 @@ so bit position a = bit position b.
 ~x: **Invert** all bits, always satisfies the formula $~x = -x-1$ (in binary form of cpp 32/64 ints).
 
 #### Bit shifts
+x << k: shifts x k to the left, adds k 0s to the right of x = $x \cdot 2^k$
+x >> k: delete the last k bits of number = $\lfloor \frac{x}{2^k} \rfloor$
 
+#### Count and Modify Bits
+Accessing the kth bit from the right
+```cpp
+// prints out x in binary
+for(int i = 31;i>=0;i--){
+  if(x & (1<<k) > 0){ // (1<<k) = 1 followed by k 0s, checks k+1th bit
+    // there is a 1 in x at the k+1th bit from the right
+    cout<<"1";
+  }
+  else{
+    cout<<"0";
+  }
+}
+```
+Setting bits to values
+```cpp
+x |= (1<<k) // sets the k+1th bit from the right to 1
+x &= ~(1<<k) // sets the k+1th bit to 0, ~(1<<k) = make every bit 1 except for k+1th bit = 111...011111...
+x ^= (1<<k) // inverts k+1th bit, if k+1th bit of x = 1, 1^1 = 0, if k+1th bit = 0, 0^1 = 1
 
+x &= (x-1) // sets the last bit that is a 1 to 0
+x &= -x // sets all bits to 0 except for the last bit that is a 1
+x |= (x-1) // inverts all bits to the right of the last 1th bit, so setting them all to 1
+```
+Check if a number is a power of 2: 2^k = 1000...000 k 0s in binary
+```cpp
+if(x & (x-1) == 0){
+  // 1000...000 one 1 followed by k 0s & 11111...111 k 1s
+  return true;
+}
+else{
+  return false;
+}
+```
+Counting bits functions
+__builtin_clz(x): count # of 0s before the first 1(32 bit integer)
+__builtin_ctz(x): count # of 0s after the last 1
+__builtin_popcount(x): count # of 1s in binary of x
+
+You can also have same function with ll after you add ll at the end: __builtin_popcountll(x)
+```cpp
+int x = 5328; // 00000000000000000001010011010000
+cout << __builtin_clz(x) << "\n"; // 19
+cout << __builtin_ctz(x) << "\n"; // 4
+cout << __builtin_popcount(x) << "\n"; // 5
+```
 ### Problems
 **Problem 1:** https://codeforces.com/contest/1338/problem/A
 I took a brute force approach.
