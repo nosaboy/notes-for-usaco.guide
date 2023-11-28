@@ -33,6 +33,4 @@ so bit position a = bit position b.
 
 #### NOT operator
 ~x: **Invert** all bits, always satisfies the formula(in binary form of cpp 32/64 ints)
-$$
-~x = -x-1
-$$
+$~x = -x-1$
