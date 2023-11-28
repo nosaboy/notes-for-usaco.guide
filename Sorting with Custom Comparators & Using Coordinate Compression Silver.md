@@ -100,7 +100,7 @@ It will just set the erased values as "?" unknown values at the end of the vecto
 We must use the erase(first, last) which removes all elements including first but not including last.
 
 Thus, to have all unique values in a vector, we must sort the vector then erase duplicates:
-/*
+*/
 
 sort(v.begin(),v.end());
 v.erase(v.unique(v.begin(),v.end()) , v.end());
