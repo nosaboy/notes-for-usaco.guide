@@ -212,11 +212,50 @@ void solve(){
 This is just the same idea as problem 1 where you have to coordinate compress then sum up the ranges. However, there is one more step.
 If any lifeguard is fired, the time they will lose is the number of 1s in the lifeguards interval, since they will be 0 after lifeguard is fired.
 Thus, we add one more step where we do a prefix sum to count the number of 1s for any range, then brute force loop through each lifeguard and
-find the minimum time lost. The answer is time of all lifeguards - min.
+find the minimum time lost. The answer is time of all lifeguards - min. Still insta solution.
 ```cpp
+void solve(){
+    int n;
+    cin>>n;
+    vi v;
 
-
-
+    vector <pi> add;
+    rep(i,0,n){
+        int a,b;
+        cin>>a>>b;
+        add.pb({a,b});
+        v.pb(a); v.pb(b);
+    }
+    sort(v.begin(),v.end());
+    v.erase(unique(v.begin(),v.end()), v.end());
+ 
+    int pre[v.size()+2]={0}; // prefix sum shift by 1 
+    rep(i,0,add.size()){
+       
+        pre[(lower_bound(v.begin(),v.end(), get<0>(add[i])) - v.begin())+1] ++;
+        pre[(lower_bound(v.begin(),v.end(), get<1>(add[i])) - v.begin())+1]--; // customer left
+    }
+    int ans = 0;
+    int total = 0; // total time
+    rep(i,1,v.size()){
+        pre[i] += pre[i-1]; // how many customers at time i
+        if(pre[i] > 0){
+            total+=v[i] - v[i-1];
+        }
+    }
+    int ones[v.size()+2]={0}; // number of ones 
+    rep(i,1,v.size()+1){
+        if(pre[i] == 1){
+            ones[i]+=v[i] - v[i-1];
+        }
+        ones[i]+=ones[i-1];
+    }
+    int mn = 1000000005;
+    rep(i,0,add.size()){
+        mn = min(mn, ones[(lower_bound(v.begin(),v.end(), get<1>(add[i])) - v.begin())] - ones[(lower_bound(v.begin(),v.end(), get<0>(add[i])) - v.begin())]);
+    }
+    cout<<total- mn<<endl;
+}
 
 ```
 
