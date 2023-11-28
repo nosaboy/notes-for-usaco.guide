@@ -35,6 +35,20 @@ so bit position a = bit position b.
 #### NOT operator
 ~x: **Invert** all bits, always satisfies the formula $~x = -x-1$ (in binary form of cpp 32/64 ints).
 
+**Example 1:** https://codeforces.com/contest/1556/problem/D
+We can find the sum of two numbers using only its AND, OR and XOR operators:
+If there is a 1 bit at the kth bit position, it means that both a and b has a 1 bit at the kth position.
+If only one of them contains a 1, it would be a XOR b. We can use a OR b and a AND b to get a XOR b since any bit that is a 1 in OR but a 0 in a AND b means only one of a or b has a 1 bit in that position. Thus **a XOR b = (a AND b) XOR (a OR b).
+If both contains a 1 at the kth position, the sum of that would be $2 * 2^k = 2^{k+1}$. If there is only one 1 at the kth position, the sum would just be $2^k$. 
+Thus, the sum of the two numbers is a+b = 2 * (a AND b) + (a XOR b) = 2 * (a AND b) + ((a AND b) XOR (a OR b)): $a+b = 2\cdot(a&b) + a⊕b = 2\cdot(a&b) + (a&b ⊕ a|b)$.
+Since n >= 3, we can find values of first 3 number a,b,c by finding a+b, a+c, b+c.
+Summing up and dividing by 2 we get (2a + 2b + 2c)/2 = a+b+c. 
+We can then find each individual value of a,b,c by subtracting:
+a = a+b+c - (b+c)
+b = a+b+c - (a+c)
+c = a+b+c - (b+c)
+We then find all other values by finding the sum of a+x, then subtract a value to get a+x - a = x.
+
 #### Bit shifts
 x << k: shifts x k to the left, adds k 0s to the right of x = $x \cdot 2^k$
 x >> k: delete the last k bits of number = $\lfloor \frac{x}{2^k} \rfloor$
