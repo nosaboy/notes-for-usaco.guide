@@ -212,7 +212,7 @@ void solve(){
 This is just the same idea as problem 1 where you have to coordinate compress then sum up the ranges. However, there is one more step.
 If any lifeguard is fired, the time they will lose is the number of 1s in the lifeguards interval, since they will be 0 after lifeguard is fired.
 Thus, we add one more step where we do a prefix sum to count the number of 1s for any range, then brute force loop through each lifeguard and
-find the minimum time lost. The answer is time of all lifeguards - min. Still insta solution.
+find the minimum time lost. The answer is time of all lifeguards - min. Still insta mindsolve.
 ```cpp
 void solve(){
     int n;
