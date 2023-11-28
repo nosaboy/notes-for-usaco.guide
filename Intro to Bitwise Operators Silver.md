@@ -155,7 +155,8 @@ int prod(int a, int b) {
 
 ### Problems
 **Problem 1:** https://codeforces.com/contest/1338/problem/A
-I took a brute force approach.
+I took a brute force approach. If everything is sorted we just print 0. If not we go through every possible time up to 63. If we have k time, it means we can add any number from 0 to 2^k - 1 in order to sort array. The greedy strategy is we always want to add the max time such that it is not bigger than the previous number, so the next number can have more room to be big. Thus we can always add to a number to form max(last number, number + 2^k - 1).
+
 ```cpp
 void solve(){
     ll n;
@@ -204,3 +205,7 @@ void solve(){
     }
 }
 ```
+**Problem 2:** https://codeforces.com/contest/1872/problem/E
+I did this problem before
+
+**Problem 3:** https://codeforces.com/contest/1017/problem/D
