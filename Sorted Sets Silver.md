@@ -267,3 +267,48 @@ void solve(){
 }
 ```
 
+
+
+**Problem 5:** https://codeforces.com/problemset/problem/1000/C
+When I saw this problem I was like ya this is literally just prefix sums + coordinate compression like that lifeguard problem its literally the same exact thing so ya I just implemented that. **There is a simpler/cleaner code solution in "view user solutions" so I shall review**
+
+```cpp
+void solve(){
+    int n;
+    cin>>n;
+    vector <ll> v;
+
+    vector <pair<ll,ll>> add;
+    rep(i,0,n){
+        ll a,b;
+        cin>>a>>b;
+        add.pb({a,b});
+        v.pb(a); v.pb(b); v.pb(b+1);
+    }
+    sort(v.begin(),v.end());
+    v.erase(unique(v.begin(),v.end()), v.end());
+ 
+    ll pre[v.size()+2]={0};
+    rep(i,0,add.size()){
+       
+        pre[(lower_bound(v.begin(),v.end(), get<0>(add[i])) - v.begin())]++;
+        pre[(lower_bound(v.begin(),v.end(), get<1>(add[i])) - v.begin())+1]--; 
+        //cout<<(lower_bound(v.begin(),v.end(), get<0>(add[i])) - v.begin())<<" "<<(lower_bound(v.begin(),v.end(), get<1>(add[i])) - v.begin())+1<<endl;
+    }
+    rep(i,1,v.size()){
+        pre[i] += pre[i-1]; 
+    }
+
+    ll ans[n+1]={0};
+    rep(i,0,v.size()-1){
+        ans[pre[i]] += v[i+1] - v[i];
+        //cout<<pre[i]<<" "<<v[i+1]<<" "<<v[i]<<endl; 
+    }
+    rep(i,1,n+1){
+        cout<<ans[i]<<" ";
+    }
+    cout<<endl;
+}
+
+
+```
