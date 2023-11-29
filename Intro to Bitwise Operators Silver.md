@@ -209,7 +209,7 @@ void solve(){
 I did this problem before
 
 **Problem 3:** https://codeforces.com/contest/1017/problem/D
-Damn this was like pretty hard no cap its a 1900 and usaco.guide was like "ya this is a ez problem". I think my main mistake is not realizing that o(2^n * 2^n) is passable. Moreover, I did not think of the fact that you can brute force pairs which I guess I should've. I think I was too focused on how to query and the 5*10^5 scared me a little. I should've realized that there are only 4096 * 4096 pairs. 
+Damn this was like pretty hard no cap its a 1900 and usaco.guide was like "ya this is a ez problem". I think my main mistake is not realizing that o(2^n * 2^n) is passable. Moreover, I did not think of the fact that you can brute force pairs which I guess I should've. I think I was too focused on how to query and the 5*10^5 scared me a little. I should've realized that there are only 4096 * 4096 pairs. Also I was TLEing cause I used maps instead of arr( I also made same mistake on UPAC 2023) so ya that extra log just TLEd since O(2^{2n}) is already very tight.
 **The editorial provides a faster solution so I should review**
 
 ```cpp
