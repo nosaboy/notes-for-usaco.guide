@@ -219,27 +219,31 @@ void solve(){
 }
 ```
 
-**Problem 7:** https://www.spoj.com/problems/HAYBALE/ **NOTE I DIDNT SOLVE THIS PROBLEM I JUST SAVED MY CODE HERE**
-Since n <= 10^6, we can just find all possible values in array a and then find the median using sorting(maybe this will tle so idk might use binary search as well). To simulate the process of adding haybales, we can just add 1 to start of a and -1 to b+1, then prefix sum the whole array after adding. This will make 000011111...111110000
-    a^          b^
+**Problem 7:** https://www.spoj.com/problems/HAYBALE/ 
+Since n <= 10^6, we can just find all possible values in array a and then find the median using sorting(maybe this will tle so idk might use binary search as well). To simulate the process of adding haybales, we can just add 1 to start of a and -1 to b+1, then prefix sum the whole array after adding. 
+This will make 000011111...111110000
+                  a^          b^
 so that each stack in the interval has 1 added to it.
 ```cpp
 void solve(){
     int n,q;
-    int pre[n+2]={0};
     cin>>n>>q;
+    int pre[n+2]={0};
     while(q--){
         int l,r;
-        cin>>l>>r;
-        pre[l]++;
-        pre[r+1]--;
+        cin>>l>>r; // we start with 1
+        pre[l]++; // add 1 to start
+        pre[r+1]--; subtract 1 to index after end
     }
+    vi v;
     rep(i,1,n+1){
-        pre[i] += pre[i-1];
+        pre[i] += pre[i-1]; // calculate prefix sum
+        v.pb(pre[i]); // add value of hay to sort vector
     }
-    sort(pre,pre+(n+2));
-    cout<<pre[n/2+1]<<endl;
-}  
+    sort(v.begin(),v.end()); // sort values of hay
+  
+    cout<<v[n/2]<<endl; // half, find median
+}     
 ```
 
 **Problem 8:** https://codeforces.com/contest/1398/problem/C
