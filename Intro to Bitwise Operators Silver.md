@@ -209,3 +209,83 @@ void solve(){
 I did this problem before
 
 **Problem 3:** https://codeforces.com/contest/1017/problem/D
+Damn this was like pretty hard no cap its a 1900 and usaco.guide was like "ya this is a ez problem". I think my main mistake is not realizing that o(2^n * 2^n) is passable. Moreover, I did not think of the fact that you can brute force pairs which I guess I should've. I think I was too focused on how to query and the 5*10^5 scared me a little. I should've realized that there are only 4096 * 4096 pairs. 
+**The editorial provides a faster solution so I should review**
+
+```cpp
+void solve(){
+    int n,m,q; cin>>n>>m>>q;
+    vi v;
+    rep(i,0,n){
+        int u; cin>>u; v.pb(u);
+    }
+    int mp[4097]={0};
+    rep(i,0,m){
+        string s; cin>>s; 
+        reverse(s.begin(),s.end());
+        int two = 1;
+        int cnt = 0;
+        rep(j,0,n){
+            if(s[j] == '1'){
+                cnt+=two;
+            }
+            two*=2;
+        }
+        mp[cnt]++;
+    }
+    int value[(1<<n)]={0};
+    rep(i,0,(1<<n)){
+        int osa =i;
+        string s="";
+        rep(j,0,n){
+            if(osa%2==0){
+                s+='0';
+            }
+            else{
+                s+='1';
+            }
+            osa = osa>>1;
+        }
+        reverse(s.begin(),s.end());
+        // turns int to binary string
+        rep(j,0,s.size()){
+            if(s[j] == '1'){
+                value[i]+= v[j];
+            }
+        }
+
+    }   
+
+    int dp[(1<<n)][101]={0};
+    rep(i,0,(1<<n)){
+        rep(j,0,(1<<n)){
+            // brute force over all possible pairs
+            //cout<<value[(~(i^j)&((1<<n)-1))]<<" "<<(~(i^j)&((1<<n)-1))<<" "<<i<<" "<<j<<endl;
+            if(value[(~(i^j)&((1<<n)-1))] <= 100){ // the value of the number the pair forms
+                dp[i][value[(~(i^j)&((1<<n)-1))]] += mp[j];
+            }
+            
+
+        }
+        rep(j,1,101){
+            dp[i][j] += dp[i][j-1]; // all k smaller will be added onto the larger k
+        }
+    }
+    while(q--){
+        int k;
+        string s; cin>>s>>k; 
+      
+        reverse(s.begin(),s.end());
+        int two = 1;
+        int cnt = 0;
+        rep(j,0,n){
+            if(s[j] == '1'){
+                cnt+=two;
+            }
+            two*=2;
+        }
+        
+        cout<<dp[cnt][k]<<endl;
+    }
+}
+```
