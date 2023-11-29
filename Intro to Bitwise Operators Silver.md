@@ -289,3 +289,87 @@ void solve(){
     }
 }
 ```
+**Problem 4:** https://atcoder.jp/contests/abc295/tasks/abc295_d
+A string is happy if there is an even amount of every digit. We can take a prefix sum approach where if for every digit $(pre[digit][r] - pre[digit][l])%2 == 0$ then we know that the substring l+1, r is happy. Since we only care about the count of the digits mod 2, we can represent the count of all digits as a binary string since there are only 10 digits so 2^10 choices. Moreover we know that for it to be divisible by 2 the binary has to be 0 so every digit for both l and r are the same which means binary string for l and r are the same. We then count all it of the prefix sum for every combination, then add n choose 2 to the count since for every substring we are choosing 2 it from n it as our left and right.
+```cpp
+void solve(){
+    string s;
+    cin>>s;
+    ll val[1024]={0};
+ 
+    ll two[11];
+    two[0] = 1;
+    rep(i,1,11){
+        two[i] = two[i-1]*2;
+    }
+    int cnt = 0; // in base 2
+    val[0]=1;
+    rep(i,0,s.size()){
+        cnt ^= two[s[i]-'0'];
+        val[cnt]++;
+    }
+    ll ans = 0;
+    rep(i,0,1024){
+        ans += val[i] * (val[i]-1) / 2;
+    }
+    cout<<ans<<endl;
+
+}   
+```
+
+
+**Problem 10:** https://cses.fi/problemset/task/2185/
+```cpp
+void solve(){
+    ll n,k;
+    cin>>n>>k;
+    vector <ll> v;
+    ll par[21] = {0};
+    rep(i,1,21){
+        if(i%2==0){
+            par[i] = -1;
+        }
+        else{
+            par[i] = 1;
+        }
+    }
+    rep(i,0,k){
+        ll u; cin>>u; v.pb(u);
+    }
+    ll ans = 0;
+    for(ll i = 1;i<(1<<k);i++){
+        ll pm = par[__builtin_popcountll(i)];
+        
+        ll osa =i;
+        ll nosa = 1;
+        string s="";
+        bool yn = false;
+        rep(j,0,k){
+            if(osa%2==0){
+                s+='0';
+            }
+            else{
+                s+='1';
+                
+                if(nosa > 1000000000000000000/v[j]){
+                    yn= true;
+                }
+                nosa *= v[j];
+            }
+            osa = osa>>1;
+        }
+        if(!yn){
+        //cout<<__builtin_popcountll(i)<<" "<<pm<<" "<<nosa<<endl;
+        // turns int to binary string
+            ll multiple = n/nosa;
+            ans += multiple * pm;
+        }
+    }
+    cout<<ans<<endl;
+
+
+}   
+
+```
+
+
