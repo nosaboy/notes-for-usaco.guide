@@ -164,3 +164,37 @@ void solve(){
     cout<<ans<<endl;
 }
 ```
+
+
+**Problem 3:** https://codeforces.com/gym/104114/problem/N
+I was stuck on this problem for quite a while because I cannot come up with a greedy solution due to there being many choices on what the values can be. If we first have a and b then we can calculate teh minimum increase as either b goes up to meet a range or a goes up to meet b range. Let say we have a,b,c where a > b < c, so the greedy solution is to increase b until it reaches c range then increasing prefix of a. But we have already calclated b so its going to be so many choices on what a,b,c are which gets confusing. 
+**Idk how to come up with this obervation:**
+The condition $|a_i - a_{i+1}| \se k$ is satisfied if and only if $a_i - k \se a_{i+1}$ and $a_{i+1} - k \se a_i$ are both satisfied. 
+If a_i > a_{i+1}, a_{i+1} must go up in order to be in the range a_i - k, so $a_i - k \se a_{i+1}$ is satisfied and $a_i \ge a_{i+1} - k$ is also satisfied since $a_i \ge a_{i+1}$. Reverse is also true.
+To prove converse, if $a_i > a_{i+1}$ then $a_i - k \se a_{i+1}$ must mean $a_{i+1}$ is in range and reverse is true. 
+To satisfy the first condition, we must set $a_{i+1}$ to $a_i - k$ if $a_i - k > a_{i+1}$ and do nothing otherwise.
+We now assume that for every i $a_i \se a_{i+1} + k$. The only problems is if a_i is too small such that a_{i+1} - k > a_i.
+To satisfy the second condition, we must set $a_i$ to $a_{i+1} - k$ if $a_{i+1} - k > a_i$ and do nothing otherwise. This will not affect the first condition since if a_{i+1} - k > a_i, then setting $a_i$ to $a_{i+1} - k$ will still satisfy $a_{i+1} - k - k \se a_{i+1}$.
+**NOTE that for the second case, we are changing the first value based on the second value. This means that if the second value changes in the next iteration, the first value will be incorrect. Thus, we must change the second value before we change the first value to ensure the second value  is final(will remain unchanged). Hence, we iterate backwards.
+```cpp
+void solve(){
+    int n,k;
+    cin>>n>>k;
+    vi v;
+    rep(i,0,n){
+        int u; cin>>u; v.pb(u);
+    }
+    // case 1: a_i - k <= a_{i+1}
+    rep(i,0,n-1){
+        v[i+1] = max(v[i+1], v[i] - k);
+    }
+    // case 2: a_{i+1} - k \se a_i
+    for(int i = n-2;i>=0;i--){
+        v[i] = max(v[i], v[i+1] - k);
+    }
+    rep(i,0,v.size()){
+        cout<<v[i]<<" ";
+    }
+    cout<<endl;
+}   
+```
