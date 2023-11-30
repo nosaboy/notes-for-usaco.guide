@@ -116,52 +116,55 @@ void solve(){
 
 **Problem 2:** http://www.usaco.org/index.php?page=viewproblem2&cpid=416
 We want to brute force the problem where we check the number of grass for every (x,y). The range of which Bessie can travel with k steps form a diamond square with center (x,y) and 4 corners at (x-k,y), (x+k,y), (x,y-k), (x,y+k). We can use a similar "prefix sum/dp" approach but instead of rectangles we have triangles. Let $pre[i][j]$ be the sum of all values in an upside down right isosceles triangle with the point(right angle) at (i,j) where the base is the very top. Its like all the values above (i,j) inclosed by y = x and y = -x. To compute the prefix at (x,y), we assume we know This means we can first find the prefix of the bottom corner of our diamond square at (x,y+k), then we want to subtract the triangles on either side with corners (x-k,y), (x+k,y) to eliminate the values on the side. However, we have eliminated the triangle with corner (x,y-k) twice, so we have to add it back once to get the value of the diamond square. So, the values with center (x,y) is $pre[x][y+k] - pre[x-k][y] - pre[x+k][y] + pre[x][y-k]$. We then iterate through all (x,y) and take the maximum.
-**HAVENT SOLVED YET***
+^Actually I dont know how to do it this way with o(n^2) precomputation by prefix summing a rotated square. However, I used an o(n^3) solution where you just take the prefix sum of every row and simulate the process by going through all rows and constructing a diamond.
+**Please check the o(n^2) solution***
 ```cpp
-
 void solve(){
     ll n,k; cin>>n>>k;
-    ll pre[1505][1505]={0};
-    ll arr[1505][1505]={0};
-    ll left[1505][1505]={0};
-    ll right[1505][1505]={0};
-    rep(i,0,1505){
-        rep(j,0,1505){
-            pre[i][j] = 0;
-        }
-    }
+    ll pre[n][n+1]={0}; // prefix sum of every coloum
+    
     
     //constructing prefix sums
     rep(i,0,n){
-        rep(j,0,n){
-            cin>>arr[i+1000][j+1000]; //shift by 400 to prevent out of bounds
+        rep(j,1,n+1){
+            cin>>pre[i][j]; 
         }
     }
-    
-    //precomputation (adding values together)
-    rep(i,2,1500){
-        rep(j,2,1500){
-            pre[i][j] = pre[i-1][j-1] + pre[i-1][j+1] - pre[i-2][j] + arr[i-1][j] + arr[i][j];
+    rep(i,0,n){
+        rep(j,1,n+1){
+            pre[i][j] += pre[i][j-1];
         }
     }
-    //cout<<pre[1000][1000]<<endl;
-    // left and right line y = x and y = -x
-    rep(i,1,1500){
-        rep(j,1,1500){
-            left[i][j] = arr[i][j] + left[i-1][j-1];
-            right[i][j] = arr[i][j] + right[i-1][j+1];
-        }
-    }
-    // count values with exacty k
+    // going through each position
+
     ll ans = 0;
-    rep(i,1000,1000+n){
-        rep(j,1000,1000+n){
-            //cout<<i<<" "<<j<<" "<<pre[i+k][j]<<" "<<pre[i+k][j] + left[i-1][j-k-1] + right[i-1][j+k+1] - pre[i-1][j-k] + pre[i-1][j+k] + pre[i-k-1][j]<<endl;
-            ans = max(ans, pre[i+k][j] - left[i-1][j-k-1] - right[i-1][j+k+1] - pre[i-1][j-k] - pre[i-1][j+k] + pre[i-k-1][j]);
+    for(ll i = 0;i<n;i++){
+        for(ll j = 0;j<n;j++){
+            ll cnt = 0;
+            ll l = j-k;
+            ll r = j+k+1; 
+            ll x = i;
+            while(x >= 0 && l < r){
+                cnt += pre[x][min(n,r)] - pre[x][max(0LL,l)];
+                
+                l++; r--;
+                
+                x--;
+            }
+            x = i+1;
+            l = j-k+1;
+            r = j+k; 
+            while(x < n && l < r){
+                cnt += pre[x][min(n,r)] - pre[x][max(0LL,l)];
+                l++; r--;
+                x++;
+            }
+            ans = max(ans,cnt);
         }
     }
-    
     cout<<ans<<endl;
+    
+   
 }
 ```
 
@@ -177,6 +180,8 @@ We now assume that for every i $a_i \se a_{i+1} + k$. The only problems is if a_
 To satisfy the second condition, we must set $a_i$ to $a_{i+1} - k$ if $a_{i+1} - k > a_i$ and do nothing otherwise. This will not affect the first condition since if a_{i+1} - k > a_i, then setting $a_i$ to $a_{i+1} - k$ will still satisfy $a_{i+1} - k - k \se a_{i+1}$.
 **NOTE that for the second case,** we are changing the first value based on the second value. This means that if the second value changes in the next iteration, the first value will be incorrect. Thus, we must change the second value before we change the first value to ensure the second value  is final(will remain unchanged). Hence, we iterate backwards.
 **There is an alternative priority queue simulation solution so pls review that**
+idk how this is prefix sums tho
+
 ```cpp
 void solve(){
     int n,k;
