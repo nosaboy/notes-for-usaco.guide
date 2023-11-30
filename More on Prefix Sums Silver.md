@@ -175,7 +175,8 @@ To prove converse, if $a_i > a_{i+1}$ then $a_i - k \se a_{i+1}$ must mean $a_{i
 To satisfy the first condition, we must set $a_{i+1}$ to $a_i - k$ if $a_i - k > a_{i+1}$ and do nothing otherwise.
 We now assume that for every i $a_i \se a_{i+1} + k$. The only problems is if a_i is too small such that a_{i+1} - k > a_i.
 To satisfy the second condition, we must set $a_i$ to $a_{i+1} - k$ if $a_{i+1} - k > a_i$ and do nothing otherwise. This will not affect the first condition since if a_{i+1} - k > a_i, then setting $a_i$ to $a_{i+1} - k$ will still satisfy $a_{i+1} - k - k \se a_{i+1}$.
-**NOTE that for the second case, we are changing the first value based on the second value. This means that if the second value changes in the next iteration, the first value will be incorrect. Thus, we must change the second value before we change the first value to ensure the second value  is final(will remain unchanged). Hence, we iterate backwards.
+**NOTE that for the second case,** we are changing the first value based on the second value. This means that if the second value changes in the next iteration, the first value will be incorrect. Thus, we must change the second value before we change the first value to ensure the second value  is final(will remain unchanged). Hence, we iterate backwards.
+**There is an alternative priority queue simulation solution so pls review that**
 ```cpp
 void solve(){
     int n,k;
