@@ -268,8 +268,32 @@ void solve(){
 ```
 
 
-
-**Problem 5:** https://codeforces.com/problemset/problem/1000/C
+**Problem 7:** https://codeforces.com/gym/104002/problem/E
+I really didn't have any clue how to solve this problem. I guess my greedy thinking was just wrong. I was thinking maybe we can first pick the max possible sum for k/2 numbers, then we see how to optimize so that it is possible. However, I did not know how to optimize so that we get the maximum sum such that everything works out. This was the wrong greedy approach, I just glimpsed through the editorial and actually, you just have to maintain the maximum **as you go along the array**. Lets always maintain x/2 values after we went through the first x numbers. For the i+1 and i+2 numbers they can either both be in the final or just 1 in the final( since we must have x/2 by the end of it). These are both possible if we just erase the smallest to make room. I still don't know how you can come up with this approach so I **got to review the editorial in more detail.** 
+```cpp
+void solve(){
+    int n;
+    cin>>n;
+    vi v;
+    rep(i,0,n){
+        int u; cin>>u; v.pb(u);
+    }
+    multiset <int> ms;
+    rep(i,0,n/2){
+        ms.insert(v[2*i]);
+        if(*ms.begin() < v[2*i+1]){
+            ms.erase(ms.begin());
+            ms.insert(v[2*i+1]);
+        }
+    }
+    int ans = 0;
+    for(auto it = ms.begin();it != ms.end();it++){
+        ans += *it;
+    }
+    cout<<ans<<endl;
+}
+```
+**Problem 9:** https://codeforces.com/problemset/problem/1000/C
 When I saw this problem I was like ya this is literally just prefix sums + coordinate compression like that lifeguard problem its literally the same exact thing so ya I just implemented that. **There is a simpler/cleaner code solution in "view user solutions" so I shall review**
 
 ```cpp
