@@ -69,3 +69,39 @@ void solve(){
  
 }
 ```
+
+**Problem 3:** https://cses.fi/problemset/task/1641
+This is very similar to the 2 sum problem but now there are 3 values that sum up to target and O(n^2) can pass. To go from 2 sum to 3 sum, we can iterate through every point and fix the middle value, then perform 2 sums on the remaining point. If left pointer goes over middle value or right pointer goes before middle value, we break since this means we didn't find a solution. Otherwise we use the same logic as 2 sums where we keep track of the sum and see if its bigger or smaller. Basically just 2 sums for every middle value.
+```cpp
+void solve(){
+	int n,x; cin>>n>>x;
+    vector <pi> v;
+ 
+    rep(i,0,n){
+        int u; cin>>u; v.pb({u,i+1}); 
+    }
+    sort(v.begin(),v.end());
+    rep(i,0,n){
+        int l = 0;
+        int r = n-1;
+        while(l < i && i < r){
+            if(v[i].first + v[l].first + v[r].first < x){
+                l++;
+            }
+            else if(v[i].first + v[l].first + v[r].first > x){
+                r--;
+            }
+            else if(i != l && i != r){
+                cout<<v[i].second<<" "<<v[l].second<<" "<<v[r].second<<endl;
+                return;
+            }
+            else{
+                break;
+            }
+        }
+    }
+    
+    cout<<"IMPOSSIBLE"<<endl;
+
+}   
+```
