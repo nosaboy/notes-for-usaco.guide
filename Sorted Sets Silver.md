@@ -54,56 +54,7 @@ pq.pop(); // [1,2]
 ### Problems
 
 **Problem 1:** https://cses.fi/problemset/task/1091
-Simulate the scenario with a multiset or priority queue. Note that the scoreboard only changes if one of the 3 scenario occurs:
-- if a cow was not on the scoreboard before, but now is on the scoreboard.
-- if a cow was on the scoreboard before, but fell off
-- if a cow was on teh scoreboard with multiple cows, but now the cow exceeded every cow to become the only cow on the scoreboard.
-```cpp
-void solve(){
-    ll n,g; cin>>n>>g;
-    vector <tuple<ll,ll,ll>> v;
-    map <ll,ll> mp;
-    set <pair<ll,ll>> ms;
-    set<ll> st;
-    rep(i,0,n){
-        ll a,b,c;
-        cin>>a>>b>>c;
-        mp[b] = g;
-        st.insert(b);
-        v.pb({a,b,c});
-    }
-    for(auto it = st.begin();it != st.end();it++){
-        ms.insert({g, *it});
-    }
-    ms.insert({g,0});
-    mp[0] = g;
-    sort(v.begin(),v.end());
-    ll ans =0 ;
-    rep(i,0,n){
-        auto it = ms.end();--it; pi ok = *it; ll mx = ok.first;
-        ll rn = get<1>(v[i]); 
-        ms.erase(ms.find({mp[rn],rn}));
-        auto itr = ms.end();--itr; pi pok = *itr; ll pmx = pok.first;
-        //cout<<mx<<" "<<pmx<<endl;
-        if(mp[rn] != mx && mp[rn] + get<2>(v[i]) >= mx){
-            ans++;
-          
-        }
-        else if(mp[rn] == mx && mx == pmx && mp[rn] + get<2>(v[i]) > mx){
-            ans++;
-        }
-        else if(mp[rn] == mx && mp[rn] + get<2>(v[i]) <= pmx){
-                ans++;   
-            
-        }
-        
-        mp[rn] += get<2>(v[i]);
-        ms.insert({mp[rn],rn});
-    }
-    cout<<ans<<endl;
-}
-
-```
+Simulate the scenario with a multiset or priority queue. 
 **Problem 2:** https://codeforces.com/contest/702/problem/C
 Did this problem, but we can just use binary search and simulate the process
 
@@ -314,8 +265,58 @@ void solve(){
 
 }
 ```
+**Problem 7:** http://www.usaco.org/index.php?page=viewproblem2&cpid=763
+Note that the scoreboard only changes if one of the 3 scenario occurs:
+- if a cow was not on the scoreboard before, but now is on the scoreboard.
+- if a cow was on the scoreboard before, but fell off
+- if a cow was on teh scoreboard with multiple cows, but now the cow exceeded every cow to become the only cow on the scoreboard.
+We simulate the scenario using a multiset, keeping track of who is currently the leader and if the number of cows on the scoreboard is bigger than 1. Make sure to also insert({g,0}) to account for all the other cows that have a score of g during the whole simulation.
+```cpp
+void solve(){
+    ll n,g; cin>>n>>g;
+    vector <tuple<ll,ll,ll>> v;
+    map <ll,ll> mp;
+    set <pair<ll,ll>> ms;
+    set<ll> st;
+    rep(i,0,n){
+        ll a,b,c;
+        cin>>a>>b>>c;
+        mp[b] = g;
+        st.insert(b);
+        v.pb({a,b,c});
+    }
+    for(auto it = st.begin();it != st.end();it++){
+        ms.insert({g, *it});
+    }
+    ms.insert({g,0});
+    mp[0] = g;
+    sort(v.begin(),v.end());
+    ll ans =0 ;
+    rep(i,0,n){
+        auto it = ms.end();--it; pi ok = *it; ll mx = ok.first;
+        ll rn = get<1>(v[i]); 
+        ms.erase(ms.find({mp[rn],rn}));
+        auto itr = ms.end();--itr; pi pok = *itr; ll pmx = pok.first;
+        //cout<<mx<<" "<<pmx<<endl;
+        if(mp[rn] != mx && mp[rn] + get<2>(v[i]) >= mx){
+            ans++;
+          
+        }
+        else if(mp[rn] == mx && mx == pmx && mp[rn] + get<2>(v[i]) > mx){
+            ans++;
+        }
+        else if(mp[rn] == mx && mp[rn] + get<2>(v[i]) <= pmx){
+                ans++;   
+            
+        }
+        
+        mp[rn] += get<2>(v[i]);
+        ms.insert({mp[rn],rn});
+    }
+    cout<<ans<<endl;
+}
 
-
+```
 **Problem 7:** https://codeforces.com/gym/104002/problem/E
 I really didn't have any clue how to solve this problem. I guess my greedy thinking was just wrong. I was thinking maybe we can first pick the max possible sum for k/2 numbers, then we see how to optimize so that it is possible. However, I did not know how to optimize so that we get the maximum sum such that everything works out. This was the wrong greedy approach, I just glimpsed through the editorial and actually, you just have to maintain the maximum **as you go along the array**. Lets always maintain x/2 values after we went through the first x numbers. For the i+1 and i+2 numbers they can either both be in the final or just 1 in the final( since we must have x/2 by the end of it). These are both possible if we just erase the smallest to make room. I still don't know how you can come up with this approach so I **got to review the editorial in more detail.** 
 ```cpp
