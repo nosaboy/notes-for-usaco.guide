@@ -2,6 +2,7 @@
 Create 2 pointers that iterates through the array in the same direction
 We don't know its specific operation for every loop but we can estimate its complexity based on the total
 number of operations: usually its O(n) since we always either increase left or right pointer
+
 **Problem 1:** https://cses.fi/problemset/task/1640
 We sort the array.
 We maintain a two pointers starting with left at 0 and right at n-1. Moving the left pointer right increases the sum while moving the right pointer left decreases the sum. If current sum is smaller, we increase. If current sum is bigger we decrease. We do this until either we find the target sum or the pointers intersect meaning it is IMPOSSIBLE.
