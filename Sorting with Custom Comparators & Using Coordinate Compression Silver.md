@@ -389,3 +389,111 @@ void solve(){
 }
 ```
 
+
+
+
+**Problem 6:** http://www.usaco.org/index.php?page=viewproblem2&cpid=645
+We know that given a range of points, the area of a box that incloses all points is (max(x) - min(x)) * (max(y) - min(y)).
+
+We can only split the field into two non-overlapping boxes if both of them are vertical that covers all y values in a certain range of x, or both horizontal where they cover all x values in a certain range of y values.
+We can brute force all of these boxes.
+```cpp
+bool cmp(const pi &x, const pi &y){ // horizonal case sorts by second first
+    if(x.second == y.second){
+        return x.first < y.first;
+    }
+    return x.second < y.second;
+}
+
+void solve(){
+	int n;cin>>n;
+    vector <pi> v;
+    multiset <int> firx;
+    multiset <int> firy;
+    multiset <int> secx;
+    multiset <int> secy;
+    int mxx = 0; int mnx = 1000000005; int mxy = 0; int mny = 1000000005;
+    rep(i,0,n){
+        int x,y;
+        cin>>x>>y;
+        v.pb({x,y});
+        secx.insert(x);
+        secy.insert(y);
+        mxx = max(mxx, x); mxy = max(mxy, y);
+        mnx = min(mnx, x); mny = min(mny, y);
+    }
+
+    sort(v.begin(),v.end());
+    // vertical case
+    int ans = (mxx-mnx) * (mxy - mny);
+    int one = (mxx-mnx) * (mxy - mny); // orginial value with only 1 field
+    rep(i,0,n){
+        // putting the next cow in the first field
+        firx.insert(v[i].first);
+        firy.insert(v[i].second);
+        secx.erase(secx.find(v[i].first));
+        secy.erase(secy.find(v[i].second));
+        if(i == n-1 || v[i].first != v[i+1].first){ //we construct a box
+            
+            if(firx.size() > 0 && secx.size() > 0){
+                // calculating min max x values of both fields
+                auto firleftx = firx.begin();
+                auto firrightx = firx.end(); firrightx--;
+                auto firlefty = firy.begin();
+                auto firrighty = firy.end(); firrighty--;
+
+                // calculating min max y values of both fields
+                auto secleftx = secx.begin();
+                auto secrightx = secx.end(); secrightx--;
+                auto seclefty = secy.begin();
+                auto secrighty = secy.end(); secrighty--;
+                ans = min(ans, (*firrightx - *firleftx) * (*firrighty - *firlefty) + (*secrightx - *secleftx) * (*secrighty - *seclefty));
+                
+
+            }
+            
+        }
+        
+      
+    }
+    // horizontal case
+    rep(i,0,n){
+
+        secx.insert(v[i].first);
+        secy.insert(v[i].second);
+     
+    }
+    firx.clear(); firy.clear();
+    sort(v.begin(),v.end(),cmp);
+    rep(i,0,n){
+        // putting the next cow in the first field
+        firx.insert(v[i].first);
+        firy.insert(v[i].second);
+        secx.erase(secx.find(v[i].first));
+        secy.erase(secy.find(v[i].second));
+        if(i == n-1 || v[i].second != v[i+1].second){ //we construct a box
+            
+            if(firx.size() > 0 && secx.size() > 0){
+                // calculating min max x values of both fields
+                auto firleftx = firx.begin();
+                auto firrightx = firx.end(); firrightx--;
+                auto firlefty = firy.begin();
+                auto firrighty = firy.end(); firrighty--;
+
+                // calculating min max y values of both fields
+                auto secleftx = secx.begin();
+                auto secrightx = secx.end(); secrightx--;
+                auto seclefty = secy.begin();
+                auto secrighty = secy.end(); secrighty--;
+                ans = min(ans, (*firrightx - *firleftx) * (*firrighty - *firlefty) + (*secrightx - *secleftx) * (*secrighty - *seclefty));
+               
+
+            }
+            
+        }
+        
+      
+    }
+    cout<<one-ans<<endl;
+}   
+```
