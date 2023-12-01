@@ -1,12 +1,40 @@
 ### Usage
 Create 2 pointers that iterates through the array in the same direction
 We don't know its specific operation for every loop but we can estimate its complexity based on the total
-number of operations: varies from O(n) to O(nlogn)
+number of operations: usually its O(n) since we always either increase left or right pointer
+**Problem 1:** https://cses.fi/problemset/task/1640
+We sort the array.
+We maintain a two pointers starting with left at 0 and right at n-1. Moving the left pointer right increases the sum while moving the right pointer left decreases the sum. If current sum is smaller, we increase. If current sum is bigger we decrease. We do this until either we find the target sum or the pointers intersect meaning it is IMPOSSIBLE.
+If the sum is smaller we 
+```cpp
+void solve(){
+	int n,x; cin>>n>>x;
+    vector <pi> v;
+ 
+    rep(i,0,n){
+        int u; cin>>u; v.pb({u,i+1}); 
+    }
+    sort(v.begin(),v.end());
+    int l = 0;
+    int r = n-1;
+    while(l < r){
+        if(v[l].first + v[r].first < x){
+            l++;
+        }
+        else if(v[l].first + v[r].first > x){
+            r--;
+        }
+        else{
+            cout<<v[l].second<<" "<<v[r].second<<endl;
+            return;
+        }
+    }
+    cout<<"IMPOSSIBLE"<<endl;
 
+}   
+```
 
 **Problem 2:** https://cses.fi/problemset/task/1660
-Given a subarray of n positive integers and integer x, determine if there exists a subarray whose sum is x.
-**Solution:**
 Maintain 2 pointers that represents the left and right of a subarray. If the current subarray is bigger 
 than our target x, we know that to make it smaller we must increment the left so the first number is not
 counted. If our subarray sum is smaller, we must increment right since doing that will add on a new number
