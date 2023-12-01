@@ -265,7 +265,7 @@ void solve(){
 
 }
 ```
-**Problem 7:** http://www.usaco.org/index.php?page=viewproblem2&cpid=763
+**Problem 5:** http://www.usaco.org/index.php?page=viewproblem2&cpid=763
 Note that the scoreboard only changes if one of the 3 scenario occurs:
 - if a cow was not on the scoreboard before, but now is on the scoreboard.
 - if a cow was on the scoreboard before, but fell off
@@ -315,7 +315,63 @@ void solve(){
     }
     cout<<ans<<endl;
 }
+```
+**Problem 6:** http://www.usaco.org/index.php?page=viewproblem2&cpid=859
+We just simulate the situation. For every iteration we delete exactly one cow. If there are no cows waiting, we take the next cow on the timeline, if there are cows waiting, we take the cow with the biggest senority.The sorting of times of cows and the seniority of cows are done using multisets. **Can you do this with pq?** Then we just erase that cow from whichever multiset and continue to do this until both multisets are empty meaning we went through every cow.
 
+
+```cpp
+void solve(){
+    int n; cin>>n;
+    multiset<tuple<int,int,int>> ms;
+                           
+    rep(i,0,n){
+        int a,b; cin>>a>>b;
+        ms.insert({a,i,b});
+        
+    }
+    int time= 0;
+    multiset<tuple<int,int,int>> wait;
+    int ans = 0;
+    while(ms.size() > 0 || wait.size() > 0){
+        auto it = ms.begin();
+        pi ok;
+        if(wait.size()){
+            
+            it = wait.begin();
+            tuple <int,int,int> pok = *it;
+            ok.first = get<0>(pok);
+            ok.second = get<2>(pok);
+            ans = max(ans, time - get<1>(pok));
+            time += ok.second;
+            wait.erase(wait.begin());
+        }
+        else{
+            it = ms.begin();
+            tuple <int,int,int> pok = *it;
+            ok.first = get<1>(pok);
+            ok.second = get<2>(pok);
+            time = get<0>(pok)+ok.second;
+            ms.erase(pok);
+        }
+        vector <tuple<int,int,int>> del;
+        for(auto itr = ms.begin();itr!= ms.end();itr++){
+            tuple <int,int,int> pok = *itr;
+            if(get<0>(pok) <= time){
+                del.pb(pok);
+                wait.insert({get<1>(pok),get<0>(pok),get<2>(pok)});
+            }
+            else{
+                break;
+            }
+        }
+        rep(i,0,del.size()){
+            ms.erase(ms.find(del[i]));
+        }
+
+    }
+    cout<<ans<<endl;
+}
 ```
 **Problem 7:** https://codeforces.com/gym/104002/problem/E
 I really didn't have any clue how to solve this problem. I guess my greedy thinking was just wrong. I was thinking maybe we can first pick the max possible sum for k/2 numbers, then we see how to optimize so that it is possible. However, I did not know how to optimize so that we get the maximum sum such that everything works out. This was the wrong greedy approach, I just glimpsed through the editorial and actually, you just have to maintain the maximum **as you go along the array**. Lets always maintain x/2 values after we went through the first x numbers. For the i+1 and i+2 numbers they can either both be in the final or just 1 in the final( since we must have x/2 by the end of it). These are both possible if we just erase the smallest to make room. I still don't know how you can come up with this approach so I **got to review the editorial in more detail.** 
