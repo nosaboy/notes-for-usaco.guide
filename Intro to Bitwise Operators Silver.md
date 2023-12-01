@@ -318,7 +318,52 @@ void solve(){
 ```
 **Problem 7:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1327
 ```cpp
+void solve(){
+    ll c,n; cin>>c>>n;
+    int ans[(n+1)]={0}; 
+    int vis[(1<<c)]={0};
+    int dist[(1<<c)]={0};
+    rep(i,0,(1<<c)){
+        vis[i] = 0;
+    }
+    vi a;
+    queue<int> q;
+    rep(i,0,n){
+        int cnt = 0;
+        string s; cin>>s;
+        rep(j,0,c){
+            if(s[j] == 'G'){
+                cnt += (1<<j);
+            }
+        }
+        a.pb(cnt);
+        q.push(cnt);
+        vis[cnt] = 1;
+        dist[cnt] = 0;
+                                        
+    }
+   
+    while(!q.empty()){
+        int x = q.front(); q.pop();
 
+        rep(i,0,c){
+            if(vis[x^(1<<i)]==0){
+                
+                q.push(x^(1<<i));
+                   
+                vis[x^(1<<i)] = 1;
+                dist[x^(1<<i)] = dist[x]+1;
+                
+            }
+            
+        }
+
+        
+    }
+    rep(i,0,n){
+        cout<<c- dist[((1<<c)-1)^a[i]]<<endl;
+    }
+}
 ```
 
 **Problem 10:** https://cses.fi/problemset/task/2185/
