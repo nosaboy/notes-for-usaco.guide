@@ -26,8 +26,10 @@ void solve(){
     int sum = 0;
     int ans = 0;
     rep(r,0,n){ // we iterate through every r
-        sum += v[r]; // we first increase sum since from previous loop we know the sum is smaller or equal to target
-        while(l < r && sum > x){ // we decrease sum until the sum is smaller or equal to target       
+        sum += v[r]; // we first increase sum since from previous loop we know
+	//the sum is smaller or equal to target
+        while(l < r && sum > x){
+	// we decrease sum until the sum is smaller or equal to target       
             sum -= v[l];
             l++;
         }
