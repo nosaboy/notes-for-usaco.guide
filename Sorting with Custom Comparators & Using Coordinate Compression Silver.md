@@ -259,4 +259,133 @@ void solve(){
 
 ```
 
+**Problem 3:** http://www.usaco.org/index.php?page=viewproblem2&cpid=787
+This problem was greedy. It is always better to sell a cow that produces smaller milk per day. If a cow's milk can sell some interval, it is most optimal that a cow that produces a larger amount of milk sells its milk at a higher interval. We precompute the interval each cow sells( sort cow by most produced milk per day, then that milk must sell as much as possible of the maximum price). So the first cow sells as much milk as possible from the largest buyer, etc. 
+We then see if it's more optimal to sell the cow rather than sell its milk in the interval. Overall, the hard part is getting the correct greedy to solve this.
+```cpp
+void solve(){
+    ll n,m,r;
+    cin>>n>>m>>r;
+    vector<ll> v; vector <pair<ll,ll>> osa; vector<ll> a;
+    rep(i,0,n){
+        ll u; cin>>u;
+        v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    
+    rep(i,0,m){
+        ll x,y;
+        cin>>x>>y;
+        osa.pb({y,x});
+    }
+    sort(osa.rbegin(),osa.rend());
+    ll pre[n]={0};
+    ll it = 0; 
+    for(int i = n-1;i>=0;i--){
+        ll cnt = v[i];
+        ll nosa = 0;
+        //cout<<cnt<<endl;
+        while(it < m && cnt > 0){
+            ll lol = 0;
+            ll ok = min(osa[it].second , cnt);
+            if(osa[it].second <= cnt){
+                lol=1;
+            }
+            else{
+                osa[it].second -= cnt;
+            }
+            
+            nosa += ok * osa[it].first;
+            cnt -= ok;
+            it+=lol;
+            
+        }
+        pre[i] = nosa;
+    }
+    rep(i,0,r){
+        ll u; cin>>u;
+        a.pb(u);
+    }
+    sort(a.rbegin(),a.rend());
+  
+    ll itr = 0;
+    ll ans = 0;
+    rep(i,0,v.size()){
+
+        if(itr < r && pre[i] < a[itr]){
+            ans += a[itr];
+            itr++;           
+        }
+        else{            
+            ans += pre[i];           
+        }
+        //cout<<v[i]<<" "<<pre[i]<<" "<<ans<<endl;
+    }
+    cout<<ans<<endl;  
+}
+
+```
+
+
+**Problem 4:** http://www.usaco.org/index.php?page=viewproblem2&cpid=896
+A mountain with peak (x,y) covers another mountain with peak (a,b) on the right of it( with x <= a) if x + y >= a+b. Proof: Lets imagine we erase the x coordinates until we reach x as 0 so we have (0,y) and (a-x,b) so we want to prove y1 >= a + b - x1. If a + b - x1 < y1 it must mean that it is within the region of y = -x + y1 -> math coordinate geo or smth. Thus, we can just check for every coordinate to the right and delete that if its sum satisfies the inequality. We then reverse the x coordinates( and not the y coordinate) so we can check the other way(right to left for the other side of the mountain) for every coordinate remaining. We then print out the remaining coordinates after checking both ways.
+**There is a easier solution with less lines of code, please review**
+```cpp
+void solve(){
+    ll n; cin>>n;
+    multiset <pair<ll,ll>> left;
+    vector <pair<ll,ll>> v;
+    rep(i,0,n){
+        ll x,y; cin>>x>>y;
+        left.insert({{x+y},y}); v.pb({x,y});
+    }
+    sort(v.begin(),v.end());
+    multiset <pair<ll,ll>> right;
+    rep(i,0,n){
+        ll x = v[i].first; ll y = v[i].second;
+        if(left.find({x+y,y}) != left.end()){
+            while(left.size()>0){
+                pair<ll,ll> ok = *left.begin();
+                if(ok.first - x <= y){
+                    left.erase(left.find(ok));
+                }
+                else{
+                    break;
+                }
+            }
+            //cout<<x<<" "<<y<<endl;
+            x = 1000000005 - x; 
+            right.insert({x+y,y});
+        }
+        
+    }
+    for(auto it = right.begin();it != right.end();it++){
+        pi ok = *it;
+        //cout<<ok.first<<" "<<ok.second<<endl;
+    }
+    sort(v.rbegin(),v.rend());
+    //cout<<endl;
+    ll ans = 0;
+    rep(i,0,n){
+        ll x = 1000000005 -v[i].first ; ll y = v[i].second;
+        
+        if(right.find({x+y,y}) != right.end()){
+            
+            while(right.size()>0){
+                pair<ll,ll> ok = *right.begin();
+                //cout<<ok.first<<" "<<ok.first - x<<" "<<y<<endl;
+                if(ok.first - x <= y){
+                    right.erase(right.find(ok));
+                }
+                else{
+                    break;
+                }
+            }
+            ans++;
+        }
+        
+    }
+    cout<<ans<<endl;
+}
+```
 
