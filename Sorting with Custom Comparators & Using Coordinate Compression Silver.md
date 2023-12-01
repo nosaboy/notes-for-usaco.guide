@@ -396,7 +396,8 @@ void solve(){
 We know that given a range of points, the area of a box that incloses all points is (max(x) - min(x)) * (max(y) - min(y)).
 
 We can only split the field into two non-overlapping boxes if both of them are vertical that covers all y values in a certain range of x, or both horizontal where they cover all x values in a certain range of y values.
-We can brute force all of these boxes.
+We can brute force all of these boxes since there are at most 50000 distinct x and y coordinates, and find the area for each box, updating the value. We put the next cow from the second field to the first field to create the next 2 boxes. 
+
 ```cpp
 bool cmp(const pi &x, const pi &y){ // horizonal case sorts by second first
     if(x.second == y.second){
