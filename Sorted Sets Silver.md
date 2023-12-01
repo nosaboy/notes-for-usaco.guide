@@ -54,8 +54,56 @@ pq.pop(); // [1,2]
 ### Problems
 
 **Problem 1:** https://cses.fi/problemset/task/1091
-Simulate the scenario with a multiset or priority queue
+Simulate the scenario with a multiset or priority queue. Note that the scoreboard only changes if one of the 3 scenario occurs:
+- if a cow was not on the scoreboard before, but now is on the scoreboard.
+- if a cow was on the scoreboard before, but fell off
+- if a cow was on teh scoreboard with multiple cows, but now the cow exceeded every cow to become the only cow on the scoreboard.
+```cpp
+void solve(){
+    ll n,g; cin>>n>>g;
+    vector <tuple<ll,ll,ll>> v;
+    map <ll,ll> mp;
+    set <pair<ll,ll>> ms;
+    set<ll> st;
+    rep(i,0,n){
+        ll a,b,c;
+        cin>>a>>b>>c;
+        mp[b] = g;
+        st.insert(b);
+        v.pb({a,b,c});
+    }
+    for(auto it = st.begin();it != st.end();it++){
+        ms.insert({g, *it});
+    }
+    ms.insert({g,0});
+    mp[0] = g;
+    sort(v.begin(),v.end());
+    ll ans =0 ;
+    rep(i,0,n){
+        auto it = ms.end();--it; pi ok = *it; ll mx = ok.first;
+        ll rn = get<1>(v[i]); 
+        ms.erase(ms.find({mp[rn],rn}));
+        auto itr = ms.end();--itr; pi pok = *itr; ll pmx = pok.first;
+        //cout<<mx<<" "<<pmx<<endl;
+        if(mp[rn] != mx && mp[rn] + get<2>(v[i]) >= mx){
+            ans++;
+          
+        }
+        else if(mp[rn] == mx && mx == pmx && mp[rn] + get<2>(v[i]) > mx){
+            ans++;
+        }
+        else if(mp[rn] == mx && mp[rn] + get<2>(v[i]) <= pmx){
+                ans++;   
+            
+        }
+        
+        mp[rn] += get<2>(v[i]);
+        ms.insert({mp[rn],rn});
+    }
+    cout<<ans<<endl;
+}
 
+```
 **Problem 2:** https://codeforces.com/contest/702/problem/C
 Did this problem, but we can just use binary search and simulate the process
 
