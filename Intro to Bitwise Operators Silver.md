@@ -316,7 +316,10 @@ void solve(){
 
 }   
 ```
+**Problem 7:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1327
+```cpp
 
+```
 
 **Problem 10:** https://cses.fi/problemset/task/2185/
 We just use PIE and brute force through all possible divisors of some set of primes. We know that for PIE we just add and subtract continuously. One thing to note which caused the first WAs was because sometimes the products of primes will overflow long long. We must check the product is smaller than 10^18 or else m/product = 0. We can do this without overflowing by doing: if **a > 10^18/b**, a * b > 10^18.
