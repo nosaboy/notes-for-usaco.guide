@@ -2,7 +2,32 @@
 Create 2 pointers that iterates through the array in the same direction
 We don't know its specific operation for every loop but we can estimate its complexity based on the total
 number of operations: usually its O(n) since we always either increase left or right pointer
+**Example 1:** https://codeforces.com/contest/279/problem/B
+Keep a two-pointer the represents the sum of the current subarray. As we add the next value by right++, we only subtract values if we have to, meaning we subtract until we have sum <= t again, then we just print max(right - left + 1).
+```cpp
+void solve(){
+	int n,t; cin>>n>>t;
+    vi v;
+    rep(i,0,n){
+        int u; cin>>u; v.pb(u);
+    }
+    int l = 0;
+    int sum = 0;
+    int ans = 0;
+    rep(r,0,n){
+        sum += v[r];
+        while(l < r && sum > t){
+            sum -= v[l]; l++;
+            
+        }
+        if(sum <= t){
+            ans = max(ans, r- l + 1);
+        }
+    }
+    cout<<ans<<endl;
 
+}   
+```
 **Problem 1:** https://cses.fi/problemset/task/1640
 We sort the array.
 We maintain a two pointers starting with left at 0 and right at n-1. Moving the left pointer right increases the sum while moving the right pointer left decreases the sum. If current sum is smaller, we increase. If current sum is bigger we decrease. We do this until either we find the target sum or the pointers intersect meaning it is IMPOSSIBLE.
