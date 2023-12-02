@@ -225,7 +225,7 @@ void solve(){
 }
 ```
 
-**Given array of integers with small range, find number of subarray such that number of unique elements is <= x.**
+**Given array of integers, find number of subarray such that number of unique elements is <= x.**
 Check properties to confirm that we can use two pointers:
 First property: If subarray l...r has <= x distinct values, then l'...r' where l <= l' <= r' <= r must also have <= k distinct values since its distinct values cannot go over the distinct values of l...r, thus first property is valid.
 Second property: Can we calculate the good() function fast?
@@ -234,6 +234,8 @@ We can count the number of x in our current subarray. Then, if the count reaches
 good(): return distinct <= k;
 add(x): if mp$[x] == 0$ distinct++;
 delete(x): if mp$[x] == 1$ distinct--;
+
+**NOTE:** To solve this problem in O(n), we can switch the map for array.
 
 ```cpp
 void solve(){
@@ -274,6 +276,7 @@ void solve(){
 
 First property: If subarray l...r satisfies, then l'...r' where l <= l' <= r' <= r satisfies since the min will only get larger and max will only get smaller, so difference can only get smaller.
 Second property: We can keep track of min and max using multiset, then insert and erase accordingly. We then find max - min and only increment left if we are forced to: when max 0 min > x. 
+
 ```cpp
 void solve(){
 	ll n,x; cin>>n>>x;
@@ -303,7 +306,8 @@ void solve(){
  
 }
 ```
-
+#### Two Stacks Method
+**NOTE:** This can also be solved in O(n) using stack.
 
 **Example 1:** https://codeforces.com/contest/279/problem/B
 Keep a two-pointer the represents the sum of the current subarray. As we add the next value by right++, we only subtract values if we have to, meaning we subtract until we have sum <= t again, then we just print max(right - left + 1).
