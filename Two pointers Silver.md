@@ -2,6 +2,69 @@
 Create 2 pointers that iterates through the array in the same direction
 We don't know its specific operation for every loop but we can estimate its complexity based on the total
 number of operations: usually its O(n) since we always either increase left or right pointer
+#### CF ITMO Pilot
+**Merge two sorted arrays into one big array**
+https://codeforces.com/edu/course/2/lesson/9/1/practice/contest/307092/problem/B
+
+We can maintain two pointers that begin at each array. We know that during every iteration, the next smallest number will be one of the two values at the front of the array. We can then insert this value then go on to the next iteration by increasing that pointer by 1. Since in every iteration we increase a pointer by 1, there is at most 2n iterations so time complexity is O(n).
+```cpp
+void solve(){
+	// merge sorted array a length and sorted array b length m to array c
+    int n,m; cin>>n>>m;
+    vi a; vi b; vi c;
+    rep(i,0,n){ // sorted
+        int u; cin>>u; a.pb(u);
+    }
+    rep(i,0,m){ // sorted
+        int u; cin>>u; b.pb(u);
+    }
+    int i = 0; int j = 0; // two pointers
+    while(i < a.size() || j < b.size()){
+        if(j == b.size() || i < a.size() && a[i] < b[j]){
+            // it is more optimal to pick a if we already picked
+            // all elements in b or ai < bi and we havent picked
+            // all elements in a
+            c.pb(a[i]); i++;
+        }   
+        else{
+            c.pb(b[j]); j++;
+        }
+
+    }
+    rep(i,0,c.size()){
+        cout<<c[i]<<" ";
+    }
+
+}   
+```
+**Given array a and b, for each element in b:(b_i), find how many elements in a is smaller than b_i.**
+https://codeforces.com/edu/course/2/lesson/9/1/practice/contest/307092/problem/A
+
+Lets say a have k elements smaller than b_i, then all those k elements will be smaller than b_{i+1}. Lets maintain two-pointers **assuming a and b are sorted**. For each b_i we will go through a_j until a_j > b_i. This j will be the number of a_j smaller than b_i.
+```cpp
+void solve(){
+    int n,m; cin>>n>>m;
+    vi a; vi b; vi c;
+    rep(i,0,n){ // sorted
+        int u; cin>>u; a.pb(u);
+    }
+    rep(i,0,m){ // sorted
+        int u; cin>>u; b.pb(u);
+    }
+    int ans[m];
+    int j = 0;
+    rep(i,0,m){
+        while(a[j] < b[i] && j < n){
+            j++;
+        }
+        ans[i] = j; // 0th index so there is exactly j elements that is smaller
+    }
+    rep(i,0,m){
+        cout<<ans[i]<<" ";
+    }
+
+}   
+```
 **Example 1:** https://codeforces.com/contest/279/problem/B
 Keep a two-pointer the represents the sum of the current subarray. As we add the next value by right++, we only subtract values if we have to, meaning we subtract until we have sum <= t again, then we just print max(right - left + 1).
 ```cpp
@@ -30,7 +93,7 @@ void solve(){
 ```
 **Problem 1:** https://cses.fi/problemset/task/1640
 We sort the array.
-We maintain a two pointers starting with left at 0 and right at n-1. Moving the left pointer right increases the sum while moving the right pointer left decreases the sum. If current sum is smaller, we increase. If current sum is bigger we decrease. We do this until either we find the target sum or the pointers intersect meaning it is IMPOSSIBLE.
+We maintain a two-pointers starting with left at 0 and right at n-1. Moving the left pointer right increases the sum while moving the right pointer left decreases the sum. If current sum is smaller, we increase. If current sum is bigger we decrease. We do this until either we find the target sum or the pointers intersect meaning it is IMPOSSIBLE.
 If the sum is smaller we 
 ```cpp
 void solve(){
