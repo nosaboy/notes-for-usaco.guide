@@ -390,7 +390,52 @@ void solve(){
 ```
 
 
+**Problem 5:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1064
+We could still "simulate the process" in O(n^2). We know that if a north cow is stopped by a east cow, then the north cow will not reach any east cow above the east cow that stopped it. Similarily, if a east cow is stopped by a north cow, it cannot be stopped by any north cow to the right of that north cow. Thus, we sort the arrays and just greedily simulate.  
+```cpp
+bool cmp(const pi &x, const pi &y){
+    return x.second < y.second;
+}
+void solve(){
+    int n; cin>>n;
+    vector <pi> a; vector <pi> b;
+    vector <pi> v;
+    rep(i,0,n){
+        char c; int x,y; cin>>c>>x>>y;
+        if(c == 'E'){
+            a.pb({x,y});
+        }
+        else{
+            b.pb({x,y});
+        }
+        v.pb({x,y});
+    }
+    sort(b.begin(),b.end()); // sort by x
+    sort(a.begin(),a.end(),cmp); // sort by y
+    map <pi,int> vis;
+    map <pi,int> mp;
+    rep(i,0,a.size()){
+        rep(j,0,b.size()){
+            if(b[j].first >= a[i].first && b[j].second <= a[i].second && vis[{b[j].first, b[j].second}] == 0){ // east and north must intersect
+                int east = b[j].first - a[i].first;
+                int north = a[i].second - b[j].second;
+                if(east > north){ // north cow blocks east
+                    mp[{b[j].first, b[j].second}] += mp[{a[i].first, a[i].second}]+1;
+                    break;
+                }
+                else if(north > east){
+                    mp[{a[i].first, a[i].second}] += mp[{b[j].first, b[j].second}]+1;
+                    vis[{b[j].first, b[j].second}] = 1;
+                }
+            }
+        }
+    }
 
+    rep(i,0,n){
+        cout<<mp[{v[i].first,v[i].second}]<<endl;
+    }
+}
+```
 
 **Problem 6:** http://www.usaco.org/index.php?page=viewproblem2&cpid=645
 We know that given a range of points, the area of a box that incloses all points is (max(x) - min(x)) * (max(y) - min(y)).
