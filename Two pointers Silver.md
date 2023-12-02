@@ -438,3 +438,36 @@ void solve(){
 
 }   
 ```
+**Problem 4:** http://www.usaco.org/index.php?page=viewproblem2&cpid=738
+We are basically asked to minimize the maximum sum of pairings, so the optimal pairing of cows is to always pair the most possible at the moment with the least possible. We first sort cows by their value, then create two pointers where we pair the least value with the most value, and subtract the number of cows of that value accordingly.
+```cpp
+void solve(){
+    int n; cin>>n;
+    int l = 0;
+    int r = n-1;
+    vector <pi> v;
+    rep(i,0,n){
+        ll x,y; cin>>x>>y;
+        v.pb({y,x});
+    }
+    sort(v.begin(),v.end());
+    int ans = 0;
+    while(l <= r){
+        if(v[l].second < v[r].second){
+            v[r].second -= v[l].second;
+            ans = max(ans, v[l].first + v[r].first);
+            l++;
+        }
+        else if(v[l].second > v[r].second){
+            v[l].second -= v[r].second;
+            ans = max(ans, v[l].first + v[r].first);
+            r--;
+        }
+        else{
+            ans = max(ans, v[l].first + v[r].first);
+            l++; r--;
+        }
+    }
+    cout<<ans<<endl;
+}
+```
