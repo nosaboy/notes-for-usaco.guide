@@ -1,8 +1,8 @@
-### Usage
+# Usage
 Create 2 pointers that iterates through the array in the same direction
 We don't know its specific operation for every loop but we can estimate its complexity based on the total
 number of operations: usually its O(n) since we always either increase left or right pointer
-#### CF ITMO Pilot
+## CF ITMO Pilot
 **Merge two sorted arrays into one big array**
 https://codeforces.com/edu/course/2/lesson/9/1/practice/contest/307092/problem/B
 
@@ -66,7 +66,7 @@ void solve(){
 }
 
 ```
-### Subarray/segment of "good" sums
+## Subarray/segment of "good" sums
 - Calculating the max/min length of segements/subarray that satisfy some condition
 - Caculate the number of segments/subarrays that satisfy some condition
 
@@ -306,7 +306,7 @@ void solve(){
  
 }
 ```
-#### Two Stacks Method
+### Two Stacks Method
 **NOTE:** This can also be solved in O(n) using stack.
 
 **Example 1:** https://codeforces.com/contest/279/problem/B
