@@ -63,8 +63,248 @@ void solve(){
         cout<<ans[i]<<" ";
     }
 
-}   
+}
+
 ```
+### Subarray/segment of "good" sums
+- Calculating the max/min length of segements/subarray that satisfy some condition
+- Caculate the number of segments/subarrays that satisfy some condition
+
+**Use Two Pointers if these two properties are satisfied:**
+**Property 1:** one of the following is met:
+- if the segment $[L,R]$ is good, then any segment nested in it is also good
+	- If l...r is good, then l'...r' is good where l <= l' <= r' <= r.
+	- **First Example:** If subarray works, smaller subarray within subarray also works
+- if the segment $[L,R]$ is good, then any segment that contains it is also good
+	- If l...r is good, then l'...r' is good where l' <= l <= r <= r'.
+	- **Second Example:** If smaller subarray works, bigger subarray including smaller subarray also works
+**Property 2:**
+We can recalculate function we are checking (check if current segment is good or bad) in fast enough time like in O(1), while moving the left or right border by one to the right.
+
+The code for two pointers will then look something like:
+```cpp
+L = 0
+for R = 0..n-1
+    add(a[R])
+    while not good():
+        remove(a[L])
+        L++
+```
+where we have to implement the add(element), remove(element), and good() = check function. 
+
+**Given array v of nonnegative integers and integer x, find the longest segment such that sum of segments is at most x.**
+https://codeforces.com/edu/course/2/lesson/9/2/practice/contest/307093/problem/A
+
+This is similar to the subarray sum problem(Problem 1). We can loop the right border and keep deleting the left elements until the sum is smaller than x, in which case we do ans = max(ans, r - l + 1) and increment right border again.
+```cpp
+void solve(){
+	ll n,x; cin>>n>>x;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    int l = 0;
+    
+    ll sum = 0;
+    int ans = -1;
+    rep(r,0,n){ // we iterate through every r
+        sum += v[r]; // we first increase sum since from previous loop we know
+	//the sum is smaller or equal to target
+        while(l < r && sum > x){
+	// we decrease sum until the sum is smaller than target       
+            sum -= v[l];
+            l++;
+        }
+        if(sum <= x){ // count the length if sum is AT MOST target
+            ans= max(ans, r - l + 1);
+        }
+    }
+    if(ans == -1){ // didnt find subarray
+        cout<<0<<endl;
+        return;
+    }
+    cout<<ans<<endl;
+ 
+}
+```
+**Given array v of nonnegative integers and integer x, find the shortest segment such that sum of segments is at least x.**
+https://codeforces.com/edu/course/2/lesson/9/2/practice/contest/307093/problem/B
+
+We use similar approach as above, except now we want to delete as much as possible for every right border. We first check if its possible to delete a left element, we then delete it and update the sum. We stop if deleting the left element results in the sum being smaller than x.
+
+```cpp
+void solve(){
+	ll n,x; cin>>n>>x;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    int l = 0;
+    
+    ll sum = 0;
+    int ans = 1000000005;
+    rep(r,0,n){ // we iterate through every r
+        sum += v[r]; // we first increase sum since from previous loop we know
+	//the sum is smaller or equal to target
+        while(l < r && sum - v[l] >= x){   
+            sum -= v[l];
+            l++;
+        }
+        if(sum >= x){ // count the length if sum is AT MOST target
+            ans= min(ans, r - l + 1);
+        }
+    }
+    if(ans == 1000000005){ // didnt find subarray
+        cout<<-1<<endl;
+        return;
+    }
+    cout<<ans<<endl;
+ 
+}
+```
+**Given array v of nonnegative integers and integer x, find the NUMBER of segment such that sum of segments is at most x.**
+
+We have to find number of segments instead of max/min length segments. This is similar. After fixing the right border, we can note that if the maximum length that ends at right border is l, then all other left borders > l and smaller than r works since we must only decrease the sum as we decrease the length meaning it will not get bigger. Thus we just add r - l to our answer since its the number of choices of the left border for every right border r. Here we defined that our current l doesn't work so we add 
+r - l + 1.
+
+```cpp
+void solve(){
+	ll n,x; cin>>n>>x;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    int l = 0;
+    
+    ll sum = 0;
+    ll ans = 0;
+    rep(r,0,n){ // we iterate through every r
+        sum += v[r]; // we first increase sum since from previous loop we know
+	//the sum is smaller or equal to target
+        while(l < r && sum > x){
+	// we decrease sum until the sum is smaller than target       
+            sum -= v[l];
+            l++;
+        }
+        if(sum <= x){ // count the length if sum is AT MOST target
+            ans+=r-(l-1); // l-1 since the current l is the first l that goes over the sum
+        }
+    }
+    cout<<ans<<endl;
+ 
+}
+```
+**Given array v of nonnegative integers and integer x, find the NUMBER of segment such that sum of segments is at least x.**
+
+This is the same thing as above where we count length. We fix border r and find the minimum length segment such that l...r >= x. We then know that if we increase the length, it will still be bigger, so the count for all good subarrays that end with r is just l+1 since all left borders from 0 to l work( here we defined that l itself works).
+```cpp
+void solve(){
+	ll n,x; cin>>n>>x;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    ll l = 0;
+    
+    ll sum = 0;
+    ll ans = 0;
+    rep(r,0,n){ // we iterate through every r
+        sum += v[r]; // we first increase sum since from previous loop we know
+	//the sum is smaller or equal to target
+        while(l < r && sum - v[l] >= x){   
+            sum -= v[l];
+            l++;
+        }
+        if(sum >= x){ // count the length if sum is AT MOST target
+            ans+= l+1;
+        }
+    }
+ 
+    cout<<ans<<endl;
+ 
+}
+```
+
+**Given array of integers with small range, find number of subarray such that number of unique elements is <= x.**
+Check properties to confirm that we can use two pointers:
+First property: If subarray l...r has <= x distinct values, then l'...r' where l <= l' <= r' <= r must also have <= k distinct values since its distinct values cannot go over the distinct values of l...r, thus first property is valid.
+Second property: Can we calculate the good() function fast?
+We can count the number of x in our current subarray. Then, if the count reaches 0 after deletion the number of distinct values decreases by 1, and if count increases by 1 after insertion and it was 0 before, the number of distinct values increases by 1. This can all be done using map in O(logn). We then check if number of distinct values is <= k, then only increment left if we are forced(distinct values > k). Then calculate max length or number of subarrays using previous logic. 
+
+good(): return distinct <= k;
+add(x): if mp$[x] == 0$ distinct++;
+delete(x): if mp$[x] == 1$ distinct--;
+
+```cpp
+void solve(){
+	ll n,x; cin>>n>>x;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    ll l = 0;
+    
+    ll ans = 0;
+    map <int,int> mp;
+    int distinct = 0;
+    rep(r,0,n){ 
+        if(mp[v[r]] == 0){ // add()
+            distinct++;
+        }
+        mp[v[r]]++;
+        while(l < r && distinct > x){ // good()
+            // delete()
+            mp[v[l]]--; 
+            if(mp[v[l]] == 0){
+                distinct--;
+            }
+            l++;
+        }
+        if(distinct <= x){ // check if valid subarray
+            ans += r - l + 1;
+        }
+    }
+ 
+    cout<<ans<<endl;
+ 
+}
+```
+
+**Given array, subarray is good if max element - min element of subarray <= x. Find number of good subarray.**
+
+First property: If subarray l...r satisfies, then l'...r' where l <= l' <= r' <= r satisfies since the min will only get larger and max will only get smaller, so difference can only get smaller.
+Second property: We can keep track of min and max using multiset, then insert and erase accordingly. We then find max - min and only increment left if we are forced to: when max 0 min > x. 
+```cpp
+void solve(){
+	ll n,x; cin>>n>>x;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    ll l = 0;
+    
+    ll ans = 0;
+    multiset <ll> ms;
+    rep(r,0,n){ 
+        ms.insert(v[r]); // add()
+        auto it = ms.end(); --it;
+        while(l < r && *it - *ms.begin() > x){ // good()
+            // delete()
+            ms.erase(ms.find(v[l]));
+            l++;
+            it = ms.end(); --it; // currently the biggest element
+        }
+        if(*it - *ms.begin() <= x){ // check if valid subarray
+            ans += r - l + 1;
+        }
+    }
+
+    cout<<ans<<endl;
+ 
+}
+```
+
+
 **Example 1:** https://codeforces.com/contest/279/problem/B
 Keep a two-pointer the represents the sum of the current subarray. As we add the next value by right++, we only subtract values if we have to, meaning we subtract until we have sum <= t again, then we just print max(right - left + 1).
 ```cpp
