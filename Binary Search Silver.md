@@ -114,7 +114,8 @@ else{
 }
 ```
 
-**Given array a and query that have two values l,r, determine number of integers inside range l...r inclusive.
+**Given array a and query that have two values l,r, determine number of integers inside range l...r inclusive.**
+We can find the left bound for all numbers >= l and right bound for all numbers <= r using binary search methods above. Then ans = right - left + 1.
 ```cpp
 void solve(){
     int n; cin>>n; vi v;
