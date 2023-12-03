@@ -44,7 +44,7 @@ We can either find x, find value to right of x, or find value to left of x. So t
 
 Maintain two pointers l,r such that a_l < x and a_r >= x is always satisfied. Add negative inf and positive inf on both sides, and use that as starting values of l and r, so let index of l = -1(-inf) and r = n(+inf).
 We calculate mid = (l+r)/2, then if mid < x, we set l = mid which satisfies a_l < x since all numbers smaller than mid will also satisfy a_l < x. Similarily if mid >= x we set r = mid since all bigger elements will also satisfy r = mid, so both conditions are maintained.
-The two conditions cannot be satisfied by a single element, so we do while(l+1 < r). In the end, the left element will be v_l and right element will be v_r. We can then find ans = whichever is minimal: ans - v_l or v_r - ans.
+The two conditions cannot be satisfied by a single element, so we do while(l+1 < r) since we want to loop until the two converge, meaning if we have l = l and r = l+1 we know that we have already found the answers so we break. In the end, the left element will be v_l and right element will be v_r. We can then find ans = whichever is minimal: ans - v_l or v_r - ans.
 If all elements smaller than x and we are looking for 
 
 **Maximum index such that value smaller or equal to than given x**
@@ -114,3 +114,45 @@ else{
 }
 ```
 
+**Given array a and query that have two values l,r, determine number of integers inside range l...r inclusive.
+```cpp
+void solve(){
+    int n; cin>>n; vi v;
+	rep(i,0,n){
+        int u; cin>>u; v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    int k; cin>>k;
+    while(k--){
+        int x,y; cin>>x>>y;
+        int l = -1; int r = n; 
+        int left = 0;
+        while(l + 1 < r){ // until the two pointers converge
+            int mid = (l+r) / 2;
+            if(v[mid] < x){ // x.....mid
+                l = mid; // all values smaller will satisfy v[l] < mid
+                
+            }
+            else{ // mid.....x
+                r = mid;
+            }
+        }
+        left = l;
+        l = -1; r = n;
+        while(l + 1 < r){ 
+ 
+            int mid = (l+r) / 2;
+            if(v[mid] > y){ // y.....mid
+                r = mid; // all values bigger will satisfy v[r] > mid
+                
+            }
+            else{ // mid.....y
+                l = mid;
+            }
+        }
+        cout<<(r-1) - (left + 1) + 1<<endl; // left is left + 1 while right is r - 1
+
+    }
+    
+}
+```
