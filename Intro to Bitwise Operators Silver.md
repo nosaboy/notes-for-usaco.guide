@@ -314,8 +314,41 @@ void solve(){
     }
     cout<<ans<<endl;
 
-}   
+}
+
+
 ```
+**Problem 6:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1182
+This is **not an easy problem**, in fact I think this is one of the few problems I had no clue on, I had to check the **very long editorial** and other peoples solutions to sort of know a general direction. I implemented the brute force & recursion method. There are two other methods that requires bits( the offical method) and one that requires two pointers to make it O(log(max(a,b))). **Please review the official analysis and each solution carefully, prove all steps and think about how to come up with the observations**. I am still not convinced that my code won't TLE, well I sorta do since im dividing things by 2 each time but I don't understand why you should never add twice and the details. **So please review this problem carefully as I was not able to get it with lots of thinking.**
+```cpp
+ll rec(ll a, ll b){
+    if(a == b){
+        return 0;
+    }
+    if(a > b){
+        if(a%2 == 0){
+            return 1 + rec(a/2, b);
+        }
+        else{
+            return 2 + rec((a+1)/2, b);
+        }
+    }
+    if(a < b){
+        if(b%2 == 0){
+            return min(b-a, 1 + rec(a, b/2));
+        }
+        else{
+            return min(b-a, 2 + rec(a, (b-1)/2));
+        }
+    }
+}
+void solve(){
+	ll a,b; cin>>a>>b;
+    cout<<rec(a,b)<<endl;
+    
+}
+```
+
 **Problem 7:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1327
 ```cpp
 void solve(){
