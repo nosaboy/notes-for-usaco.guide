@@ -86,7 +86,6 @@ bool cmp(string a, string b){
   return a.size() < b.size();
 }
 ```
-
 ### Coordinate Compression
 mapping each value to a smaller value based on its position in a sorted array.
 We do this when we have large values, but **we only care about their relative order**
@@ -112,6 +111,7 @@ int getccindex(int x){
  return lower_bound(v.begin(),v.end(), x) - v.begin(); // returns index of x in v
 }
 ```
+
 
 **Example 1:** https://codeforces.com/gym/102951/problem/D
 This is just prefix sums by summing up ranges but with larger constraints on the number line. 
@@ -172,6 +172,105 @@ void solve(){
 }
 ```
 
+# C++ Sets with Custom Comparators
+We can sort an array if we know whether an element comes before another element.
+We can define an ordering in a class so it can be used as C++ STL containers or functions that require ordering.
+
+We must define/implement function f(x,y) that returns a bool value of whether x comes before y or not for every pair of element x and y in array.
+Follows strick weak ordering, which satisfies:
+- Irreflexivity: f(x, x) = false.
+- Antisymmetry: If f(x, y) then !f(y, x).
+- Transitivity: If f(x, y) and f(y, z) then f(x, z).
+- Transitivity of Equivalence: Let equal(x, y) = !f(x, y) && !f(y, x). If equal(x, y) and equal(y, z) then equal(x, z).
+
+3 ways to do this:
+### Operator <()
+We can use the following format to define a sorting function inside the struct(type) itself.
+```cpp
+bool operator<(Type other) const
+```
+This returns true if current element goes before the "other" element and false if it goes after.
+Here is example:
+```cpp
+struct Edge // define struct
+{
+    int from, to, weight;
+    bool operator<(Edge other) const // sort comparator inside struct
+    {
+        return weight > other.weight; // sort by decreasing order
+    }
+};
+
+```
+Alternatively we can define comparator function outside 
+```cpp
+struct Edge {
+	int from, to, weight;
+};
+bool operator<(const Edge &x, const Edge &y) { return x.weight > y.weight; }
+```
+Thus, we can pass these in normal STL structures as type:
+```cpp
+vector<Edge> v;
+sort(v.begin(), v.end());
+priority_queue<Edge> pq;
+set<Edge> s;
+```
+and it will sort by decreasing based on Edge weight.
+
+### Define a Custom Comparator functions
+We can just define a function that takes in two parameters of same type and returns boolean( whether a goes before b or not)
+```cpp
+bool name(T a, T b)
+```
+Sort by decreasing:
+```cpp
+
+bool cmp(const Edge &x, const Edge &y){
+	return x.weight > y.weight;
+}
+sort(v.begin(),v.end(),cmp);
+```
+**Always consult STL reference on where to place the comparison function in an STL function.**
+
+### Functors
+Use comparison functions for STL containers using functors:
+```cpp
+struct Edge { // type
+	int from, to, weight;
+};
+
+struct cmp { // comparator function
+	bool operator()(const Edge &x, const Edge &y) const {
+		return x.weight > y.weight;
+	}
+};
+
+set<int, cmp> s; // using cmp
+priority_queue<int, vector<int>, cmp> pq; // using cmp
+
+```
+
+We can also use cmp as a normal sort function by adding ():
+```cpp
+vi v;
+sort(v.begin(),v.end(),cmp())
+```
+
+#### Built in Functor Classes
+```cpp
+sort(data.begin(), data.end(), greater<int>()); //decreasing order
+set<Edge, greater<Edge>> st; // does same thing as cmp above
+// valid:
+set<int, greater<int>> a;
+map<int, string, greater<int>> b;
+priority_queue<int, vector<int>, greater<int>> c;
+
+```
+
+Using const for before types for comparator functions ensures security: we don't change the values themselves, we only read them.
+
+Use stable sort if a = b under the conditions of f to **avoid undefined behaviour**.
 
 
 ### Problems
