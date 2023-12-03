@@ -307,7 +307,113 @@ void solve(){
 }
 ```
 ### Two Stacks Method
-**NOTE:** This can also be solved in O(n) using stack.
+**NOTE:** This can also be solved in O(n) using stacks. We maintain two stacks that represent some arbitrary left and right region of our subarray. We also maintain max and min stacks for each left and right stack that contains our original values, and calculate their "prefix max and min."
+
+Lets have positions 1 2 3 4 5 6 7 8 9 10, and let left stack contain 2 3 4, right stack contain 9 8 7 6 5 **From top to bottom order**. The top of left stack is the left most value. The top of right stack is the right most value. Then,
+Left max = 4 4 4
+Left min = 4 3 2
+Right max = 9 8 7 6 5
+Right min = 5 5 5 5 5
+
+Good()
+To calculate the min and max of subarray, we take the max and min value of both arrays, accessing them from the top of the prefix stack: max(rightmax.top(), leftmax.top()), min(rightmin.top(), leftmin.top())
+
+Add()
+To add some value from the right, we just add it to the top of the right stack since we are adding the right most element, so after adding 10 to the right stack we have
+Right stack = 10 9 8 7 6 5
+Right max = 10 9 8 7 6 5
+Right min = 5 5 5 5 5 5
+
+Delete()
+To delete a value from the left side we delete the top element from the left stack since we are deleting the left most element. If the left stack is empty, we still want to delete the left most value so we transfer all elements in the right stack to the left stack and recalculate all min and max values. To transfer, we want to push the top of the second stack one by one. This works because the top of second stack is the right most element so pushing it to the left stack first means that it will be at the bottom. We pushed the left most element of the right stack last meaning that it will go on top of the left stack, this means that everything in the left stack is still in order where top = more left element. Then update each min and max prefix stack accordingly.
+**Alternative solution using two stacks in O(n), faster time:**
+```cpp
+void solve(){
+	ll n,x; cin>>n>>x;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    ll l = 0;
+    
+    ll ans = 0;
+    stack <ll> left; stack <ll> leftmax; stack <ll> leftmin;
+    stack <ll> right; stack <ll> rightmax; stack <ll> rightmin;
+ 
+    rep(r,0,n){ 
+        // add()
+        right.push(v[r]); 
+        if(rightmax.size()){
+            rightmax.push(max(rightmax.top(), v[r]));
+            rightmin.push(min(rightmin.top(), v[r]));
+        }
+        else{
+            rightmax.push(v[r]);
+            rightmin.push(v[r]);
+        }
+        // setting max and min value of two arrays
+        ll mxval = 0;
+        if(leftmax.size()){
+            mxval = max(mxval, leftmax.top());
+        }
+        if(rightmax.size()){
+            mxval = max(mxval, rightmax.top());
+        }
+        ll mnval = 1000000000000000005;
+        if(leftmin.size()){
+            mnval = min(mnval, leftmin.top());
+        }
+        if(rightmin.size()){
+            mnval = min(mnval, rightmin.top());
+        }
+ 
+ 
+        while(l < r && mxval - mnval > x){ // good()
+            // delete()
+            l++;
+                
+           
+            if(left.size()==0){ // we must get elements from right stack
+                ll mn = 1000000000000000005; ll mx = 0;
+                while(right.size()){
+                    
+                    mn = min(mn, right.top());
+                    mx = max(mx, right.top());
+                    left.push(right.top()); leftmax.push(mx); leftmin.push(mn);
+                    right.pop(); rightmax.pop(); rightmin.pop();
+ 
+                }
+            }
+            left.pop();
+            leftmax.pop();
+            leftmin.pop();
+            mxval = 0;
+            if(leftmax.size()){
+                mxval = max(mxval, leftmax.top());
+            }
+            if(rightmax.size()){
+                mxval = max(mxval, rightmax.top());
+            }
+            mnval = 1000000000000000005;
+            if(leftmin.size()){
+                mnval = min(mnval, leftmin.top());
+            }
+            if(rightmin.size()){
+                mnval = min(mnval, rightmin.top());
+            }
+        }
+        //cout<<left.size()<<" "<<right.size()<<" "<<l<<" "<<r<<" "<<mxval<<" "<<mnval<<endl;
+        if(mxval - mnval <= x){ // check if valid subarray
+            ans += r - l + 1;
+        }
+    }
+ 
+    cout<<ans<<endl;
+ 
+}
+
+```
+
 
 **Example 1:** https://codeforces.com/contest/279/problem/B
 Keep a two-pointer the represents the sum of the current subarray. As we add the next value by right++, we only subtract values if we have to, meaning we subtract until we have sum <= t again, then we just print max(right - left + 1).
@@ -469,5 +575,113 @@ void solve(){
         }
     }
     cout<<ans<<endl;
+}
+```
+
+**Problem 6:** https://codeforces.com/problemset/problem/701/C
+This looks like the number of distinct values subarray problem, we can prove we can solve using two pointers.
+First property: if l...r has all distinct characters, then l'...r' where l' <= l <= r <= r' has all distinct characters, so the second condition is satisfied.
+Second property: We can keep track of the number of distinct characters by maintaining a counter like previously, then if it matches the total distinct elements we calculate ans, else we want to increase and decrease our coverage and subtract/add to our counter accordingly.
+```cpp
+void solve(){
+	int n; cin>>n;
+    string s;
+    cin>>s;
+    set <char> st;
+    rep(i,0,n){
+        st.insert(s[i]);
+    }
+    int types = st.size(); // # of distinct characters
+    map <char,int> mp;
+    int cnt = 0;
+    int l = 0;
+    int ans = 1000000000;
+    rep(r,0,n){
+        if(mp[s[r]] == 0){ // add()
+            cnt++;
+        }
+        mp[s[r]]++;
+       
+        while(l < r && ((mp[s[l]] == 1 && cnt > types) || (mp[s[l]] > 1 && cnt >= types))){ // if we can decrease length we will
+            // delete()
+            mp[s[l]]--;
+            if(mp[s[l]] == 0){
+                cnt--;
+            }
+            
+            l++;
+        }
+ 
+        if(cnt == types){
+            ans = min(ans, r - l + 1);
+        }
+    }
+    cout<<ans<<endl;
+ 
+}
+```
+
+**Problem 8:** http://www.usaco.org/index.php?page=viewproblem2&cpid=643
+Lets first calculate for one box, this is a simple two pointers where we calculate the maximum length for each r such that its values differ no more by k, where we sort the array.
+Then, lets store the prefix maximum of each r, so $pre[r]$ is the maximum length "good" subarray that is to the left of r. Then iterate for every r we set the maximum lengthed good l...r as the first box, then set the second box as the maximum subarray to the left of l so $pre[l-1]$, then ans will be the max of the sum of the two lengths. This works because if we dont choose the left most l such that subarray l...r is good, the answer will only get worse.
+```cpp
+void solve(){
+	int n,k; cin>>n>>k; vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end()); int ans = 0;
+    int l = 0;
+    pi pre[n+1];
+    pre[0] = {0,0};
+    rep(r,0,n){
+        while(l < r && v[r] - v[l] > k){
+            l++;
+        }
+        pre[r+1] = {max(pre[r].first, r - l + 1), l+1};
+
+        
+    }
+    rep(i,1,n+1){
+   
+        ans = max(ans, i - pre[i].second + 1 + pre[pre[i].second-1].first );
+    }
+    cout<<ans<<endl;
+
+}
+```
+
+**Problem 9:**
+We take care of each case seperately. 
+For the minimum number of moves, lets fix any interval length n as our final. Then the min moves to fill the intervals is the number of 0s in that interval. If the two borders are in the intveral we are done, else we can always place the border in one of the zeros and repeat this checking process again. There is an exception to this is when there is a block of cows and an extra cow somewhere else, the algo will count this as n - (n-1) = 1 moves when in reality you cant move the extra cow anywhere, thus we must use 2 moves to do this. Every other case we can always move one of the borders into the range. 
+
+For the max, we realize that we can move the first border of the first move as far as possible, like one more inside the next cow, so we move cow 0 to position of cow 1 + 1 to maximize coverage. We can keep filling 0s in front of it and make a chain as we go, stretching our moves. Thus the answer is the max of the number of 0s in between cow 1 and cow n-1 or number of 0s between cow 0 and cow n-2, since we move cow 0 or cow n-1 on the first move, and move it to some 0 inside the allowed range.
+
+```cpp
+void solve(){
+	int n;cin>>n; vi v;
+    rep(i,0,n){
+        int u;cin>>u; v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    int l = 0; int ans = 0;
+    rep(r,0,n){
+        while(l < r && v[r] - v[l] + 1 > n){
+            l++;
+        }
+        if(v[r] - v[l] + 1 <= n){
+            if(r - l + 1 == n-1 && (v[r] - v[l] + 1 != n)){ // special case where
+            // all cows except for one cow are block 
+            // and we have one cow outside of that block
+                ans = max(ans, n-2);
+            }
+            else{
+                ans = max(ans, r - l + 1);
+            }
+            
+        }
+    }
+    cout<<n - ans<<endl;
+    cout<<max(v[v.size() - 1] - v[1] + 1 - n + 1, v[v.size() - 2] - v[0] + 1 - n + 1);
 }
 ```
