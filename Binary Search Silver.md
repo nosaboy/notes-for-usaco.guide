@@ -257,3 +257,143 @@ void solve(){
 }
 ```
  
+### C++ Functions for Binary Search 
+- **lower_bound** returns a pointer to the first array element whose value is at least x.
+- **upper_bound** returns a pointer to the first array element whose value is larger than x.
+- **equal_range** returns both above pointers.
+All three built in functions assume that array is sorted and will return array.end() if element doesn't exist.
+Calculate how many elements in array a is equal to x using the above three functions:
+```cpp
+auto a = lower_bound(array, array+n, x);
+auto b = upper_bound(array, array+n, x);
+cout << b-a << "\n";
+auto r = equal_range(array, array+n, x);
+cout << r.second-r.first << "\n";
+```
+
+We can use binary search to find maximum value of a increasing then decreasing function( like the peak of a mountain).
+That is, we want to find maximum k such that f(k-1) < f(k), so k also satisfies f(k) > f(k+1).
+To do this if we have f(k) > f(k+1), we go left else if f(k) < f(k+1) we go right.
+
+
+## General Binary Search for monotonic functions
+### Find min such that f(x) is true: 000...00111...11
+If f(x) is true, then f(y) is true for all y >= x.
+If f(x) is false, then f(y) is false for all y <= x.
+```cpp
+hi++; // we will return n+1 if we found no element such that f(x) = true
+while (lo < hi) { // do not converge
+	int mid = lo + (hi - lo) / 2;
+	if (f(mid)) {
+		hi = mid; // mid works so everything above works
+	} else {
+		lo = mid + 1; // mid doesnt work so we search the next
+		// element in hopes that it works
+	}
+}
+return lo;
+```
+### Finding Maximum: 111...11000...00
+```cpp
+// if none of the values in the range work, return lo - 1
+lo--;
+while (lo < hi) {
+	// find the middle of the current range (rounding up)
+	int mid = lo + (hi - lo + 1) / 2;
+	if (f(mid)) {
+		// if mid works, then all numbers smaller than mid also work
+		lo = mid;
+	} else {
+		// if mid does not work, greater values would not work 
+  		// so we immediately skip this value and check the one below it
+		hi = mid - 1;
+	}
+}
+return lo;
+```
+
+**Example 1:** https://codeforces.com/contest/1201/problem/C
+Given array n, perform operations: increase a number by 1 k times. What is maximum median after k operations.
+
+We want to make median as large as possible using only k operations. This is monotonic function since if we can make x the median, we can make all numbers smaller than x median as well. We just run binary search on answer and see if its possible. To check good(), we greedily add 1s to closest values until we get n/2 numbers that are bigger than x. If this is possible in k operations, good(x) = true.
+
+```cpp
+void solve(){
+	
+    int n,k; cin>>n>>k;
+    vector <int> v;
+    rep(i,0,n){
+        int u; cin>>u; v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    int lo = -1; int hi = 2000000000;
+    while(lo  < hi){
+        int mid = lo + (hi - lo + 1) / 2;
+     
+        int cnt = 0; // number of values >= mid
+        ll sum = 0; // # of operations
+        // to prevent int overflow, we set to ll
+        for(int i = n-1;i>=0;i--){
+            if(cnt == n/2+1){
+                break;
+            }
+            if(v[i] < mid){
+                sum += mid-v[i];   
+            }
+            cnt++;
+        }
+        if(sum <= k){ // all left value works
+            lo = mid; 
+        }
+        else{ // mid doesnt work, so we search the one below
+            hi = mid-1;
+        }
+    }
+    cout<<lo<<endl;
+}
+```
+
+### Common Mistakes when implementing Binary Search
+
+#### Off by 1: If we have left = 0, right = 1, it will create an infinite loop under some conditions
+```cpp
+while (lo < hi) {
+		int mid = (lo + hi) / 2; // if lo = 0, hi = 1, we have (0+1)/2 = 0.
+		if (f(mid) <= x) {
+			lo = mid; // if this happens, lo = 0 and we repeat with lo = 0, hi = 1.
+		} else {
+			hi = mid - 1;
+		}
+}
+```
+To fix this we change the mid value: 
+```cpp
+mid = (lo+hi+1)/2
+```
+
+#### Negative Bounds
+If we do mid = (lo+hi)/2 and they are negative, the /2 will round up instead of rounding down. Thus, we use
+```cpp
+int mid = lo + (hi - lo) / 2;
+```
+
+**Example 2:** http://www.usaco.org/index.php?page=viewproblem2&cpid=666
+We can use lower_bound and upper_bound function to calculate the range we wanted as shown above with arrays.
+```cpp
+void solve(){
+	
+    int n,q; cin>>n>>q;
+    int a[n];
+    rep(i,0,n){
+        cin>>a[i];
+    }
+    sort(a,a+n);
+    while(q--){
+        int l,r; cin>>l>>r;
+        auto it = lower_bound(a, a+n, l);
+        auto itr = upper_bound(a, a+n, r);
+        cout << itr-it << "\n";
+    }
+    
+}
+```
