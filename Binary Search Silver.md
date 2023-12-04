@@ -157,3 +157,103 @@ void solve(){
     
 }
 ```
+
+### Binary Search for Answer
+We want to find some "good" value such that the function good() is monotonic meaning if x is good then x + 1 is good or if x is good then x - 1 is good. We usually have to find the first good value overall values( the first time where bad turns into good on number line: 000000...011111...).
+
+Use two pointers l and r where:
+- left pointer always points to some bad integer
+- right pointer always points to some good integer
+and we want to make the as close as possible by peeking the middle.
+
+```cpp
+while(l + 1 < r){
+        int m = (l+r)/2;
+        if(good(m)){
+            r = m; // we shrink r = m since m is good
+        }
+        else{
+            l = m; // set l = m since m is bad as well
+        }
+}
+```
+
+We can do this for any problem where good() is monotonic function and we are asked the max/min value that is good.
+Sometimes we don't know a specific r starting value that works. We can limit our search by only checking specific value such as powers of 2s. We can brute force over all 2^k and find a value that satisifies good() and set the as our starting r value.
+
+**Given n rectangles with h * l, find smallest square that all n rectangles can fit in it.**
+
+We can use binary search. The function good() to check if all rectangles fit in a square side length x is floor(x/l) * floor(x/r) >= n? THis is because we can fit floor(x/l) rectangles at for length and floor(x/r) rectangles for width.
+If for some x good(x) = true, we know that all values above x would also be true so the monotonic function looks like: 000...00111...111.
+Thus, we set that l = 0 and r = 1 is satisifed and find smallest r.
+
+```cpp
+void solve(){
+	
+    ll w,h,n; cin>>w>>h>>n;
+    ll l = 0;
+    
+    ll cnt = 1;
+    ll r;
+    rep(i,0,60){ // find some smallest good value 2^k
+        if((cnt/w) * (cnt/h) >= n){
+            r = cnt;
+            break;
+        }
+        cnt *= 2;
+    }
+    
+    while(l + 1 < r){
+        ll m = (l+r)/2;
+        if((m/w) * (m/h) >= n){ // m is good
+            // If we just put r = 10^18, this will int overflow 
+            // since if we peek m = 10^18 we have 10^32 multiplication
+            
+            r = m;
+        }
+        else{
+            l = m;
+        }
+    }
+    cout<<r<<endl; // the smallest good value
+   
+}
+```
+
+**Given length of n ropes, divide some ropes into k ropes of the same length, what is the maximum length of this length where it is a real number**
+
+This is hard to do greedily, but we can just simulate/check using binary search since if some rope length is satisfied, then all rope lengths below it is also satisfied. Thus, the monotonic function is 111...11000...000. Thus, we always set l = 1 and r = 0 and solve for max l. To find good() for a given x, we just greedily cut the max amount from each rope, so we have floor(length/x) for each rope. If the sum >= k, we know we can always form k ropes. 
+
+**Note: This problem deals with REAL NUMBERS** so we must use binary search on real numbers since the two pointers can be infinitely close together. We could do while(r - l > eps) for some small eps.
+A problem that leads to TLE is if the eps is too small, so when numbers are stored in floating point to some decimal and are taken the average it might remain the same number, so the average of 0.000...01 and 0.000...02 might be 0.000...01 since it does not store many digits after decimal, which causes the while loop to run infinitely. One way to fix TLE is to **set a max number of operations that we will loop through** and we break after we reached that many operations.
+Instead of while loop we can use for loop which fixes the number of operations. Given that l and r are both 10^9 and we want 10^-9 accuracy, it will take log(10^18) = 60 something operations. Thus we can just put 100 to be safe. We can check the exact number of operations we need by running binary search and printing l and r values, then finding when does double reach accuracy of eps = 10^-6 or smth.
+
+```cpp
+void solve(){
+	
+    int n,k; cin>>n>>k;
+    vector <int> v;
+    rep(i,0,n){
+        int u; cin>>u; v.pb(u);
+    }
+    double l = 0; // l is for sure good
+    double r = 1000000005; // r is for sure bad since we cant cut one piece
+    rep(i,0,100){ // constant = 100 operations
+        int sum = 0; // number of ropes floor()
+        double m = (l+r)/2;
+        rep(j,0,n){ // iterate through all ropes
+            sum += v[j]/m; 
+        }
+        if(sum >= k){
+            l = m;
+
+        }
+        else{
+            r = m;
+        }
+    }
+    cout<<setprecision(20)<<l<<endl;
+   
+}
+```
+ 
