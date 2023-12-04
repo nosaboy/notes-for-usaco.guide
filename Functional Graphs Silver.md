@@ -8,9 +8,32 @@ For each node x, lets precalculate all values f(x,k) where k < # of noes and **k
 
 To pre calculate each f(x,k), we use the following recursion for all powers of two k:
 - if k = 1, f(x,k) = $go[x]$ where go denotes the node x points to.
-- if k > 1, f(x,k) = f(f(x,k/2),k/2): Assuming that k/2 is calculated, we go k/2 steps from x and arrive at f(x,k/2), then take another k/2 steps to arrive at f(x,k). We do this for every node x and for each node x we only have logu numbers that we want to calculate, so the time is O(nlogu) where u is the maximum length of a jump.
+- if k > 1, f(x,k) = f(f(x,k/2),k/2): Assuming that k/2 is calculated, we go k/2 steps from x and arrive at f(x,k/2), then take another k/2 steps to arrive at f(x,k).
+
+We do this for every node x and for each node x we only have logu numbers that we want to calculate, so the time is O(nlogu) where u is the maximum length of a jump.
 
 ### Cycle detection
+If we start at a node x and walk, what is the first node in the cycle and how many nodes are in the cycle?
+
+We can keep track of visited cycles. If a node is visited a second time, it is the first node of the sequence and we can easily count length by setting timer: current - initial. This requires O(n) time and memory.
+
+#### Floyd's Algorithm
+We only need O(n) time and O(1) memory to detect cycle using Floyd's algorithm(tortise and hare).
+
+**Example 1:** https://codeforces.com/contest/1137/problem/D
+
+
+**Example 2:** https://codeforces.com/contest/1020/problem/B
+This can be solved in O(n^2) by simulating the process:
+```cpp
+
+```
+
+This can also be solved in O(n):
+
+```cpp
+
+```
 
 
 
