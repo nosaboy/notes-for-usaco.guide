@@ -1,4 +1,5 @@
-A graph where the outdegree of each node is exactly 1(each node goes to exactly one other node). 
+A graph where the outdegree of each node is exactly 1(each node goes to exactly one other node).
+### Kth Successor( binary jumping?)
 We can thus define f(x,k) as the node we will reach from x and walking k steps. Since each step there is exactly one option, f(x,k) always produces some other node.
 
 With naive approach of simulation, we can query f(x,k) in O(k) time. With smart preprocessing we can query f(x,k) in O(logk) time.
@@ -9,7 +10,7 @@ To pre calculate each f(x,k), we use the following recursion for all powers of t
 - if k = 1, f(x,k) = $go[x]$ where go denotes the node x points to.
 - if k > 1, f(x,k) = f(f(x,k/2),k/2): Assuming that k/2 is calculated, we go k/2 steps from x and arrive at f(x,k/2), then take another k/2 steps to arrive at f(x,k). We do this for every node x and for each node x we only have logu numbers that we want to calculate, so the time is O(nlogu) where u is the maximum length of a jump.
 
-
+### Cycle detection
 
 
 
