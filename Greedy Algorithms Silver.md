@@ -10,11 +10,33 @@ Moreover, we can only use 2 or 20 twice since using it three times will lead to 
 Thus, it is always better to always pick the maximum coin possible for each choice.
 **NOTE: for general case this doesn't always work. Sometimes we can find counter case and prove by contradiction.**
 
-#### Scheduling Problem
+#### Scheduling Problem: https://cses.fi/problemset/task/1629
 Given n events with their starting and ending times, find a schedule that includes as many events as possible.
 
 For every possible position after choosing some events, what is the best position we can be at for us to choose more events? We want to be at the **eariest time possible** so we have more events to choose from. Thus, we always pick a possible event that ends in the earliest time, since the weight of every event to the answer is the same( adds 1 to ans).
 
+```cpp
+void solve(){
+	
+    int n; cin>>n;
+    vector <pi> v;
+    rep(i,0,n){
+        int a,b; cin>>a>>b;
+        v.pb({b,a}); 
+    }
+    sort(v.begin(),v.end()); // sort by ending time
+    int end = 0;
+    int ans =0;
+    rep(i,0,n){
+        if(v[i].second >= end){
+            end = v[i].first;
+            ans++;
+        }
+    }
+    cout<<ans<<endl;
+    
+
+```
 #### Tasks and Deadlines
 Given n tasks with durations and deadlines, choose an order to perform the tasks. For each task, we earn d − x points where d is the task’s deadline and x is the moment when we finish the task. What is the largest score we can get?
 
