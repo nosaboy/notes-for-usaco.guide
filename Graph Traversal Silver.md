@@ -100,6 +100,26 @@ void dfs(int n){
    }
 }
 ```
+## Floodfill
+Special type of dfs( on a grid)
+Goes from (x,y) to (x+1,y), (x-1,y), (x,y+1), (x,y-1)
+Will probably MLE for 4000 x 4000 grid.
+```cpp
+// changes for neighbouring cells
+const int R_CHANGE[]{0, 1, 0, -1};
+const int C_CHANGE[]{1, 0, -1, 0};
+
+// checker for if node can be visited
+if (r < 0 || r >= row_num || c < 0 || c >= col_num || building[r][c] == '#' || visited[r][c]){
+	continue;
+}
+
+// try all neighbouring cells
+rep(i,0,4){
+	flood(r + R_CHANGE[i], c + C_CHANGE[i]);
+}
+	
+```
 
 ### BFS impl
 Searches by "flooding", visiting the earliests node(s) first, used for calculating distance of unweighted graph.
