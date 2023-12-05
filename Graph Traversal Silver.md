@@ -111,12 +111,12 @@ const int C_CHANGE[]{1, 0, -1, 0};
 
 // checker for if node can be visited
 if (r < 0 || r >= row_num || c < 0 || c >= col_num || building[r][c] == '#' || visited[r][c]){
-	continue;
+    continue;
 }
 
 // try all neighbouring cells
 rep(i,0,4){
-	flood(r + R_CHANGE[i], c + C_CHANGE[i]);
+    flood(r + R_CHANGE[i], c + C_CHANGE[i]);
 }
 	
 ```
