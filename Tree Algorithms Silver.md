@@ -1,7 +1,7 @@
 #### Calculate # of nodes in subtree or distance from node to root using dp
 ```cpp
-dist[MAX_N] // distance of node to root
-cnt[MAX_N] // number of nodes in subtree rooted at n
+int dist[MAX_N]; // distance of node to root
+int cnt[MAX_N]; // number of nodes in subtree rooted at n
 void dfs(int n){
     vis[n] = true;
     cnt[n]++; // subtree contains itself
@@ -9,14 +9,49 @@ void dfs(int n){
         if(!vis[aj[n][i]]){
             dist[aj[n][i]] = dist[n]+1; // distance of child = distance of node + 1
             dfs(aj[n][i]); // dfs child
-            cnt[n] += aj[n][i] // we add the # of nodes in subtree rooted at child to # of nodes in subtree of parent
+            cnt[n] += cnt[aj[n][i]]; // we add the # of nodes in subtree rooted at child to # of nodes in subtree of parent
         }
     }
 }
 ```
+**Example 1:** https://cses.fi/problemset/task/1674
+We just use dp to find the size of node subtree using the size of the subtrees of its children. For calculating cnt_of_x, we do 1 + cnt_of_child for every child. Or we can just count nodes in subtree normally: store cnt_of_x = 1 at the beginning, but we print cnt_of_x - 1 in the final answer since we don't include the node x itself.
+
+```cpp
+vi aj[200005];
+int cnt[200005]; // number of nodes in subtree rooted at n
+int vis[200005];
+void dfs(int n){
+    vis[n] = true;
+    // subtree size doesnt contain itself in this problem
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]); // dfs child
+            cnt[n] += cnt[aj[n][i]]+1; // we add the # of nodes in subtree rooted at child to # of nodes in subtree of parent
+        }
+    }
+}
+ 
+ 
+void solve(){
+    int n; cin>>n;
+    rep(i,2,n+1){
+        int u; cin>>u; 
+        aj[i].pb(u);
+        aj[u].pb(i);
+        cnt[i]=0;
+        vis[i]=0;
+    }
+    dfs(1);
+    rep(i,1,n+1){
+        cout<<cnt[i]<<" ";
+    }    
+}
+
+```
 
 ### Tree Diameter
-Calculate maxmium length of a path between any 2 nodes in a tree in O(n).
+Calculate maximum length of a path between any 2 nodes in a tree in O(n).
 #### DP Approach
 First **Root the tree at a random node**. Note that every path of the tree between 2 nodes always contains a "high node", the highest node in the path. We can first fix our highest node x, then the longest path that has x as the highest node is just the sum of the two longest distances from x to a **leaf** in its subtree. 
 We need to calculate two function:  
