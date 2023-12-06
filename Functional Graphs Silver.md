@@ -26,7 +26,25 @@ We only need O(n) time and O(1) memory to detect cycle using Floyd's algorithm(t
 **Example 2:** https://codeforces.com/contest/1020/problem/B
 This can be solved in O(n^2) by simulating the process:
 ```cpp
+void solve(){
+    int n; cin>>n;
+    int go[n+1];
+    rep(i,0,n){
+        cin>>go[i+1];
+    }
+    rep(i,1,n+1){ // simulate for every node
+        int vis[n+1]={0};
+        int curr = i;
+        while(vis[curr] == 0){
+            vis[curr] = 1;
+    
+            curr = go[curr];
 
+        }
+        cout<<curr<<" ";
+    }
+    cout<<endl;      
+}
 ```
 
 This can also be solved in O(n):
