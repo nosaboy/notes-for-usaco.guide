@@ -8,3 +8,6 @@ Sometimes we can **write a slower brute forcy solution** in order to:
 - earn partial credit
 - generate stress tests
 
+For each dp problem, we need 
+- base case
+- transition step
