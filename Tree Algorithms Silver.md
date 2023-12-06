@@ -33,13 +33,48 @@ We just pick the two largest toleaf(childs) and add their sum, then add the node
 ```cpp
 int toleaf[MAX_N];
 int maxlen[MAX_N];
-
+int ans = 0;
 void dfs(int n){
 	vis[n] = true;
+    vector <int> len; len.pb(0); len.pb(0); // if n is a leaf
 	rep(i,0,aj[n].size()){
 		if(!vis[aj[n][i]]){
 			dfs(aj[n][i]);
+            len.pb(toleaf[aj[n][i]]); // after dfs we have already calculated toleaf[child]
 		}
 	}
+    sort(len.rbegin(),len.rend());
+    toleaf[n] = len[0] + 1;
+    maxlen[n] = len[0] + len[1] + 1;
+    ans = max(maxlen[n]);
 }
 ```
+
+#### 2 DFS Approach
+
+We choose any node a, dfs and find the furthest node b from that node. Then, we can show that node b is an endpoint of the diameter. We can then dfs b to find the furthest node from that node c. The path from b to c will be the diameter.
+
+
+### All longest path in O(n)
+Calculate for every node the maximum length of a path beginning at that node: If we can find the maximum length starting at every node, the tree diameter problem turns into the max of these lengths.
+
+For every node x, we cam split this into 2 cases: The longest path either goes through a child of x or the parent of x.
+For the maximum path length that goes through child of x. Since this path from child x cannot then go back to x, this path is toleaf(x) = max(toleaf(child of x) + 1). We can use dp approach to calculate toleaf(x). 
+
+For the maximum path length that goes through parent of x, we can just calculate max path length of parent and second max path length of parent. This is so if the max length path from parent goes through x itself, we know that this path is impossible since we are constructing x -> parent x -> x, thus we take the second longest path from parent that **does not go back to x**(goes in a different direction). If the first longest path does not pass through x, we take that path.
+
+```cpp
+
+```
+
+### Binary Trees
+rooted tree where every node only has 0,1, or 2 children(left and right nodes).  
+Ways of traversing a tree:
+- pre-order: first process the root, then traverse the left subtree, then traverse the right subtree
+- in-order: first traverse the left subtree, then process the root, then traverse the right subtree
+- post-order: first traverse the left subtree, then traverse the right subtree, then process the root
+
+We can construct the tree if we know 
+- the pre-order and in-order
+- the post-order and in-order
+
