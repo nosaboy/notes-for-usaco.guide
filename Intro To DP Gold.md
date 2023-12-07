@@ -67,7 +67,7 @@ while(n > 0){
 }
 ```
 #### Counting number of solution
-**If the number of solutions are not ordered:** https://cses.fi/problemset/task/1635
+**If the solutions are not ordered:** https://cses.fi/problemset/task/1635
 The number of solutions is just the sum of the number of solutions of its subproblems, since 2 + 3 is different from 3 + 2.
 ```cpp
 void solve(){
@@ -95,3 +95,32 @@ void solve(){
        
 }
 ```
+**If the solutions ARE ordered:** https://cses.fi/problemset/task/1636/
+We want to sort and construct solution in order. After we stop picking a coin, we cannot pick that coin again in the future(we visualize each coin value as a block). We loop through each coin THEN loop through each sum. This way we can first process the number of ways for specificly that type of coin. This will make the construction of the sum be in order.
+```cpp
+void solve(){
+    int k,n; cin>>k>>n;
+    vi c;
+    rep(i,0,k){
+        int u;cin>>u;c.pb(u);
+    }
+    int dp[n+1];
+    rep(i,0,n+1){
+        dp[i] = 0;
+        
+    }
+    dp[0]=1;
+    rep(i,0,k){ // for every coin
+        rep(j,1,n+1){ // for every sum
+            // by doing looping every coin first, we ensure that every coin stays together in one block when constructing sum
+            if(j - c[i] >= 0){
+                dp[j] = add(dp[j], dp[j-c[i]]); // j can be constructed using all previous coins c_0...c_i
+                // by adding one c_i coin to j-c_i.
+            }
+        }
+    }
+    cout<<dp[n]<<endl;
+       
+}
+```
+
