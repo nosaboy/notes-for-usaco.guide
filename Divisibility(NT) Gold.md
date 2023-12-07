@@ -10,6 +10,4 @@ Note that if two integers a and b are no coprime, they have some common factor c
 ### CPH Chapter 21 Number Theory 
 
 Given prime factorization:
-$$
-n = p_1^{a_1}p_2^{a_2}...p_n^{a_b}
-$$
+$n = p_1^{a_1}p_2^{a_2}...p_n^{a_b}$
