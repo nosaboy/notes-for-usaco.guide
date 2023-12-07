@@ -123,4 +123,31 @@ void solve(){
        
 }
 ```
-
+**Problem 1:** https://codeforces.com/contest/1418/problem/C
+```cpp
+void solve(){
+    int n;cin>>n; vi v; v.pb(0);
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    int dp[n+1][2];
+    rep(i,0,n+1){
+        dp[i][0] = 1000000005;
+        dp[i][1] = 1000000005;
+    }
+    dp[0][0] = 0;
+    rep(i,1,n+1){
+        if(i > 1){
+            dp[i][0] = min(dp[i][0],dp[i-2][1]);
+            dp[i][0] = min(dp[i][0],dp[i-1][1]);
+            dp[i][1] = min(dp[i][1],dp[i-2][0] + v[i] + v[i-1]);   
+            dp[i][1] = min(dp[i][1],dp[i-1][0] + v[i]);   
+        }
+        else{
+            dp[i][0] = min(dp[i][0],dp[i-1][1]);
+            dp[i][1] = min(dp[i][1],dp[i-1][0] + v[i]);   
+        }
+    }
+    cout<<min(dp[n][0],dp[n][1])<<endl;
+}
+```
