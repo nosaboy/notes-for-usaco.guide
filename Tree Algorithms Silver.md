@@ -113,3 +113,35 @@ We can construct the tree if we know
 - the pre-order and in-order
 - the post-order and in-order
 
+**Problem 1:** https://codeforces.com/contest/755/problem/C
+If the furthest node reachable by x is y, that means x is in the same tree as y. We can thus create an edge between x and y to denote that they are connected. The number of trees will then be the distinct number of connected components after making the graph.
+```cpp
+vi aj[200005];
+int vis[200005];
+void dfs(int n){
+    vis[n]=true;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+        }
+    }
+}
+ 
+void solve(){
+    int n; cin>>n;
+    rep(i,1,n+1){
+        int u;cin>>u;
+        aj[i].pb(u);
+        aj[u].pb(i);
+    }
+    int cnt =0;
+    rep(i,1,n+1){
+        if(!vis[i]){
+            cnt++;
+            dfs(i);
+        }
+    }
+    cout<<cnt<<endl;    
+    
+}
+```
