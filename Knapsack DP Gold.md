@@ -156,3 +156,61 @@ void solve(){
     
 }
 ```
+
+**Problem 8:**
+
+**NOT FINISHED**
+```cpp
+void solve(){
+    int n,k;cin>>n>>k;
+    vi w; 
+    w.pb(0); 
+    int sum = 0;
+    rep(i,0,n){
+        int u;cin>>u;w.pb(u);
+        sum+=u;
+    }
+    sort(w.begin(),w.end());
+    int dp[k+1][505]={0};
+    dp[0][0]=1;
+    
+    rep(j,1,n+1){
+        for(int i = k;i>=0;i--){
+            if(i - w[j] >= 0){
+                dp[i][j]=1;
+                rep(l,1,n+1){
+                    dp[i][l] |= dp[i-w[j]][l];
+                }
+            }
+        }
+    }
+    vi v; // all numbers that is part of a subset that sums up to k
+    v.pb(0);
+    rep(i,0,n+1){
+        if(dp[k][i]){
+            v.pb(w[i]);
+        }
+    }
+    // second knapsack for new values
+    int dps[sum+1]={0};
+    dps[0]=1;
+    rep(j,1,v.size()+1){
+        for(int i = k;i>=0;i--){
+            if(i - v[j] >= 0){
+                dps[i] |= dps[i-v[j]];
+            }
+        }
+    }
+    vi ans;
+    rep(i,0,sum+1){
+        if(dps[i]){
+            ans.pb(i);
+        }
+    }
+    cout<<ans.size()<<endl;
+    rep(i,0,ans.size()){
+        cout<<ans[i]<<" ";
+    }
+}
+ 
+```
