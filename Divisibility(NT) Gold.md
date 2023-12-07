@@ -11,3 +11,8 @@ Note that if two integers a and b are no coprime, they have some common factor c
 
 Given prime factorization:
 $n = p_1^{a_1}p_2^{a_2}...p_n^{a_b}$
+
+Number of factors: $\tau(n) = \prod_{i=1}^k (a_i+1)$
+Sum of factors: $\sigma(n) = \prod_{i=1}^{k} (1+p_i+p_i^2+...+p_i^{a_i}) = \prod_{i=1}^{k} \frac{p_i^{a_i+1}-1}{p-1}$
+Product of factors: $\Mu(n) = n^{\tau(n)/2}$ Since every factor can be paired with another factor so that a * b = n.
+
