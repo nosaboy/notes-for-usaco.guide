@@ -123,7 +123,8 @@ void solve(){
        
 }
 ```
-**Problem 1:** https://codeforces.com/contest/1418/problem/C
+**Problem 1:** https://codeforces.com/contest/1418/problem/C 
+We can simulate the process using dp(kind of like frog but you need more stuff). 
 ```cpp
 void solve(){
     int n;cin>>n; vi v; v.pb(0);
