@@ -22,7 +22,7 @@ Product of factors: $\mu(n) = n^{\tau(n)/2}$ Since every factor can be paired wi
 - Twin prime conjecture: There is an infinite number of pairs of the form {p, p+2}, where both p and p+2 are primes.
 - Legendre’s conjecture: There is always a prime between numbers $n^2$ and $(n+1)^2$, where n is any positive integer.
 
-#### Prime factoring O(sqrt(n))
+#### Prime factoring - O(sqrt(n))
 We know that every prime factor can be between 2 and sqrtn. Thus we just bruteforce over all 2 to sqrtn and factor as much as possible. If we have some left in the end, that must be the last prime factor > sqrt(n).
 ```cpp
 vector<int> factors(int n) {
@@ -40,7 +40,7 @@ vector<int> factors(int n) {
 ```
 To check if this number is prime or not, if the returned primes vector.size() == 1, the prime factor only contains 1 prime number which is itself, so it must be prime. 
 
-#### Sieves of Eratosthenes: Check if prime for all numbers 2 to n O(nlog(log(n)))
+#### Sieves of Eratosthenes: Check if prime for all numbers 2 to n - O(nlog(log(n)))
 
 
 
