@@ -42,6 +42,35 @@ vector<int> factors(int n) {
 ```
 To check if this number is prime or not, if the returned primes vector.size() == 1, the prime factor only contains 1 prime number which is itself, so it must be prime. 
 
+**Example 1:** https://cses.fi/problemset/task/1713
+For each query, we can just compute each prime factor and its exponents in O(sqrt(x)), then use the # of divisors formula to find answer. Time is O(nsqrt(x)).
+```cpp
+void solve(){
+    int n;cin>>n;
+    rep(i,0,n){
+        int u;cin>>u;
+        int ans = 1;
+        rep(j,2,sqrt(u)+1){
+            if(u%j==0){
+                int cnt = 0;
+                while(u%j==0){
+                    u/=j;
+                    cnt++;
+                }
+                ans *= cnt+1;
+ 
+            }
+        }
+        if(u>1){
+            ans*=2;
+        }
+        cout<<ans<<endl;
+ 
+    }
+    
+}
+```
+We can speed this up using Sieves of Eratosthenes. 
 #### Sieves of Eratosthenes: Check if prime for all numbers 2 to n in O(nlog(log(n)))
 Faster way to precompute all primes from 2 to n. Computes integer array where $v[k] = 0$ if $k$ is prime or $v[k] = x$ when $k$ is composite and $x$ is a factor of k.
 For every new prime k we find, we set $v[k] = 0$, then go through every multiple of k from k+1 to n and put $v[ak] = k$ until $ak > n$. So x = {2k, 3k, 4k,...} will all have $v[x] = k.$
@@ -73,6 +102,56 @@ void sieve(int n){
 If we found that k is a prime, we loop through multiples of k in floor(n/k) times. Thus the worst case is if every number is prime, so max time is
 $\sum_{k=2}^{n} \lfloor\frac{n}{k}\rfloor = n/2 + n/3 + ... + n/n = nlogn.$ based off of harmonic sum. Since every number is not prime, this runs in O(nlog(log(n))) which is pretty close to O(n) with a **very small** multiplier
 
+CSES Counting Divisors using Sieves in O(xlog(log(x))): Cuts down to 1/3 of O(nsqrt(x)) solution time.
+We first calculate all possible primes. Then, we just cycle through all primes instead of recomputing primes in sqrt(x) for every x.
+- **NOTE: $x$ can have $\mathcal{O}(\log x)$ distinct prime factors**
+```cpp
+vi prime; 
+void sieve(int n){
+	int v[n+1]={0};
+	rep(k,2,n+1){
+		if(v[k]){ 
+			continue;
+		}
+		for(int x = 2*k;x<=n;x+=k){ 
+			v[x]=k;
+		}
+	}
+	rep(i,2,n+1){
+		if(v[i] == 0){
+			prime.pb(i);
+		}
+	}
+}
+void solve(){
+    int n;cin>>n;
+    sieve(1000005);
+    rep(i,0,n){
+        int u;cin>>u;
+        int ans = 1;
+        rep(j,0,prime.size()){
+            if(prime[j] > sqrt(u)){ // save more time
+                break;
+            }
+            if(u%prime[j]==0){
+                int cnt = 0;
+                while(u%prime[j]==0){
+                    u/=prime[j];
+                    cnt++;
+                }
+                ans *= cnt+1;
+
+            }
+        }
+        if(u>1){
+            ans*=2;
+        }
+        cout<<ans<<endl;
+
+    }
+    
+}
+```
 #### Euclidean Algorithm: Find gcd of (a,b) in O(log(min(a,b))) 
 If b = 0: gcd(a,b) = a
 Else: gcd(a,b) = gcd(b, a mod b) switch because now a mod b < b.
@@ -90,7 +169,15 @@ int gcd(int a, int b){
 
 #### Euler's Totient Function: Find number of positive integers smaller than n and coprime to n in O(sqrt(n))
 Number of positive integers smaller than n and coprime to n = $\phi(n) = \prod_{i=1}^{k} p_i^{a_i-1}\cdot(p_i-1)$
-After calculating the prime factors and their powers, we can then find phi(n) using above formula.
 ```cpp
 
 ```
+
+### MONT Chapter 1 Divisibility
+...didnt complete
+
+
+
+
+
+
