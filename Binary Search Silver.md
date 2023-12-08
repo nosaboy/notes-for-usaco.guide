@@ -397,3 +397,77 @@ void solve(){
     
 }
 ```
+**Problem 1:** http://www.usaco.org/index.php?page=viewproblem2&cpid=690
+We first note that we are trying to find the minimum of something, which might be binary search. We see that for each k we can do some simulation in order to find if its possible( after dance, time does not exceed T), and the function good(k) is monotonic. We can for each k in binary search simulate the total time for k using a multiset and adding the next number to the smallest number in the multiset.
+```cpp
+void solve(){
+    int n,t;cin>>n>>t;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u; v.pb(u);
+    }
+    int lo = 0; int hi = n;
+    while(lo < hi){
+        int mid = (lo+hi)/2;
+        multiset <int> ms;
+        rep(i,0,mid){
+            ms.insert(v[i]);
+        }
+        rep(i,mid,n){
+            auto it = ms.begin();
+            int cnt = *it;
+            ms.erase(ms.find(cnt));
+            ms.insert(cnt + v[i]);
+        }
+        auto it = ms.end(); --it;
+        int mx = *it;
+        if(mx <= t){ // takes no more than t minutes
+            hi = mid;
+        }
+        else{
+            lo = mid + 1;
+        }
+    }
+    cout<<hi<<endl;
+       
+}
+```
+
+**Problem 2:** http://www.usaco.org/index.php?page=viewproblem2&cpid=858
+At first glance it looks like greedy or bisearch cause we are finding the minimum of some simulation. It is probably easier to bisearch for answer and simulate the process. It is always optimal to take the cows that arrive next in the timeline. Choosing a cow that is not the next to arrive worsens the answer I think, thus we sort cows by arrival time first. Then we simulate the answer and for each bus we take the largest # of cows possible without exceeding mid. Then mid will work if we can take all cows given the m buses(All cows goes on some bus after m buses).
+```cpp
+void solve(){
+    int n,m,c;cin>>n>>m>>c;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    int lo = 0; int hi = 1000000000;
+    while(lo < hi){
+        int mid = (lo+hi)/2;
+        
+        int it = 0;
+        rep(i,0,m){ // for every bus
+            if(it < n){ // we still have cows left
+                int cnt = 0; // cows on the bus
+                int start = v[it]; // starting cow
+                while(it < n && cnt < c && v[it] - start <= mid){
+                    // good to append to bus
+                    cnt++;
+                    it++;
+                }
+            }
+            
+        }
+        if(it == n){ // mid is good
+            hi = mid;
+        }
+        else{
+            lo = mid + 1;
+        }
+    }
+    cout<<hi<<endl;
+}
+```
+
