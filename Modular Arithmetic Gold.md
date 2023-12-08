@@ -39,11 +39,47 @@ int pow(int x, int n) {
 #### Modular Inverse
 y is the inverse of x mod m if $xy \equiv 1 \pmod{m}$. The inverse of x mod m is $y = x^{-1}$. We can thus do mod division: We know that $xx^{-1} \equiv 1 \pmod{m}$, so $y/x \equiv x^{-1}\cdot y\pmod{m}.$
 Just multiply the numerator by the inverse of the denominator. 
-**NOTE: If x has an inverse mod m, then x must be coprime to m.** 
+**NOTE: x has an inverse mod m if and only if x and m are coprime** 
 We can calculate the inverse using Eulers theroem(FLT++): $x^{\phi(m)} \equiv 1 \pmod{n}$, so $x^{-1} = x^{\phi(m)-1}$. Where $\phi(m)$ is Eulers Totient Function.
 
-We can calculate mod inverse in O(sqrt(m) + log(phi(m))):
-first calculate the Eulers Totient Function of m in O(sqrt(m)), then use the pow function above to calculate x^{\phi(m)-1}$ in O(log(phi(m))).
+**Calculate using Extended Euclidean algorithm:**
+We can solve the linear diophantine equation ax + my = 1 using extended eulicdean algorithm. We can the find the mod inverse of x by taking everything to mod m: $ax + my \equiv ax \equiv 1 \pmod{m}$. The mod inverse of x is thus a.
+
+**Calculate using Eulers Theorem:**
+If a and m are coprime, then we can calculate using FLT: $a^{m-1} \equiv 1 \pmod{m},$ so the inverse is $a^{m-2}.$ 
+We can calculate mod inverse in O(log(m) + log(m)):
+first calculate the Eulers Totient Function of m in O(log(m)) if the prime factorization is known(if it isn't known, we have to calculate prime factors in O(sqrt(m)) time), then use the pow function above to calculate x^{\phi(m)-1}$ in O(log(phi(m))) = O(log(m)).
+
+**Beware: Division in mod takes O(logm) time**
 ```cpp
 ```
+https://cp-algorithms.com/algebra/module-inverse.html
+**Fast inv function(less than 50 operations) using Euclidean Division:**
+```cpp
+int inv(int a) {
+  return a <= 1 ? a : m - (long long)(m/a) * inv(m % a) % m;
+}
+```
 
+#### Benq ModInt template
+https://github.com/bqi343/cp-notebook/blob/master/Implementations/content/number-theory%20(11.1)/Modular%20Arithmetic/ModIntShort.h
+
+### Problems
+**Problem 1:** https://cses.fi/problemset/task/1712
+We know 10^9+7 is prime, so $a^{10^9+6} equiv 1 \pmod{10^9+7}.$ So the power of a loops back every $10^9+6$. Thus, $a^{b^c} \equiv a^{b^c \pmod{10^9+6}} \pmod{10^9+7}.$ Thus, we first calculate $x = b^c \pmod{10^9+6}$, then calculate $a^x \pmod{10^9+7}$ using power mod function.
+
+```cpp
+int pow(int x, int n, int m) {
+  if (n == 0) return 1%m;
+  long long u = pow(x,n/2,m);
+  u = (u*u)%m;
+  if (n%2 == 1){
+   u = (u*x)%m;
+  }
+  return u;
+}
+void solve(){
+    int a,b,c;cin>>a>>b>>c;
+    cout<<pow(a,pow(b,c,1000000006),1000000007)<<endl;
+}
+```
