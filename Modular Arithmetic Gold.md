@@ -40,4 +40,10 @@ int pow(int x, int n) {
 y is the inverse of x mod m if $xy \equiv 1 \pmod{m}$. The inverse of x mod m is $y = x^{-1}$. We can thus do mod division: We know that $xx^{-1} \equiv 1 \pmod{m}$, so $y/x \equiv x^{-1}\cdot y\pmod{m}.$
 Just multiply the numerator by the inverse of the denominator. 
 **NOTE: If x has an inverse mod m, then x must be coprime to m.** 
-We can calculate the inverse using Eulers theroem(FLT++): $x^{\phi(m) \equiv 1 \pmod{n}$, so $x^{-1} = x^{\phi(m)-1}$.
+We can calculate the inverse using Eulers theroem(FLT++): $x^{\phi(m) \equiv 1 \pmod{n}$, so $x^{-1} = x^{\phi(m)-1}$. Where $\phi(m)$ is Eulers Totient Function.
+
+We can calculate mod inverse in O(sqrt(m) + log(phi(m))):
+first calculate the Eulers Totient Function of m in O(sqrt(m)), then use the pow function above to calculate x^{\phi(m)-1}$ in O(log(phi(m))).
+```cpp
+```
+
