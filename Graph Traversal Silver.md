@@ -110,7 +110,7 @@ const int R_CHANGE[]{0, 1, 0, -1};
 const int C_CHANGE[]{1, 0, -1, 0};
 void flood(r,c){
     // checker for if node can be visited
-    if (r < 0 || r >= row_num || c < 0 || c >= col_num || building[r][c] == '#' || visited[r][c]){
+    if (r < 0 || r >= row_num || c < 0 || c >= col_num || g[r][c] == '#' || vis[r][c]){
         // bad states that we do not want to visit
         continue;
     }
