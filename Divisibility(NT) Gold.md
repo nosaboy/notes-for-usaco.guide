@@ -175,6 +175,9 @@ int lcm(a,b){
   return a/gcd(a,b) * b;
 }
 ```
+**IMPORTANT:** gcd and lcm are **both associative:**
+$\gcd(a_1, a_2, a_3, a_4) = \gcd(a_1, \gcd(a_2, \gcd(a_3, a_4))).$
+
 #### Euler's Totient Function: Find number of positive integers smaller than n and coprime to n in O(sqrt(n))
 Number of positive integers smaller than n and coprime to n = $\phi(n) = \prod_{i=1}^{k} p_i^{a_i-1}\cdot(p_i-1)$
 ```cpp
@@ -371,6 +374,33 @@ void solve(){
         cout<<(mx[{a/gcd(a,b), b/gcd(a,b)}]++)+1<<" ";
     }
     cout<<endl;
+    
+}
+```
+
+**Problem 6:** https://codeforces.com/contest/1349/problem/A
+We note that gcd and lcm are associative. 
+Lets solve for every v_i: x_i = gcd(lcm of vi with every other number in v). Then the answer is just the gcd of all x_i since gcd is associative. Thus, x_i = gcd(lcm of all numbers to the right of it with v_i). We know that lcm(a,b) must be divisible by a. And thus lcm(v_i,a) will be divisible by v_i for all other number a. Thus the gcd of that must include v_i. We then know that the gcd takes the minimum power of lcm(v_i,a)/v_i for every a. Thus gcd will take all gcd(every other number) in order to find their smallest exponents for each thing. Since this gcd(every other number together) might also include some of v_i itself, we must lcm or smth idk. **Anyway still kinda confused on what i did I just tried stuff and it worked so... BUT I DONT KNOW A CONCRETE CONVINCING MATH PROOF YK**
+
+```cpp
+void solve(){
+    int n;cin>>n;
+    ll suf[n];
+    suf[n-1]=0;
+    vector<ll> v;
+    rep(i,0,n){
+        int u;cin>>u; v.pb(u);
+        
+    }
+    for(int i = n-2;i>=0;i--){
+        suf[i] = gcd(suf[i+1], v[i+1]);
+    }
+    ll ans = 0;
+    rep(i,0,n){
+        ans = gcd(ans, lcm(v[i], suf[i]));
+    }
+    
+    cout<<ans<<endl;
     
 }
 ```
