@@ -471,3 +471,43 @@ void solve(){
 }
 ```
 
+**Problem 3:** http://www.usaco.org/index.php?page=viewproblem2&cpid=594
+The answer is monotonic(find the minimum) so we think of binary search. Let the fixed radius be R. The greedy strat is just to encompass as much hay as possible. So we start with the first hay at the border of the first radius to the left, so we place the first cow at v0 + R, then the range is v0 to v0 + 2R. We know that all hay in this range wont need another cow to destroy. We then look at the next cow not encompassed by the previous range. Then we see at the end how many cows we need to encompass all hays, and adjust radius using binary search.
+```cpp
+void solve(){
+    int n,k;cin>>n>>k;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end()); // sort on line
+
+    int lo = 0; int hi = 1000000005;
+    while(lo < hi){
+        int mid = (lo + hi)/2;
+        int cnt = 0;
+        int x = 0;
+        int i = 0;
+	// simulating process
+        while(i<n){
+            int start = v[i];
+            cnt++;
+            while(i<n && start + 2*mid >= v[i]){
+		// if the range of encompasses the hay, we know its included so we dont have to add more cows for this
+                i++;
+            }
+            
+        }
+        if(cnt <= k){
+            // if we used less than or equal to k cows, its valid
+            hi = mid;
+        }
+        else{
+            lo = mid+1;
+        }
+    }
+    cout<<hi<<endl;
+}
+```
+
+**Problem 4:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1038
