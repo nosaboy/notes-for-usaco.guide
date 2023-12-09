@@ -83,3 +83,58 @@ void solve(){
     cout<<pow(a,pow(b,c,1000000006),1000000007)<<endl;
 }
 ```
+**Problem 2:** https://codeforces.com/contest/1279/problem/D
+We can just pretty much calculate the probability for each gift individually, then add them up using mod. Lets say we choose a present y from the xth kid. The probabiliy that after choosing another kid z, the decision is valid is: 1/n for choosing the xth kid, 1/k_x for choosing that gift out of k_x gifts, and cnt_gift/n where cnt_gift denotes the number of kids that have that gift on their list. The probability is these numbers multiplied together. We can then calculate the sum of probability of all gifts using mod functions.
+```cpp
+ll add(ll x, ll y)
+{
+    x += y;
+    while(x >= MOD) x -= MOD;
+    while(x < 0) x += MOD;
+    return x;
+}  
+ 
+ll mult(ll x, ll y)
+{
+    return (x * 1ll * y) % MOD;
+}
+ll lpow(ll x, ll y)
+{
+    if(y == 0){
+        return 1;
+    }
+    ll z = 1;
+    while(y)
+    {
+        if(y & 1) z = mult(z, x);
+        x = mult(x, x);
+        y >>= 1;
+    }
+    return z;
+}
+ 
+ 
+void solve(){
+    int n;cin>>n;
+	map <int,int> mp;
+	vi aj[n];
+    rep(i,0,n){
+		int m;cin>>m;
+		rep(j,0,m){
+			int u;cin>>u;mp[u]++;
+			aj[i].pb(u);
+		}
+	}
+	ll ans = 0;
+	rep(i,0,n){
+		rep(j,0,aj[i].size()){
+			ll osa = mult(1,lpow(n,MOD-2)); // 1/n
+			ll nosa = mult(1,lpow(aj[i].size(),MOD-2)); // 1/k_x
+			ll losa = mult(mp[aj[i][j]], lpow(n,MOD-2)); // cnt_gift/n
+			ans = add(ans, mult(mult(osa,nosa),losa)); // multiply them together, then add to answer
+		}
+	}
+	cout<<ans<<endl;
+    
+}
+```
