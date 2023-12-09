@@ -108,11 +108,11 @@ Will probably MLE for 4000 x 4000 grid.
 // changes for neighbouring cells
 const int R_CHANGE[]{0, 1, 0, -1};
 const int C_CHANGE[]{1, 0, -1, 0};
-void flood(r,c){
+void flood(int r,int c){
     // checker for if node can be visited
     if (r < 0 || r >= row_num || c < 0 || c >= col_num || g[r][c] == '#' || vis[r][c]){
         // bad states that we do not want to visit
-        continue;
+        return;
     }
     vis[r][c] = true; // mark as visited
     // try all neighbouring cells
@@ -122,7 +122,80 @@ void flood(r,c){
 }
 	
 ```
-
+**Floodfill Problem 2:** https://codeforces.com/contest/1365/problem/D
+We make an obervation that if a BAD is next to a GOOD, it is impossible since the BAD can just take one step and follow the GOOD. Then, we make a greedy assumption that it is most optimal to just "circle" every bad by covering all 4 sides. Everything bigger which blocks BAD will only result in a worse case(**How to prove this?**). Thus, we just circle every BAD, then try to see if we can reach every GOOD from (n,m) using floodfill.
+```cpp
+const int R_CHANGE[]{0, 1, 0, -1};
+const int C_CHANGE[]{1, 0, -1, 0};
+int vis[55][55];
+char g[55][55];
+void flood(int r,int c){
+    // checker for if node can be visited
+    if (r < 0 || r >= 53 || c < 0 || c >= 53 || g[r][c] == '#' || vis[r][c]){
+        // bad states that we do not want to visit
+        return;
+    }
+    vis[r][c] = true; // mark as visited
+    // try all neighbouring cells
+    rep(i,0,4){
+        flood(r + R_CHANGE[i], c + C_CHANGE[i]);
+    }
+}
+ 
+void solve(){
+    int n,m;cin>>n>>m;
+    
+    rep(i,0,55){
+        rep(j,0,55){
+            vis[i][j]=0;
+            g[i][j] = '#';
+        }
+    } 
+    vector <pi> v;
+    rep(i,1,n+1){
+        rep(j,1,m+1){
+            cin>>g[i][j];
+            if(g[i][j] == 'G'){
+                v.pb({i,j});
+            }
+        }
+    } 
+    bool yn = true;
+    rep(i,1,n+1){
+        rep(j,1,m+1){
+            if(g[i][j] == 'B'){
+                rep(l,0,4){
+                    if(g[i+R_CHANGE[l]][j+C_CHANGE[l]] != 'B'){
+                        if(g[i+R_CHANGE[l]][j+C_CHANGE[l]] != 'G'){
+			    // we place wall to circle BAD
+                            g[i+R_CHANGE[l]][j+C_CHANGE[l]] = '#';
+                        }
+                        else{ // if BAD is next to GOOD, its impossible
+                            yn = false;
+                        }
+                    }
+                    
+                }
+                
+            }
+        }
+    }   
+    flood(n,m); // flood from n,m
+    rep(i,0,v.size()){ // check every GOOD to see if it was reached
+        if(!vis[v[i].first][v[i].second]){
+            yn = false;
+        }
+    }
+    if(yn){
+        cout<<"Yes\n";
+    }
+    else{
+        cout<<"No\n";
+    }
+    
+    
+}
+```
 ### BFS impl
 Searches by "flooding", visiting the earliests node(s) first, used for calculating distance of unweighted graph.
 **Queues:** First in, first out - moves like a waiting line. O(1) operations:
