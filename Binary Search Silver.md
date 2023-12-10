@@ -511,3 +511,48 @@ void solve(){
 ```
 
 **Problem 4:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1038
+We do binary search on the answer. For each cow we want to place it in the earliest avaliable segment position as possible, so that it is at least distance mid away from the cow before. we simulate this process in O(m+n) by placing cows in the next "avaliable" position thats in a segment.
+
+```cpp
+void solve(){
+    int n,m; cin>>n>>m;
+    vi v;
+    map <int,int> end;
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        end[a] = b;
+        v.pb(a);
+    }
+    sort(v.begin(),v.end());
+    int lo = 0; int hi = 1000000000;
+    while(lo < hi){
+        int mid = (lo+hi+1)/2;
+        int it = 0;
+        int pos = 0;
+        int cnt = 0;
+        while(it < m && cnt < n){
+            pos = max(pos, v[it]);
+            if(v[it]<= pos && pos <= end[v[it]]){
+                pos += mid;
+                cnt++;
+            }
+            else{
+                it++;
+            }
+        }
+        if(cnt >= n){
+            lo = mid;
+        }
+        else{
+            hi = mid-1;
+        }
+    }
+    cout<<lo<<endl;
+
+}
+```
+
+
+**Problem 10:** https://cses.fi/problemset/task/1620
+
+**Problem 11:** https://cses.fi/problemset/task/1085
