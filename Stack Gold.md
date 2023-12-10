@@ -160,3 +160,62 @@ void solve(){
 }
 ```
 
+**Problem 6:** https://cses.fi/problemset/task/1147
+- Calculate maximum rectangle histogram(Problem 1:CSES Advertisement) using 1 stack instead of 2.
+- Find the largest rectangle area that doesnt contain some character in O(nm)
+We can use the maximum rectangle histogram approach, **but in 2d**. 
+We fix the bottom of the rectangle(loop for every row), then apply the maximum rectangle histogram in O(m). Time is O(nm).
+We use only 1 monotonic stack to calculate the maximum rectangle histogram. We know that the stack of heights is sorted in increasing order. Thus we say for every previous position, what is the maximum rectangle that can be formed that has right side at the i-1th index and left side at stack.top(). Since stack is sorted, it must have height stack.top(). We do this until the stack.top() < ith height, in which stack.top() will no longer be the smallest height. We then push the leftmost position such that the ith height is the smallest to the top of the stack. This way when we use the ith height as our left side we can get the maximum length. 
+
+```cpp
+void solve(){
+    int n,m; cin>>n>>m;
+	stack<int> nxt[m];
+	int g[n][m]; 
+    rep(j,0,m){
+        nxt[j].push(-1); // border 
+    }
+    rep(i,0,n){
+        string s;cin>>s;
+        rep(j,0,m){
+            g[i][j] = s[j];
+			if(g[i][j] == '*'){
+                nxt[j].push(i); // sort tree position top to bottom
+			}
+        }
+
+    }
+    
+    int ans = 0;
+    for(int i = n-1;i>=0;i--){ // for every row
+        stack <pi> st;
+        st.push({-1,-1}); // border account for RTE(stack has no elements)
+        rep(j,0,m){
+            while(nxt[j].top() > i){ // tree is below curr row on grid
+                nxt[j].pop(); // pop this tree since it doesn't affect us
+            }
+            // (i - nxt[j].top()) = height of histogram(how much up until we reach tree or border)
+            int start = j;
+            while(st.size() > 0 && st.top().first > i - nxt[j].top()){
+                start = st.top().second;
+                ans = max(ans, (st.top().first) * (j - st.top().second)); // st.top().first smallest height,
+                // the rectangle has height st.top().first and length: [st.top().second...j-1]
+                st.pop();
+            }
+            // (j - st.top().second) = length of histogram(how much to the left until we reach smaller
+            // histogram or border)
+            st.push({(i - nxt[j].top()), start}); // push the leftmost position such that curr height is smallest
+        }
+        while(st.size() > 0){
+
+            ans = max(ans, (st.top().first) * (m - st.top().second));
+            st.pop();
+        }
+    }
+    cout<<ans<<endl;
+    
+    
+}
+```
+
+**Problem 
