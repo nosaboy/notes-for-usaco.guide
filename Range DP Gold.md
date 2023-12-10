@@ -49,4 +49,6 @@ void solve(){
 }
 ```
 
+**Problem 4:** https://codeforces.com/contest/245/problem/H
+Assume that we have the answer for all palindromes length 1 to k-1 and we want to find the number of palindromes of a subtring length k. 
 **Problem of Interest:** https://dmoj.ca/problem/ccc16s4
