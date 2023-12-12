@@ -152,3 +152,43 @@ void solve(){
     cout<<min(dp[n][0],dp[n][1])<<endl;
 }
 ```
+
+**Problem 2:**
+
+We note that this problem basically wants find a range that maximizes the count of u - count of k for some u. We can just fix what u is, then solve for when only u and x is in the array. We use the maximum subarray sum method to do this, sotring the min value of cnt_u - cnt_k in mn, then the maximum subarray that ends in $i$ is $cnt[u] - cnt[k] - mn$ when $u = v[i].$
+```cpp
+void solve(){
+    int n,k; cin>>n>>k;
+    vi v; 
+    int pre[n+1]; // prefix of count of k
+    map <int,int> mp; // we only visit each number once when placing initial mn
+    map <int,pi> mn; // minimum of prefix sum(value of cnt[u] - cnt[k])
+    map <int,int> cnt; // current count of number u
+    pre[0]=0;
+    int tot = 0;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+        pre[i+1]=pre[i];
+        if(mp[u]==0){
+            mp[u]=1;
+            // we initially set min to 
+            mn[u]={-pre[i+1],i};
+        }
+        if(u == k){
+            pre[i+1]++;
+            tot++;
+        }
+    }
+    int ans = 0;
+    rep(i,0,n){
+        int u = v[i]; // current number
+        if(mn[u].first >= cnt[u] - cnt[k]){
+            mn[u] = {cnt[u] - cnt[k], i+1};
+        }
+        cnt[u]++;        
+        ans = max(ans, (cnt[u] - cnt[k]) - mn[u].first + tot);
+    }
+    cout<<ans<<endl;
+}
+
+```
