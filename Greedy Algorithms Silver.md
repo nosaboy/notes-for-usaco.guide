@@ -57,4 +57,7 @@ Constructs an optimal code for compressing a given string.
 **I'll look more into it if this idea actually appears in smth**
 
 
+### Problems
+**Problem 1:** https://cses.fi/problemset/task/1074
+
 
