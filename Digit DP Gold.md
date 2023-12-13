@@ -107,5 +107,177 @@ We can first fix the digit we want to be half of the digit. We then try to const
 3. if we have put down a number other than 0 yet
 4. count of number in construction
 ```cpp
+vi digit;
+ll dp[50][2][2][50]; 
+// position
+// whether we have gone under(0) or not(1)
+// number we want
+// cnt of number we want
+// cnt of sec number we want
+void reset(){
+    rep(i,0,50){
+        rep(j,0,2){
+            rep(l,0,2){
+                rep(p,0,50){
+                   
+                        dp[i][j][l][p]=-1;
+                    
+                   
+                }             
+            }
+        }
+    }
+}
+int num; 
+ll rec(int pos, int under, int start, int cnt){
+    if(pos == digit.size()){ // we finished constructing a number
+        
+        if(cnt >= 20 && start == 1){
+            return dp[pos][under][start][cnt] = 1;
+        }
+        return dp[pos][under][start][cnt] = 0;
+    }
+    int k = digit[pos]; // upper bound digit
+    
+    
+    
+    if(under == 0){ // we can do 0...9
+        k = 9;
+    }
+    ll ans = 0;
+    rep(i,0,k+1){
+        int newtight = under & (i == k);
+        int newstart = start;
+        if(i == 0){
+            newstart = start|0;
+            
+        }
+        else{
+            newstart = 1;
+        }
+        int newcnt = cnt;
+        if(newstart){
+            if(i == num){
+                newcnt++;
+            }
+            else{
+                newcnt--;
+            }
+        }
+        if(dp[pos+1][newtight][newstart][newcnt] == -1){
+            rec(pos+1,newtight,newstart,newcnt);
+        }
+        ans += dp[pos+1][newtight][newstart][newcnt];
+        
+    }
+    return dp[pos][under][start][cnt] = ans;
+}
+int num1; int num2;
+ll dup(int pos, int under, int start, int cnt){
+    if(pos == digit.size()){ // we finished constructing a number
+        
+        if(cnt == 20 && start == 1){
+            return dp[pos][under][start][cnt] = 1;
+        }
+        return dp[pos][under][start][cnt] = 0;
+    }
+    int k = digit[pos]; // upper bound digit
+    
+    
+    
+    if(under == 0){ // we can do 0...9
+        k = 9;
+    }
+    ll ans = 0;
+    rep(i,0,k+1){
+        int newtight = under & (i == k);
+        int newstart = start;
+        if(i == 0){
+            newstart = start|0;
+            
+        }
+        else{
+            newstart = 1;
+        }
+        int newcnt = cnt;
+        if(newstart){
+            if(i == num1){
+                newcnt++;
+            }
+            else if(i == num2){
+                newcnt--;
+            }
+            else{
+                continue;
+            }
+        }
+        if(dp[pos+1][newtight][newstart][newcnt] == -1){
+            dup(pos+1,newtight,newstart,newcnt);
+        }
+        ans += dp[pos+1][newtight][newstart][newcnt];
+        
+    }
+    return dp[pos][under][start][cnt] = ans;
+}
+void solve(){
+    ll l,r;cin>>l>>r;
+    digit.clear();
+    
+    // get digit from last to first
+    l--;
+    while(l){
+        digit.pb(l%10);
+        l/=10;
+    }
+    reverse(digit.begin(),digit.end());
+    ll osa = 0;
+    rep(i,0,10){
+        reset();
+        num = i;
+        ll ok = rec(0,1,0,20);
+        osa += ok;
 
+    }
+    rep(i,0,10){
+        rep(j,i+1,10){
+       
+            reset();
+            num1 = i; num2 = j;
+            ll ok = dup(0,1,0,20);
+            osa -= ok;
+        }
+        
+    }
+    digit.clear();
+    //reset for r
+    // get digit from last to first
+    
+    while(r){
+        digit.pb(r%10);
+        r/=10;
+    }
+    reverse(digit.begin(),digit.end());
+
+    ll nosa = 0;
+    rep(i,0,10){
+        reset();
+        num = i;
+        ll ok = rec(0,1,0,20);
+        nosa += ok;
+        //cout<<i<<" "<<ok<<endl;
+    }
+    //cout<<nosa<<endl;
+    rep(i,0,10){
+        rep(j,i+1,10){
+            reset();
+            num1 = i; num2 = j;
+            ll ok = dup(0,1,0,20);
+            nosa -= ok;
+            //cout<<i<<" "<<j<<" "<<ok<<endl;
+        }
+        
+    }
+    
+    cout<<nosa-osa<<endl; // rec(r) - rec(l-1)
+}
 ```
