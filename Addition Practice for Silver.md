@@ -85,7 +85,7 @@ void solve(){
 ```
 
 **Problem 5:** https://codeforces.com/contest/1077/problem/D
-
+We can binary search for the answer(number of copies possible), since we can have a greedy method. We sort the integers by the number of appearences. Thus if we fix that we are taking x copies, then for each integer v_i there must be (number of v_i)/x appearences in our final answer array. We know that the answer is monotonic, so we just check if at the end the size of our final answer array is >= k or not.
 ```cpp
 void solve(){
     int n,k;cin>>n>>k;
@@ -133,5 +133,81 @@ void solve(){
         cout<<ans[i]<<" ";
     }
 
+}
+```
+
+**Problem 6:** https://codeforces.com/problemset/problem/1223/C
+We can binary search the positions, since bigger position always means smaller answer. We note that the greedy method is always try to put the largest at any positions where they both intersect, then choose whether x or y is larger then put the next biggest v_i at the each ath or bth position unvisited. We then check in the end whether the sum is bigger than k or not and do binary search. Note we have to add long long to everything for this to AC.
+```cpp
+void solve(){
+    ll n;cin>>n;
+    vector <ll> v;
+    rep(i,0,n){
+        ll u;cin>>u;v.pb(u);
+    }
+    
+    sort(v.begin(),v.end());
+    ll x,a,y,b;cin>>x>>a>>y>>b;
+    ll k; cin>>k;
+    ll lo = 0; ll hi = n;
+    hi++;
+    while(lo < hi){
+        ll mid = lo + (hi - lo) / 2; // position
+        ll vis[mid]={0};
+        ll ab = lcm(a,b);
+        ll it = v.size()-1;
+        ll ans = 0;
+        // first pick position where a and b intersect
+        for(ll i = ab-1;i<mid;i+=ab){
+            vis[i] = 1;
+            ans += v[it]/100 * (x+y);
+            it--;
+        }
+        // choose next largest
+        if(x > y){
+            for(ll i = a-1;i<mid;i+=a){
+                if(vis[i] == 0){
+                    vis[i] = 1;
+                    ans += v[it]/100 * x;
+                    it--;
+                }   
+            }
+            for(ll i = b-1;i<mid;i+=b){
+                if(vis[i] == 0){
+                    vis[i] = 1;
+                    ans += v[it]/100 * y;
+                    it--;
+                }   
+            }
+        }
+        else{
+            for(ll i = b-1;i<mid;i+=b){
+                if(vis[i] == 0){
+                    vis[i] = 1;
+                    ans += v[it]/100 * y;
+                    it--;
+                }   
+            }
+            for(ll i = a-1;i<mid;i+=a){
+                if(vis[i] == 0){
+                    vis[i] = 1;
+                    ans += v[it]/100 * x;
+                    it--;
+                }   
+            }
+        }
+        if(ans >= k){ // works
+            hi = mid;
+        }
+        else{
+            lo = mid + 1;
+        }
+    }
+    if(hi == n+1){ // didnt find ans
+        cout<<-1<<endl;
+    }
+    else{
+        cout<<hi<<endl;
+    }
 }
 ```
