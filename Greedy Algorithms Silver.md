@@ -59,5 +59,23 @@ Constructs an optimal code for compressing a given string.
 
 ### Problems
 **Problem 1:** https://cses.fi/problemset/task/1074
+We want to find a point on the line such that the distance from all points(stick lengths) to that point is minimal. We can achieve this by always choosing the median(or one of the medians). This is because, well i know cause i did a similar problem but im not quite sure atm.
+```cpp
+ 
+void solve(){
+    int n;
+    cin>>n;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    ll ans = 0;
+    sort(v.begin(),v.end());
+    rep(i,0,n){
+        ans += abs(v[i] - v[n/2]);
+    }
+    cout<<ans<<endl;
+}
 
+```
 
