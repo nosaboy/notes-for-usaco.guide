@@ -5,6 +5,47 @@ of cold water so the average is (h * n/2 + c * n/2)/n = (n(h+c)/2)/n = (h+c)/2. 
 
 We know that if days are even, then the avg temperature is always (x+y)/2. If the days are odd, the avg temperature is always (d(x+y) + x)/(2d+1) = 
 
+2013-12-13
+Ok, we realize that odd moves is an monotonically decreasing function, and even moves is just (h+c)/2. Thus, we binary search for x: the minimum odd that went over t, so the first number of moves that the avg temperature exceeds t. We then know that the answer is either 2 or the moves on either side of t, so it would be 2, x-2, or x. Since x is the first number to the right of t so x-2 is the last number to the left of t. Thus, we can just check each of these and compare their answer.
+**Please review the O(1) equation solution**
+```cpp
+void solve(){
+    long double h,c,t;cin>>h>>c>>t;
+    long lo = 1; long hi = 1000000005;
+    while(lo < hi){
+        long mid = lo + (hi - lo) / 2;
+        long double ok = ((mid) * (h+c)+h)/(2*mid+1); // equation to calculate avg
+        if(ok >= t){
+            
+            lo = mid+1;
+        }
+        else{
+
+            hi = mid;
+        }
+    }
+// checking each answer 2, x-2,x
+    long double ok = (h+c)/2;
+    int osa = 2*hi+1;
+    long double mid = hi;
+    long double ans = ((mid) * (h+c)+h)/(2*mid+1); 
+    if(osa != 1 && t-ans >= ((mid-1) * (h+c)+h)/(2*mid-1)-t){
+        ans = ((mid-1) * (h+c)+h)/(2*mid-1);
+        osa-=2;
+    }
+    if(ans < t && t-ans >= t-((h+c)/2)){
+        osa=2;
+    }
+    else if(ans >= t && ans-t >= t-((h+c)/2)){
+        osa=2;
+    }
+    
+    cout<<osa<<endl;
+  
+
+
+}
+```
 
 **Problem 4:** https://codeforces.com/contest/803/problem/D
 We can binary search on answer(maximum length of the ad). We fix this length, then any line cannot go past this length. We then simulate fitting the strings greedily, trying to fit the maximum possible string length without exceeding aans length. Then check if its possible to fit everything in it without exceeding k lines. The simulation is kinda weird & messy cause you have to deal with strings, but idea is simple.
