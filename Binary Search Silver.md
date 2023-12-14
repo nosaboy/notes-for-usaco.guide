@@ -556,3 +556,95 @@ void solve(){
 **Problem 10:** https://cses.fi/problemset/task/1620
 
 **Problem 11:** https://cses.fi/problemset/task/1085
+
+**Problem 17:** https://codeforces.com/contest/847/problem/B
+For every number inserted, lets see if we can append this number into some pre existing array such that all number before it in the array is smaller or equal to it. Then, we wont have to make any more moves. Else, we are forced to create a new array and iterate again. 
+```cpp
+void solve(){
+    int n;cin>>n;
+    multiset <pi> ms;
+    vi v;
+    vector <vi> ans;
+    int cnt = 0;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+        auto it = ms.upper_bound({u,1000000005});
+        if(it == ms.begin()){
+            vi a;a.pb(u);
+            ans.pb(a);
+            ms.insert({u,ans.size()-1});
+        }
+        else{ // found
+            --it;
+            pi ok = *it;
+            int idx = ok.second;
+            ms.erase(ms.find(ok));
+            ans[idx].pb(u);
+            ms.insert({u,idx});
+        }
+    }
+ 
+    rep(i,0,ans.size()){
+        rep(j,0,ans[i].size()){
+            cout<<ans[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+  
+ 
+ 
+}
+```
+**Problem 19:** https://codeforces.com/gym/104468/problem/H
+We can use binary search to calculate the second query in O(logn). We know that if prefix at mid works, then every prefix < mid will have a sum less than $pre[mid]$ so it will also be less than Y. It remains to find the sum of prefix in O(1) time. We can do this by first calculating prefix sum of every colour. To process the first query, we can then store a total sum, then store a sum of the ith colour. This way for each colour we have added (total sum - sum of colour) for each value. Thus when binary searching mid the total sum is just $pre[mid] + (total sum - sum of colour) * mid$: original prefix + added value (total sum - sum of colour) to $mid$ numbers.
+```cpp
+void solve(){
+    ll n;cin>>n;
+    vector <ll> a; vector <ll> c;
+    vector <ll> aj[200005];
+    rep(i,0,200005){
+        aj[i].pb(0);
+    }
+    rep(i,0,n){
+        ll u;cin>>u;a.pb(u);
+    }
+    rep(i,0,n){
+        ll u;cin>>u;c.pb(u);
+        aj[u].pb(a[i]);
+    }
+    rep(i,0,200005){
+        rep(j,1,aj[i].size()){
+            aj[i][j] += aj[i][j-1];
+        }
+    }
+    ll q; cin>>q;
+    ll sum = 0;
+    ll osa[200005]={0};
+    while(q--){
+        int ch; cin>>ch;
+        if(ch == 1){
+            ll x,y;cin>>x>>y;
+            osa[x]+= y;
+            sum += y;
+        }   
+        else{
+            ll x,y;cin>>x>>y;
+            ll lo = 0; ll hi = aj[x].size()-1;
+            while (lo < hi) {
+                // find the middle of the current range (rounding up)
+                ll mid = lo + (hi - lo + 1) / 2;
+
+                if (aj[x][mid] + (sum - osa[x])*mid <= y) {
+                    // if mid works, then all numbers smaller than mid also work
+                    lo = mid;
+                } else {
+                    // if mid does not work, greater values would not work either
+                    hi = mid - 1;
+                }
+            }
+            cout<<lo<<endl;
+        }
+    }
+}
+```
+
