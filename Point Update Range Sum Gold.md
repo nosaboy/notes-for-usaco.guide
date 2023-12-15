@@ -10,4 +10,4 @@ Do point update and range query in O(logn) for any **associative operation**
 - gcd/lcm
 
 Example: 
-First build
+First construct binary tree, where each node is the 
