@@ -36,4 +36,28 @@ rep(i,1,n){ // for each day
 
 Brute force: We iterate over all permuations of n, and for each permutation we simulate the process and add things up: O(n!n)
 
-DP: 
+DP: Let $dp[S]$ be a pair which stores (num of elevators, weight of current elevator). For each subset, we always take the dp that first minimizes num of elevators, and then if num of elevators are the same, then minimize weight of current elevator(default sort pairs). For every subset S, we loop through each element. The pull DP is for each element X, If $weight[X] + dp[SnotincludingX].second > maxweight$, then we are forced to increase num of elevators by 1, so answer is $(dp[SnotincludingX].first+1, weight[X]). Else, we dont have to increase num of elevators, so answer is $(dp[SnotincludingX].first, dp[SnotincludingX].second + weight[X]). The minimum pair over all X will be the answer.
+```cpp
+pi dp[1<<n];
+// base case
+dp[0] = {1,0}; # one elevator for empty set, 0 weight
+
+rep(i,1,(1<<n)){ // for every subset
+  dp[i] = {n+1,0}; // worst case is if it requires n elevators
+  rep(j,0,n){
+    if(i&(1<<j)){ // if j is an element in set i
+      pi osa = dp[(i^(1<<j))]; // most optimal answer without element j
+      if(osa.second + weight[j] <= maxweight){ // elevator can still stand this weight in most optimal choice
+        osa.second += weight[j]; // add weight of j to elevator
+      }
+      else{ // it couldnt stand it, must make new elevator
+        osa.first++;
+        osa.second = weight[j]; // we add the weight to the new elevator
+      }
+    }
+    dp[i] = min(dp[i], osa); // find the most optimal choice(sort by first, then by second)
+  }
+}
+
+```
+
