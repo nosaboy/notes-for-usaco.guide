@@ -1,6 +1,15 @@
-### Usage
+## Usage
 - Subset states can be stored as integers using bits
-**Example 1:** Optimal selection: Given the prices of k products over m days(2d array of integers), we want to buy each product exactly once(k <= n) and buy at most one product a day. What is the minimum total price
+- Very small n < 20("smart bruteforce")
+- Used to cheese subtasks
+
+```cpp
+for(int i = 0; i < (1<<n); i++) {
+    // process each subset
+}
+```
+### Optimal selection: 
+Given the prices of k products over m days(2d array of integers), we want to buy each product exactly once(k <= n) and buy at most one product a day. What is the minimum total price
 
 Brute foce: O(2^(nk)), since we go through every possibility
 
@@ -30,13 +39,14 @@ rep(i,1,n){ // for each day
   }
 }
 ```
-
-**Example 2:** Given elevator with max weight x and n people with known weight, what is minimum number of rides needed if people enter the elevator in optimal order.
+### Bitmask DP on Permuations
+Given elevator with max weight x and n people with known weight, what is minimum number of rides needed if people enter the elevator in optimal order.
 - Sometimes we can use bits to calculate most optimal permutation, since n! > 2^n by a lot
 
 Brute force: We iterate over all permuations of n, and for each permutation we simulate the process and add things up: O(n!n)
 
 DP: Let $dp[S]$ be a pair which stores (num of elevators, weight of current elevator). For each subset, we always take the dp that first minimizes num of elevators, and then if num of elevators are the same, then minimize weight of current elevator(default sort pairs). For every subset S, we loop through each element. The pull DP is for each element X, If $weight[X] + dp[SnotincludingX].second > maxweight$, then we are forced to increase num of elevators by 1, so answer is $(dp[SnotincludingX].first+1, weight[X]). Else, we dont have to increase num of elevators, so answer is $(dp[SnotincludingX].first, dp[SnotincludingX].second + weight[X]). The minimum pair over all X will be the answer.
+- O(2^n)
 ```cpp
 pi dp[1<<n];
 // base case
@@ -60,4 +70,12 @@ rep(i,1,(1<<n)){ // for every subset
 }
 
 ```
+
+### Counting Subsets
+
+Each subset S is assigned an integer value. Calculate for each S the sum of the values of all its subsets. 
+
+Brute force: Go through each pair of subsets, then see if one is a subset of the other and add value: O((2^n)^2)
+
+DP: 
 
