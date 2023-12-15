@@ -234,3 +234,29 @@ void solve(){
     cout<<ans<<endl;
 }
 ```
+
+**Problem 9:** http://www.usaco.org/index.php?page=viewproblem2&cpid=835
+We note that it is always more optimal to get the cows with the most w. This is because we can more likely prevent cows with smaller w going in the line by filling up with more cows.
+```cpp
+void solve(){
+    int n;cin>>n;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    sort(v.rbegin(),v.rend()); / sort w_i largest to smallest
+    int ans = 0;
+    rep(i,0,n){
+        if(v[i] >= i){ // of wi > cows already added
+            ans++; // we can add this cow
+        }
+        else{ // as line gets bigger, w_i gets smaller so every cow after will not go in the line
+            break;
+        }
+    }
+    cout<<ans<<endl;
+}
+```
+
+**Problem 10:** 
+
