@@ -258,5 +258,163 @@ void solve(){
 }
 ```
 
-**Problem 10:** 
+**Problem 10:** http://www.usaco.org/index.php?page=viewproblem2&cpid=571
+Self Editorial
+This problem is tianjicaima but with multiple horses :)
+For each Bessie horse, we want to eliminate the largest possible Elsie horse. If for some Bessies horse we do not eliminate the largest Elsie horse, our answer will only get worse. We thus go from largest to smallest value, and try to eliminate the biggest Elsie horse possible. This way smaller Bessie horses have more chance eliminating smaller Elsie horses.
+```cpp
+void solve(){
+    int n;cin>>n;
+    vi v;
+    int vis[2*n+1]={0};
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+        vis[u]=1;
+    }
+    vi a; // Bessies horse
+    rep(i,1,2*n+1){
+        if(!vis[i]){
+            a.pb(i); 
+        }
+    }
+    sort(a.rbegin(),a.rend()); // sort value largest to smallest
+    sort(v.rbegin(),v.rend()); // sort value largest to smallest
+    int l = 0; int r = 0;
+    int ans = 0;
+    while(l < n && r < n){
+        if(a[l] > v[r]){
+            // possible to pair
+            ans++;
+            l++;r++;
+        }
+        else{
+            // cant pair, got to decrease r
+            r++;
+        }
+    }
+    cout<<ans<<endl;
+}
+```
 
+**Problem 11:** http://www.usaco.org/index.php?page=viewproblem2&cpid=573
+
+Self Editorial:
+We realize that a point is a point, so we want to maximize number of points in first half, then number of points in second half using the remaining unused cards. For the first half, we can just sort both decks and use strategy in Problem 10. For second half, it is similar. We sort the Elsies deck by increasing, then for each Elsie card we want to see if there is some value smaller than it. If there is we can pair that up and increase ans by 1.
+```cpp
+void solve(){
+    int n;cin>>n;
+    vi v;
+    int vis[2*n+1]={0};
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+        vis[u]=1;
+    }
+    vi a;
+    vi b; // first half
+    vi c; // second half
+
+	// insert bessies cards
+    rep(i,1,2*n+1){
+        if(!vis[i]){
+            a.pb(i);
+        }
+    }
+	// insert first half
+    rep(i,0,n/2){
+        b.pb(v[i]);
+    }   
+    int ans = 0;
+    sort(a.rbegin(),a.rend()); // sort value largest to smallest
+    sort(b.rbegin(),b.rend()); // sort value largest to smallest
+    int l = 0; int r = 0;
+    // find the largest possible points for first half
+    while(l < n/2 && r < n/2){
+        if(a[l] > b[r]){
+            // possible to pair
+            ans++;
+            vis[a[l]]=1; // used a[l]
+            l++;r++;
+        }
+        else{
+            // cant pair, got to decrease r
+            r++;
+        }
+    }   
+	// insert second half
+    rep(i,n/2,n){
+        c.pb(v[i]);
+    } 
+    // push all unused values to second half
+    a.clear();
+    rep(i,1,2*n+1){
+        if(!vis[i]){
+            a.pb(i);
+        }
+    }
+    sort(a.begin(),a.end()); // sort smallest to largest
+    sort(c.begin(),c.end()); // sort smallest to largest
+    l = 0;
+    r = 0;
+	//  find largest possible points in second half
+    while(l < a.size() && r < n/2){
+        if(a[l] < c[r]){
+            // possible to pair
+            ans++;
+            l++;r++;
+        }
+        else{
+            // cant pair, make r bigger
+            r++;
+        }
+    }
+    cout<<ans<<endl;
+}
+
+```
+
+**Problem 13:** http://www.usaco.org/index.php?page=viewproblem2&cpid=810
+Observations:
+- It is always optimal to stop at the largest tastiness rest stop until we are forced to move
+Self Editorial:
+The observation holds because if we stop at some rest stop other than the largest, the answer is less optimal because we could've spent that time stopping at the largest stop.
+We store the largest stop in front of current position using prefix max. We then simulate while going through each "optimal" rest stop, stopping until farmer john catches up, adding the total tastiness values.
+
+```cpp
+void solve(){
+    ll l,n,a,b;cin>>l>>n>>a>>b;
+    ll diff = a-b;
+    vector <pair<ll,ll>> v;
+    rep(i,0,n){
+        ll x,y;cin>>x>>y;
+        v.pb({x,y});
+    }
+    pair<ll,ll> pre[n]; // maximum valued tastiness range [i...n]
+    sort(v.begin(),v.end());
+    pre[n-1] = v[n-1]; 
+    vector <pair<ll,ll>> ar; // most optimal rest stop
+    ar.pb(v[n-1]);
+    for(int i = n-2;i>=0;i--){
+        if(pre[i+1].second < v[i].second){ // if tastiness is bigger than pref
+            pre[i] = v[i];
+            ar.pb(v[i]); // most optimal rest stop at this time
+        }
+        else{
+            pre[i] = pre[i+1];
+        }
+    }
+    sort(ar.begin(),ar.end()); // sort by time
+    ll time = 0;
+    ll ans = 0;
+    rep(i,0,ar.size()){
+        ans += (ar[i].first-time) * diff * ar[i].second; // formula
+        time = ar[i].first;
+    }
+    cout<<ans<<endl;
+}
+```
+
+**Problem 14:** http://www.usaco.org/index.php?page=viewproblem2&cpid=714
+
+```cpp
+
+```
