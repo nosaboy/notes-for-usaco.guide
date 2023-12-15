@@ -37,11 +37,30 @@ void solve(){
     
 
 ```
-#### Tasks and Deadlines
+#### Tasks and Deadlines: https://cses.fi/problemset/task/1630
 Given n tasks with durations and deadlines, choose an order to perform the tasks. For each task, we earn d − x points where d is the task’s deadline and x is the moment when we finish the task. What is the largest score we can get?
 
 Consider the duration of two tasks. If a > b, then placing a in front of b is less optimal. This is because if we have consecutive tasks a and b such that a > b and a is in front of b, we can switch. This will add b to the answer since a now starts at pos + b instead of pos, but will also subtract a from answer since b now starts at pos - a instead of pos. Since a > b, + b - a decreases our answer.
 
+```cpp
+void solve(){
+    int n; cin>>n;
+    vector <pi> v;
+    rep(i,0,n){
+        int a,b;cin>>a>>b;
+        v.pb({a,b}); // sort by duration
+    }
+    sort(v.begin(),v.end());
+    ll time = 0;
+    ll ans = 0;
+    rep(i,0,n){
+        time += v[i].first;
+        ans += v[i].second - time;
+    }
+    cout<<ans<<endl;
+    
+}
+```
 #### Minimizing Sums
 Given n numbers a1,a2,...,an, find a value x that minimizes sum $|a_1-x| + |a_2-x| + ... + |a_n-x|$.
 
@@ -82,7 +101,7 @@ void solve(){
 Observations:
 - We visualize the people and the apartment ranges on a number line
 
-
+Self Editorial:
 The greedy strat is that for every apartment, we are given some choices for what people to assign it to, and we always pick the **earliest person**. This is because it will not ruin the answer moving forwards and picking someone other than the earliest avaliable person will only ruin the answer.
 ```cpp
 void solve(){
@@ -114,4 +133,104 @@ void solve(){
     
 }
 
+```
+
+**Problem 3:** https://cses.fi/problemset/task/1090
+Obersvations:
+
+Self Editorial
+Traverse through people in ascending order. For each person we always want to pick the **largest person that will not exceed the limit**. This is because if we pick anyone smaller, the answer will only get worse since a larger small will then get with the largest, which causes more gondolas.
+```cpp
+void solve(){
+    int n,x;cin>>n>>x;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    int l = 0; int r = n-1;
+    int ans = 0;
+    while(l <= r){
+        if(l==r){
+            // there is only 1 person left
+            ans++;
+            break;
+        }
+        else{
+            if(v[l] + v[r] <= x){
+                // successful pairing
+                ans++;
+                l++; r--;
+            }
+            else{
+                // unsuccessful pairing, we must decrease the sum 
+                ans++; // the max guy can only go on a gondola by themselves
+                r--;
+            }
+        }
+    }
+    cout<<ans<<endl;
+    
+}
+
+```
+
+**Problem 5:** https://cses.fi/problemset/task/1073
+Observations:
+- Always process the cube that will cause the least damage
+
+Self written editorial
+When processing every cube, we want to put it on top of the smallest possible cube. If its bigger than every cube we create a new tower. This is because if we don't place it on the smallest possible cube, the answer can only get worse since they achieve the same thing, so why not put it on the smallest so the larger ones might store more. 
+```cpp
+void solve(){
+    int n; cin>>n;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    ll ans = 0;
+    multiset<int> ms; // current towers
+    rep(i,0,n){
+        auto it = ms.upper_bound(v[i]); // check for smallest cube larger than current cube
+        if(it == ms.end()){ // curr cube is largest
+            ms.insert(v[i]);
+        }
+        else{
+            // we put cube on this tower
+            ms.erase(it); 
+            ms.insert(v[i]);
+        }
+    }
+    cout<<ms.size()<<endl; // num of towers
+    
+}
+```
+
+**Problem 6:** https://cses.fi/problemset/task/1632
+This is just scheduling problem but with multiple people. For each event we see if a person is avaliable to view it. 
+```cpp
+void solve(){
+    int n,k;cin>>n>>k;
+    vector <pi> v;
+    rep(i,0,n){
+        int a,b;cin>>a>>b;
+        v.pb({b,a}); 
+    }
+    sort(v.begin(),v.end()); // sort by earliest end time
+    multiset <int> end;
+    rep(i,0,k){
+        end.insert(0); // k people starting at time 0
+    }
+    int ans = 0;
+    rep(i,0,n){
+        auto it = end.upper_bound(v[i].second);
+        if(it != end.begin()){ // there is a student whose end time < curr starting time
+            ans++; // student will watch this movie
+            --it;
+            end.erase(it);
+            end.insert(v[i].first); // set to curr end time
+        }
+    }
+    cout<<ans<<endl;
+}
 ```
