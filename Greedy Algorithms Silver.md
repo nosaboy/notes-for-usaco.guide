@@ -78,4 +78,40 @@ void solve(){
 }
 
 ```
+**Problem 2:** https://cses.fi/problemset/task/1084
+Observations:
+- We visualize the people and the apartment ranges on a number line
 
+
+The greedy strat is that for every apartment, we are given some choices for what people to assign it to, and we always pick the **earliest person**. This is because it will not ruin the answer moving forwards and picking someone other than the earliest avaliable person will only ruin the answer.
+```cpp
+void solve(){
+    int n,m,k;cin>>n>>m>>k;
+    vi a; vi b;
+    rep(i,0,n){
+        int u;cin>>u;a.pb(u);
+    }
+    rep(i,0,n){
+        int u;cin>>u;b.pb(u);
+    }
+    sort(a.begin(),a.end());
+    sort(b.begin(),b.end());
+    int ans = 0;
+    int i = 0; int j =0;
+    while(i < n && j < m){
+        if(a[i] < b[j] - k){
+            i++; // a is too small to be in range, so we move a up
+        }
+        else if(a[i] > b[j] + k){
+            j++; // a is too big to be in range, so we move b up
+        }
+        else{
+            ans++;
+            i++; j++;
+        }
+    }
+    cout<<ans<<endl;
+    
+}
+
+```
