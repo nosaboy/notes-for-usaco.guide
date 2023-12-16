@@ -414,6 +414,36 @@ void solve(){
 ```
 
 **Problem 14:** http://www.usaco.org/index.php?page=viewproblem2&cpid=714
+We realize that we want to greedily order the cow such that after each cow greedily chooses some chicken for all cows, the ans is max. Note that it is always best to just pick a chicken as soon as possible since it wont affect answer if we wait. We note that if we sort cows by end points and process it smallest to largest then pick the earliest chicken possible, it will not ruin some further picking. Consider only two cow ranges, one after another. We will lose if a chicken shares both ranges A and B and another chicken is only present in one cow range A, then we pick the chicken that shares both ranges for cow A. Thus leaving nothing for cow B. Always prioritizing the earliest ending cow prevents this, since the only way for the above scenario happens is if the chicken that only occupies A is in front of the other chicken that occupies both ranges. In this case we always pick the earliest chicken possible, so it will always work out.
+```cpp
+void solve(){
+    int n,m;cin>>n>>m;
+    vi a; multiset <int> ms;
+    rep(i,0,n){
+        int u;cin>>u;a.pb(u);
+        ms.insert(u);
+    }
+    vector <pi> v;
+    rep(i,0,m){
+        int a,b;
+        cin>>a>>b;
+        v.pb({b,a});
+    }
+    sort(v.begin(),v.end()); // sort by end time
+    int ans = 0;
+    rep(i,0,m){
+        auto it = ms.lower_bound(v[i].second); // earliest chicken avaliable 
+        if(it != ms.end() && *it <= v[i].first){ // this earliest chicken is inside range
+            ms.erase(it); // used this chicken
+            ans++;
+        }
+    }  
+
+    cout<<ans<<endl;  
+}
+```
+
+**Problem 15:** http://www.usaco.org/index.php?page=viewproblem2&cpid=990
 
 ```cpp
 
