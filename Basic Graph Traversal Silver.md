@@ -337,7 +337,78 @@ void solve(){
 }
 
 ```
+**Problem 2:** http://www.usaco.org/index.php?page=viewproblem2&cpid=920
+We note that for each connected component of colouring, if it works then there are 2 ways to arrange(switch up the colours) since we must satisfiy some constraint between same and different colourings. Thus if there are x connect components and all of their constraints can be satisifed, the answer will be 2^x. If ONE of the connect components have constrains that cannot be satsfied(if S x y and D x y both occur, they cannot be satsfied), then the total answer is 0.
+We must store all the SAME & DIFFERENT edges, then use 2 colouring to check if its possible.
+```cpp
+int vis[100005]={0};
+int colour[100005]={0};
+vector <pi> aj[100005];
+bool possible = true; // is colouring possible
+void dfs(int n){
+    vis[n]=1;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i].first]){
+            if(aj[n][i].second == 1){ // same
+                colour[aj[n][i].first] = colour[n];
+            }
+            else{ // diff
+                colour[aj[n][i].first] = 3- colour[n];
+            }
+            
+            dfs(aj[n][i].first);
+        }
+        else{
+            // check if colours satisfy condition
+            if(aj[n][i].second == 1){ // same
+                if(colour[aj[n][i].first] != colour[n]){
+                    possible = false;
+                }
+            }
+            else{ // diff
+                if(colour[aj[n][i].first] != 3-colour[n]){
+                    possible = false;
+                }
+            }
+        }
+        
+    }
+}
+void solve(){
+    int n,k;cin>>n>>k;
+    rep(i,0,n+1){
+        vis[i]=0;
+	    colour[i]=0;
+    }
+    rep(i,0,k){
+        char c; int x,y;cin>>c>>x>>y;
+        // add edge to count connected components
+        aj[x].pb({y, (c == 'S') ? 1 : 0}); aj[y].pb({x,(c == 'S') ? 1 : 0});
+	// 1 = same, 0 = diff
+        
+    }
 
+    // count connected components
+    int cnt = 0;
+    rep(i,1,n+1){
+        if(!vis[i]){
+	        cnt++;	
+            dfs(i);
+        }
+    }
+    // is all conditions possible to satisfy
+    if(!possible){
+        cout<<0;
+        return;
+    }
+    // print 2^cnt in binary
+    cout<<1;
+    rep(i,0,cnt){
+        cout<<0;
+    }
+    
+}
+```
 **Problem 3:** https://codeforces.com/contest/1176/problem/E
 If we have have two colours, then we can choose all nodes coloured red so that every other coloured blue must be adjacent to the nodes coloured red(the nodes we took out). We know that since we colour each node in two colours, there must be one colour that does not exceed floor(n/2). Thus, we pick that the nodes that have the smaller colour.
 
