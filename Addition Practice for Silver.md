@@ -1,3 +1,22 @@
+**Problem 1:** https://cses.fi/problemset/task/1650
+Based on properties of XOR function we know that to to undo xor from a to b, we simply xor a and b again. Thus, we can build an xor prefix sum, then just un-xor the prefix a-1 from prefix b.
+
+```cpp
+void solve(){
+    int n,q; cin>>n>>q;
+    vi v; int pre[n+1];
+    pre[0]=0;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+        pre[i+1] = pre[i] ^ v[i];
+    }
+
+    while(q--){
+        int a,b;cin>>a>>b;
+        cout<<(pre[b]^pre[a-1])<<endl;
+    }
+}
+```
 **Problem 2:** https://codeforces.com/problemset/problem/1359/C
 Since the temperature is the average of the cups, we know that the temperature can be 2 choices at any given time. If the optimal time $n$ is even, we know that we have poured n/2 cups of hot water and n/2 cups
 of cold water so the average is (h * n/2 + c * n/2)/n = (n(h+c)/2)/n = (h+c)/2. If $n$ is odd, we know that since we poured 1 cup of hot water first, we poured 1 cup of hot water last. Thus, the average is
