@@ -557,6 +557,65 @@ void solve(){
 
 **Problem 11:** https://cses.fi/problemset/task/1085
 
+**Problem 13:** https://www.codechef.com/problems/TRPTSTIC
+I think this is pretty straight forward although impl 2d prefix sum might be scary. We first fix each room (i,j) as the mentors room. Note that we can only put this as a mentors room is it has space for at least 1 person. We then use binary search to find the minimum square with top left at (i-mid, j-mid) and top right at (i+mid, j+mid). This way, the maximum length of all these rooms is at most mid. We then know that if the 2d prefix sum of this square >= k+1, we can fit all mentor and students, so it is valid. We thus run binary search and find smallest mid that can fit all people for each fixed mentor room, then take the minimum of that.
+One more thing about 2d prefix sums is that if we go out of bounds, we just take 0 or n as our coordinates. So we have max(x,0) and min(x,n).
+
+```cpp
+void solve(){
+    ll n,m,k;
+    cin>>n>>m>>k;
+    ll pre[n+1][m+1]={0}; // 1 indexed
+    ll a[n][m];
+    rep(i,0,n){
+        rep(j,0,m){
+            cin>>a[i][j];
+        }
+    }
+	// construct 2d prefix sum
+    for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= m; j++) {
+		    pre[i][j] = a[i-1][j-1] + pre[i - 1][j] + pre[i][j - 1] - pre[i - 1][j - 1];
+		}
+	}
+    ll ans = 1000000005;
+    for(ll i = 1;i<=n;i++){
+        for(ll j = 1;j<=m;j++){
+            // fix mentors room
+            if(a[i-1][j-1] > 0){ // if there is room for the mentor in this room
+                ll lo = 0; ll hi = 1000000005;
+                while(lo < hi){ // minimum dist
+                    ll mid = lo + (hi - lo) / 2;
+			// sum = 2s prefix sum of square 
+                    ll sum = pre[min(n,i+mid)][min(m,j+mid)] 
+                        - pre[max(i-mid-1,0LL)][min(m,j+mid)] 
+                        -pre[min(n,i+mid)][max(j-mid-1,0LL)] 
+                        +pre[max(i-mid-1,0LL)][max(j-mid-1,0LL)];
+                    //cout<<mid<<" "<<i<<" "<<j<<" "<<sum<<" "<<k<<endl;
+			// if capacity >= people, mid is valid
+                    if (sum >= k+1) {
+                        hi = mid;
+                    } else {
+                        lo = mid + 1;
+                    }
+                }
+                //cout<<hi<<" "<<i<<" "<<j<<endl;
+                ans = min(ans,hi);
+            }
+            
+        }
+    }
+    if(ans == 1000000005){
+        cout<<-1<<endl;
+        return;
+    }
+    cout<<ans<<endl;
+
+
+	
+
+}
+```
 **Problem 14:** https://cses.fi/problemset/task/2422/
 We can binary search fopr the mid answer. We first find the minimum number such that the number of values on the multiplication table that is nelow this number is >= half. This means median is the closest number <= this number that is on the multiplcation table. 
 ```cpp
@@ -625,9 +684,79 @@ void solve(){
 }
 ```
 **Problem 18:** https://codeforces.com/contest/1244/problem/E
-
+Time wasters:
+- Did not organize how to calculate min moves needed given a range
+	- kinda confused about the formula which made me doubt myself
+ - Tried to fix start point then binary search endpoint, then seeing if we can also move start point after binary searchign for endpoint
+   	- shouldve just binary searched for length(answer) like a normal person
+ - Started out with only checking for starting point as an integer in the array(did not condsider also checking for endpoints), using only 1 for loop inside binary search 
+Self Editorial:
+We first visualize the numbers as points on a number line( and as a bar graph). We then note that having none of the end points of the final answer range be inside the array will not produce a better answer. Thus, we always want one of the endpoints to be some number in the array. We can then binary search the length of the range, then loop through each point in the array and set that as the starting and ending point(loop over twice), and determine if the minimum number of moves to achieve this binary searched range is smaller than k or not.
+**Is
 ```cpp
-
+void solve(){
+    ll n,k;cin>>n>>k;
+    vector<ll> v;
+    rep(i,0,n){
+        ll u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    ll pre[n+1]={0}; ll suf[n+1]={0};
+    suf[n]=0;
+    rep(i,0,n){
+        pre[i+1] = pre[i]+v[i];
+    }
+    for(int i = n-1;i>=0;i--){
+        suf[i] = suf[i+1]+v[i];
+    }
+    ll ans = 1000000000000000005;
+ 
+    ll lo = 0; ll hi = 1000000000000000005;
+    while (lo < hi) {
+        ll mid = lo + (hi - lo) / 2; // length
+        ll mn = 1000000000000000005;
+	// starting at a point in array
+        rep(i,0,n){
+            ll l = v[i]; ll r = v[i]+mid; // left and right borders
+            auto itr = lower_bound(v.begin(),v.end(),l);
+            ll osa = 0;
+            if(itr != v.begin()){
+                --itr; // largest point below left bound
+                ll pos = (itr - v.begin());
+                osa = (pos+1LL) * l - pre[pos+1];
+                
+            }
+            auto it = upper_bound(v.begin(),v.end(),r);
+            ll pos = (it - v.begin()); // smallest point above right bound
+            ll nosa = (pre[n] - pre[pos]) - (n-pos) * (r);
+            mn = min(mn, osa + nosa); 
+        }
+	ending at point in array
+        rep(i,0,n){
+            ll l = v[i]-mid; ll r = v[i]; // left and right borders
+            auto itr = lower_bound(v.begin(),v.end(),l);
+            ll osa = 0;
+            if(itr != v.begin()){
+                --itr;
+                ll pos = (itr - v.begin());
+                osa = (pos+1LL) * l - pre[pos+1];
+                
+            }
+            auto it = upper_bound(v.begin(),v.end(),r);
+            ll pos = (it - v.begin());
+            ll nosa = (pre[n] - pre[pos]) - (n-pos) * (r);
+            mn = min(mn, osa + nosa); 
+        }
+            
+            
+        if (mn <= k) {
+            hi = mid;
+        } else {
+            lo = mid + 1;
+        }
+    }
+    cout<<hi<<endl;
+}
 ```
 **Problem 19:** https://codeforces.com/gym/104468/problem/H
 We can use binary search to calculate the second query in O(logn). We know that if prefix at mid works, then every prefix < mid will have a sum less than $pre[mid]$ so it will also be less than Y. It remains to find the sum of prefix in O(1) time. We can do this by first calculating prefix sum of every colour. To process the first query, we can then store a total sum, then store a sum of the ith colour. This way for each colour we have added (total sum - sum of colour) for each value. Thus when binary searching mid the total sum is just $pre[mid] + (total sum - sum of colour) * mid$: original prefix + added value (total sum - sum of colour) to $mid$ numbers.
