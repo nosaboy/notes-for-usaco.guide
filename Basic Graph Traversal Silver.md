@@ -224,6 +224,64 @@ while (!q.empty()) {
    }
 }
 ```
+### Connected Component Problems
+**Problem 1:** http://www.usaco.org/index.php?page=viewproblem2&cpid=644
+Self Editorial:
+n,m < 3000, so we can do O(n^2). Thus, we can just brute force simulate and check after each deletion of a node how many connected components it has. 
+**Can this be faster using DSU?**
+```cpp
+vi aj[3005];
+int vis[3005];
+int cnt = 0;
+int del[3005];
+void dfs(int n){
+    if(del[n]){ // if already deleted
+	// we skip this node
+        vis[n]=1; 
+        return;
+    }
+    vis[n] = true;
+    cnt++; // add to number of nodes
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+        }
+    }
+}
+
+void solve(){
+    int n,m;cin>>n>>m;
+    rep(i,0,m){
+        int a,b;
+        cin>>a>>b;
+        aj[a].pb(b); aj[b].pb(a);
+    }
+
+    
+    rep(i,0,n){
+        cnt = 0;
+        rep(j,0,3005){
+            vis[j] = false;
+        }
+        rep(j,1,n+1){
+            if(del[j] == 0){ // not deleted yet
+                dfs(j); // dfs once then break
+                break;
+            }
+        }
+        if(cnt == n-i){ // 1 connected component
+            cout<<"YES\n";
+        }
+        else{
+            cout<<"NO\n";
+        }
+        int u;cin>>u;
+        del[u]=1;
+        
+    }
+}
+```
+
 
 ### Two Colouring Problems
 **Problem 1:** https://codeforces.com/contest/862/problem/B
