@@ -557,6 +557,35 @@ void solve(){
 
 **Problem 11:** https://cses.fi/problemset/task/1085
 
+**Problem 14:** https://cses.fi/problemset/task/2422/
+We can binary search fopr the mid answer. We first find the minimum number such that the number of values on the multiplication table that is nelow this number is >= half. This means median is the closest number <= this number that is on the multiplcation table. 
+```cpp
+void solve(){
+    ll n;cin>>n;
+    ll lo = 0; ll hi = n*n;
+	// compute min number >= median
+    while(lo < hi){
+        ll mid = lo + (hi - lo) / 2;
+        ll ans = 0;
+	// compute how many numbers on multiplication table <= mid.
+        rep(i,1,n+1){
+            ans += min(n,mid/i);
+        }
+        if (ans < n*n/2+1) {
+			lo = mid+1;
+		} else { // number of values on multiplication table below mid is >= median
+			hi = mid;
+		}
+    }
+    ll mx = 0;
+    rep(i,1,n+1){ // find the biggest number <= hi on the multiplication table
+        mx = max(mx,hi/i * i); 
+    }
+    cout<<mx<<endl;
+    
+    
+}
+```
 **Problem 17:** https://codeforces.com/contest/847/problem/B
 For every number inserted, lets see if we can append this number into some pre existing array such that all number before it in the array is smaller or equal to it. Then, we wont have to make any more moves. Else, we are forced to create a new array and iterate again. 
 ```cpp
@@ -594,6 +623,11 @@ void solve(){
  
  
 }
+```
+**Problem 18:** https://codeforces.com/contest/1244/problem/E
+
+```cpp
+
 ```
 **Problem 19:** https://codeforces.com/gym/104468/problem/H
 We can use binary search to calculate the second query in O(logn). We know that if prefix at mid works, then every prefix < mid will have a sum less than $pre[mid]$ so it will also be less than Y. It remains to find the sum of prefix in O(1) time. We can do this by first calculating prefix sum of every colour. To process the first query, we can then store a total sum, then store a sum of the ith colour. This way for each colour we have added (total sum - sum of colour) for each value. Thus when binary searching mid the total sum is just $pre[mid] + (total sum - sum of colour) * mid$: original prefix + added value (total sum - sum of colour) to $mid$ numbers.
