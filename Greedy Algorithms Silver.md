@@ -444,7 +444,60 @@ void solve(){
 ```
 
 **Problem 15:** http://www.usaco.org/index.php?page=viewproblem2&cpid=990
+Mistakes:
+- Over complication and not organizing thoughts(not joting down approaches with pen and paper)
+- Didnt realize low constrains canbe taken advantage of
+- Didnt try to "fix" any berries and then try to find greedy
+- Tried to find a greedy strategy for everything(just looping through berry patches once and taking something)
+	- should've realized this was sus and tried to loop for every berry, or fix something so that we can force a strategy(like fixing min Elsies berries = upperbound of Bessies berries)
 
+
+Self Editorial:
+I was lowkey bricking this but the idea is actually quite simple. We note that n < 1000 and bi < 1000. Thus, we can first fix some berry number, then loop through n and it will not TLE. Moreover, log(1000) < 10 so we can have a O(nklogn) solution. The solution is as follows: Lets fix the minimum berry of any of Elsies baskets = i. We thus know that for every Bessies baskets, it can not exceed i. We can first just pick i berries for every one of k/2 baskets for Elsie, since this maximizes the number of berries left for Bessie. Then if this can be achieved, we loop through k/2 times and always take the largest possible amount of berries without exceeding i for Bessie. We then sum up everything and the ans is just the max sum for all i.
 ```cpp
-
+void solve(){
+    int n,k;cin>>n>>k;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    int ans =0;
+    rep(i,1,1001){
+        multiset <int> ms; // current berries for every patch
+        rep(j,0,n){
+            ms.insert(v[j]);
+        }
+        bool y= true; // can we form k/2 baskets for Elsie, where each basket is at least i?
+	// Elsies baskets
+        rep(j,0,k/2){
+            auto it = ms.end(); // pick biggest element
+            --it;
+		
+            if(*it < i){ // we must fill each of the k/2 baskets with at least i, so if the biggest element is still smaller than i we know this i is invalid.
+                y = false;
+                break;
+            }
+            else{
+                int ok = *it - i; // take minimum for elsie baskets
+                ms.erase(it);
+                ms.insert(ok); // new value
+            }
+        }
+        if(y){ // possible
+            // we perform greedy on the remaining k/2 baskets for bessie
+            int sum = 0;
+            rep(j,0,k/2){
+                auto it = ms.end(); // take maximum element
+                --it;
+                int ok = max(0, *it - i); // whats left after taking
+                sum += *it-ok; // take as much as possible
+                ms.erase(it); 
+                ms.insert(ok); // new value after taking some berries
+            }
+            ans = max(ans, sum); // we are looping through all fixed i, and taking max ans
+        }
+    }
+    cout<<ans<<endl;
+}
+   
 ```
