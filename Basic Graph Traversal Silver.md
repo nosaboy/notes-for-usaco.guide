@@ -282,7 +282,228 @@ void solve(){
 }
 ```
 
+**Problem 2:** http://www.usaco.org/index.php?page=viewproblem2&cpid=668
 
+Self Editorial:
+Pretty straight forward tbh. We construct a directed graph, where node i can go to node j if the power of node i >= distance from i to j. Since n <= 200, n^2 is possible. We can then brute force and fix every starting node, then check maximum reachbility using counter. Then we find max cnt for all starting node i. This also takes O(n^2).
+```cpp
+vi aj[205];
+int cnt = 0; // number of nodes reached
+int vis[205]={0};
+void dfs(int n){
+    vis[n]=true;
+    cnt++;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+        }
+    }
+}
+
+void solve(){
+    int n;cin>>n;
+    vector <tuple<double,double,double>> v;
+    rep(i,0,n){
+        double x,y,p;cin>>x>>y>>p;
+        v.pb({x,y,p});
+        
+    }
+    rep(i,0,n){
+        rep(j,0,n){
+            // distance formula:
+            double dist = sqrt((get<0>(v[i]) - get<0>(v[j])) * (get<0>(v[i]) - get<0>(v[j])) + (get<1>(v[i]) - get<1>(v[j])) * (get<1>(v[i]) - get<1>(v[j])));
+            if(dist <= get<2>(v[i])){ // v[i] can reach v[j]
+            
+                aj[i].pb(j); // create directed edge
+            }
+        }
+    }
+    int ans = 0;
+    rep(i,0,n){
+        // reset
+        cnt = 0;
+        rep(j,0,n){
+            vis[j]=0;
+        }
+        dfs(i); // find reachbility
+        ans = max(ans, cnt);
+
+    }
+    cout<<ans<<endl;
+}
+   
+```
+
+**Problem 3:** http://www.usaco.org/index.php?page=viewproblem2&cpid=944
+
+Self Editorial:
+A trivial fact: Given some points on a xy grid, a fence that incloses all points which minimizes area and perimeter is a fence whose length is max x - min x and height is max y - min y. For every connected component, we find the perimeter of this fence by finding these variables using dfs. Then the final answer is the minimum of all the connected components.
+```cpp
+vi aj[100005];
+int cnt = 0; // number of nodes reached
+int vis[100005]={0};
+pi coord[100005];
+int mnx,mxx,mny,mxy;
+void dfs(int n){
+    vis[n]=true;
+    // calculate min max x and y
+    mnx = min(mnx, coord[n].first);
+    mxx = max(mxx, coord[n].first);
+    mny = min(mny, coord[n].second);
+    mxy = max(mxy, coord[n].second);
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+        }
+    }
+}
+
+void solve(){
+    int n,m;cin>>n>>m;
+    rep(i,1,n+1){
+        int x,y;cin>>x>>y;
+        coord[i] = {x,y};
+    }
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b); aj[b].pb(a);
+    }
+    // go thorugh every connected component
+    int ans = 1000000005;
+    rep(i,1,n+1){
+        if(!vis[i]){
+            // reset
+            mnx = 1000000005; mxx = 0;
+            mny = 1000000005; mxy = 0;
+            dfs(i); // go through each connected component
+            ans = min(ans, 2 * (mxx - mnx) + 2 * (mxy-mny)); // perimeter
+        }
+    }
+    cout<<ans<<endl;
+
+}
+```
+
+**Problem 4:** https://open.kattis.com/problems/birthday
+
+Self Editorial:
+Since p <= 100 we can do O(p^3) or some O(p^2c)- very tight but it passed :shrug: 
+We can brute force over all pairs. For each pair of people, we can erase its corresponding edge, and see how many nodes we can reach starting from some person. If the total number of nodes reached < n, we know we have not reached everyone and thus we print yes. Basically just brute force + simulation.
+```cpp
+int fir, sec;
+vi aj[105];
+int vis[105];
+int cnt;
+void dfs(int n){
+    vis[n]=true;
+    cnt++;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            if((fir == n && sec == aj[n][i]) || (sec == n && fir == aj[n][i])){
+                // skip this edge since we erased it
+            }
+            else{
+                dfs(aj[n][i]);
+            }
+            
+        }
+    }
+}
+bool gg = 0; // we end program if we reach 0 0.
+void solve(){
+    if(gg){
+        return;
+    }
+    int n,m;cin>>n>>m;
+    if(n== 0 && m == 0){
+        // we reached 0 0, so we terminate program
+        gg = 1;
+        return;
+    }
+    // reset
+    rep(i,0,n+1){
+        vis[i]=0;
+        aj[i].clear();
+    }
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b); aj[b].pb(a);
+    }
+    // brute force every pair
+    int ans = 1000000005;
+    rep(i,0,n){
+        rep(j,0,n){
+            // reset
+            fir = i; sec = j;
+            cnt = 0;
+            rep(l,0,n+1){
+                vis[l]=0;
+            }
+            dfs(i); // count number of visited nodes
+            if(cnt < n){ // not all nodes were visited
+                cout<<"Yes\n";
+                return;
+            }   
+            
+        }
+    }
+    cout<<"No\n";
+
+}
+    
+```
+**Problem 5:** https://dmoj.ca/problem/acsl1p4
+
+Self Editorial:
+Since constrains are really small(n <= 20, k <= 30), we can do O(np) solution. We can brute force by finding for every node, if it is contained in a cycle. First, we note that a cycle exists if we have A win B, B win C, ... , X win A. Thus, we can construct a directed graph, where A -> B if A wins B. Then, A is contained in a cycle if after we dfs starting from A, we visit A again.
+**Can we do this in O(n)?**
+```cpp
+vi aj[105];
+int vis[105];
+int goal; // starting node we are trying to come back to
+bool osa; // did we reach the starting node again?
+void dfs(int n){
+    vis[n]=true;  
+    
+    rep(i,0,aj[n].size()){
+        if(aj[n][i] == goal){ // one of the neighbours is the starting node
+	// we visited A again, so it is in some cycle.
+            osa = 1;
+        }
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);        
+        }
+        
+    }
+}
+void solve(){
+    int n,m; cin>>n>>m;
+    rep(i,0,m){
+        int a,b,x,y;cin>>a>>b>>x>>y;
+        // create direct edge based on who wins
+        if(x > y){
+            aj[a].pb(b);
+        }
+        else{
+            aj[b].pb(a);
+        }
+    }
+    int ans =0;
+    rep(i,1,n+1){ // for each node
+        // reset
+        rep(j,1,n+1){
+            vis[j] = 0;
+        }
+        osa = 0; 
+        goal = i; // start is current node
+        dfs(i);
+        if(osa){
+            ans++;
+        }
+    }
+    cout<<ans<<endl;
+}
+```
 ### Two Colouring Problems
 **Problem 1:** https://codeforces.com/contest/862/problem/B
 We can first find the number of red and blue nodes by simulating colouring as above. Then, we know that it is safe to add an edge to two nodes if they have different colours. In order to maximize edges, we must connect each red node to as many blue nodes possible if they are not connected already. This means the max is just the sum of the number of blue nodes not connected to a red node for every red node. So sum of # of blue - neighbour of x for every red node x.
