@@ -692,7 +692,8 @@ Time wasters:
  - Started out with only checking for starting point as an integer in the array(did not condsider also checking for endpoints), using only 1 for loop inside binary search 
 Self Editorial:
 We first visualize the numbers as points on a number line( and as a bar graph). We then note that having none of the end points of the final answer range be inside the array will not produce a better answer. Thus, we always want one of the endpoints to be some number in the array. We can then binary search the length of the range, then loop through each point in the array and set that as the starting and ending point(loop over twice), and determine if the minimum number of moves to achieve this binary searched range is smaller than k or not.
-**Is
+**Is this solvale with only one loop instead of two?**
+**Is this solvable with ternary search?** 
 ```cpp
 void solve(){
     ll n,k;cin>>n>>k;
