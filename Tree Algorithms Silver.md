@@ -145,3 +145,49 @@ void solve(){
     
 }
 ```
+**Problem 2:** http://www.usaco.org/index.php?page=viewproblem2&cpid=788
+
+Self Editorial:
+Since both n and q <= 5000, we can have an O(nq) solution. This allows for brute force. For every query, we can just traverse through the tree starting at starting node. Then directly simulate and update min(curr relevence of path) as we go through.
+
+**What I learned:**
+- You can store weights between two edges using adjancency list instead of using a map. Just store a pi $aj[n]$ where pair represents {neighbour, weight}. This way, we can reduce O(log(n)) to O(1).
+ 
+```cpp
+vector <pi> aj[5005];
+int vis[5005];
+int cnt;
+int r; // current query relevent
+void dfs(int n, int mn){ // {curr node, min curr value on path}
+    vis[n]=true;  
+    cnt++;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i].first] && min(mn,aj[n][i].second) >= r){ // at least relevence r
+            // we visit it     
+            dfs(aj[n][i].first,min(mn,aj[n][i].second));        
+        }
+        
+    }
+}
+void solve(){
+    int n,q; cin>>n>>q;
+    rep(i,0,n-1){
+        int a,b,x;cin>>a>>b>>x;
+        aj[a].pb({b,x});
+        aj[b].pb({a,x});
+    }
+    while(q--){
+        int a;cin>>r>>a; // relevence, start node
+        // reset
+        cnt = 0;
+        rep(i,1,n+1){
+            vis[i] = 0;
+        }
+        dfs(a,1000000005);
+        cout<<cnt-1<<endl; // we dont include start node
+    }
+    
+}
+```
+
+**Problem 4:** http://www.usaco.org/index.php?page=viewproblem2&cpid=968
