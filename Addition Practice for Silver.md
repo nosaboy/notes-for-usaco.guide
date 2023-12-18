@@ -271,3 +271,114 @@ void solve(){
     }
 }
 ```
+
+**Problem 11:** https://codeforces.com/contest/1468/problem/D
+
+Time: 20 minutes ish, kinda wacky with greedy sol and a little bit with the math for how many moves 
+
+Self Editorial:
+I thought this was not that hard. We note that we never want to go towards the guard. Then, we want to waste as much time as possible. If we start by moving in the opposite direction without placing down any fire crackers, we have not increased the distance between us and the guard, and not wasted any time since we didnt place down any fire crackers. Moreover, we decreased the distance from us to the border which means this move was just bad for us. Instead, we should place as many fire crackers as possible before we are forced to move. We then waste as much time as possible by moving until we reach the border, always maintaining dist of 1 with the guard. Now its left to determine which fire crackers to place. We note that earlier placed firecrackers will explode earlier. So we want to maximize the time of earlier firecrackers. We can go through the array, and see if the firecracker will explode if it is set at the current time. If it will, we increase current time by 1(since we set this fire cracker), and continue. Else, we don't use this firecracker at all since it will be a waste of time.
+**Formal proof of why this choosing works?**
+```cpp
+void solve(){
+    int n,m,a,b;cin>>n>>m>>a>>b;
+    vi v;
+    rep(i,0,m){
+        int u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    if(a<b){
+        int cnt = b-a-1; // seconds hooligan can stay at a
+        int ans =0;
+        int it = 0;
+        for(int i = m-1;i>=0;i--){ 
+            
+            if(it+1 <= cnt){ // math to see if our current time exceeds the max time we can stay
+                
+                if(b - 1 - (it+1) >= v[i]){ // math: if this firecracker will explode before the guard catches us if we set it at this time
+                // explode <= total time - curr time = time for guard to get to border - current time
+                    it++; // increase time
+                    ans++; // increase ans
+                }
+            }
+        }
+        cout<<ans<<endl;
+    }
+    else{ // other case where a > b, we must go from a to border n
+        int cnt = a-b-1; // seconds hooligan can stay at a
+        int ans =0;
+        int it = 0;
+        for(int i = m-1;i>=0;i--){ 
+            
+            if(it+1 <= cnt){
+                if(n-b - (it+1) >= v[i]){
+                    it++;
+                    ans++;
+                }
+            }
+        }
+        cout<<ans<<endl;
+    }
+}
+   
+```
+
+**Problem 13:** https://codeforces.com/contest/51/problem/C
+
+Time: pretty bad like it was free but impl was not good cause **I didnt really get how eps work in binary search, like i had a but where I set long double pos = v_i + mid, but then pos - mid <= v_i failed or smth. So I didnt really get how binary search with precision worked and that costed a lot of time ig.
+
+Self Editorial:
+This is pretty much like CCC S3 Lunch Concert but you only have 3 stations( this can also be generalized with k stations using bianry search as well). Pretty much just fix the radius of the station using binary search(since answer is monotonic because bigger radius = more chance to succeed), then go through each house and greedily assign station(put new station only if its absolutely necessary). Then in the end check if number of stations added exceeded 3.
+```cpp
+void solve(){
+    int n;cin>>n;
+    vector<long double> v;
+    rep(i,0,n){
+        long double u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    long double lo = 0; long double hi = 1000000005;
+    while(lo + 0.000000001 < hi){ // eps = 10^-9
+        long double mid = lo + (hi - lo) / 2;
+        int cnt = 1;
+        long double pos = v[0]+mid; // must put a station at this position to fit in v[0]
+        rep(i,0,n){
+            if(pos - mid-0.000000001<= v[i] && v[i] <= pos + mid+0.000000001){ // precision eps stuff
+                // alreay contained in current station
+            }
+            else{
+                cnt++; // add station
+                
+                pos = v[i]+mid; // new station position
+                
+            }
+        }
+        if (cnt <= 3) { // works, number of station used smaller than 3
+			hi = mid;
+		} else {
+			lo = mid + 0.000000001;
+		}
+    }
+    cout << fixed << setprecision(9) <<hi<<endl;
+    long double pos = v[0]+hi;
+    cout<<pos<<" ";
+    int cnt = 1;
+    // simulate to get station pos since we already know min radius
+    rep(i,0,n){
+        if(pos - hi -0.000000001<= v[i] && v[i] <= pos + hi+0.000000001){ // precision eps stuf
+                // alreay contained in current station
+        }
+        else{
+            
+            cnt++; // add new station
+            pos = v[i]+hi;
+            cout<<pos<<" ";
+        }
+    }
+    while(cnt < 3){ // if there are extra stations left over, we add any station
+        cout<<2000000000<<" ";
+        cnt++;
+    }
+    
+}
+```
