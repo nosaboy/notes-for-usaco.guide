@@ -572,6 +572,64 @@ void solve(){
 
 **Problem 7:** http://www.usaco.org/index.php?page=viewproblem2&cpid=669
 
+Time: 13ish minutes
+
+Self Editorial:
+We can just binary search for answer since O(n^2logn) passes. We can binary search for answer. For eac X, construct a graph where two nodes A and B are connected if their distance^2 <= X. Then, run dfs and see if the graph is connected(if we visited all n vertices after dfs). Since the answer X is monotonic(if X works, Y works where Y > X), we can binary search.
+```cpp
+int vis[100005];
+vi aj[100005];
+int cnt;
+
+void dfs(int n){
+    vis[n]=true;
+    cnt++;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+        }
+    }
+}
+
+void solve(){
+    int n;cin>>n;
+    pi v[n];
+    rep(i,0,n){
+        int a,b;
+        cin>>a>>b;
+        v[i]={a,b};
+    }
+
+    int lo = 0; int hi = 1000000005;
+    while(lo < hi){
+        int mid = lo + (hi - lo) / 2;
+        rep(i,0,n){
+            aj[i].clear();
+            vis[i]=0;
+        }
+        cnt = 0;
+        rep(i,0,n){
+            rep(j,i+1,n){
+                int dist = (v[i].first - v[j].first) * (v[i].first - v[j].first) + (v[i].second - v[j].second) * (v[i].second - v[j].second);
+                if(dist <= mid){
+                    aj[i].pb(j);
+                    aj[j].pb(i);
+                }
+            }
+        }
+        dfs(0);
+		if (cnt == n) { // we can visit all nodes
+			hi = mid;
+		} else {
+			lo = mid + 1;
+		}
+    }
+    cout<<hi<<endl;
+}
+    
+```
+
+**Problem 
 ### Two Colouring Problems
 **Problem 1:** https://codeforces.com/contest/862/problem/B
 We can first find the number of red and blue nodes by simulating colouring as above. Then, we know that it is safe to add an edge to two nodes if they have different colours. In order to maximize edges, we must connect each red node to as many blue nodes possible if they are not connected already. This means the max is just the sum of the number of blue nodes not connected to a red node for every red node. So sum of # of blue - neighbour of x for every red node x.
