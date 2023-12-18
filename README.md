@@ -11,6 +11,7 @@
 - Code & comments
 
 ## Problems
+- Time(Stopwatch from reading problem to AC)
 - Simplifed Problem Statement(What are we trying to do)
 - Thought process & self written editorial
 - AC Code(inside void solve()) & comments
