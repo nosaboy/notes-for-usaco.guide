@@ -50,7 +50,7 @@ void solve(){
 
 ```
 
-### Tree Diameter
+### Tree Diameter: https://cses.fi/problemset/task/1131
 Calculate maximum length of a path between any 2 nodes in a tree in O(n).
 #### DP Approach
 First **Root the tree at a random node**. Note that every path of the tree between 2 nodes always contains a "high node", the highest node in the path. We can first fix our highest node x, then the longest path that has x as the highest node is just the sum of the two longest distances from x to a **leaf** in its subtree. 
@@ -66,9 +66,11 @@ maxlength(n) = largest toleaf(child_of_n) + second largest toleaf(child_of_n) + 
 We just pick the two largest toleaf(childs) and add their sum, then add the node itself.
 
 ```cpp
-int toleaf[MAX_N];
-int maxlen[MAX_N];
-int ans = 0;
+int toleaf[200005];
+int maxlen[200005]; 
+vi aj[200005];
+int vis[200005];
+int ans = 0; // number of vertices in maximum path
 void dfs(int n){
 	vis[n] = true;
     vector <int> len; len.pb(0); len.pb(0); // if n is a leaf
@@ -81,8 +83,21 @@ void dfs(int n){
     sort(len.rbegin(),len.rend());
     toleaf[n] = len[0] + 1;
     maxlen[n] = len[0] + len[1] + 1;
-    ans = max(maxlen[n]);
+    ans = max(ans,maxlen[n]);
 }
+ 
+void solve(){
+    int n;cin>>n;
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    dfs(1);
+    cout<<ans-1<<endl;
+ 
+}
+   
 ```
 
 #### 2 DFS Approach
@@ -191,3 +206,159 @@ void solve(){
 ```
 
 **Problem 4:** http://www.usaco.org/index.php?page=viewproblem2&cpid=968
+
+Time: 12 minutes
+
+Self Editorial: 
+We know there is EXACTlY one path from any node to another. Thus, if the path is continously the same patch of grass, we know that the farmer will not be happy if their preference was different. We note first that if 2 grass types are both on the path, farmer will alwyas be happy. Moreover, if there is only one grass type and thats the grass type the farmer likes, he will always be happy. 
+Thus, we can group nodes into "connected regions" of the same colour, where each node in the region can be visited by all other nodes in the region such that the path only contains that grass type. We do this using dfs. Then, if two nodes are in different regions it means their path contains both grass types. If they are in the same region an their type is different from farmers preference, he will be unhappy since their path will only contain that type.
+```cpp
+int vis[100005];
+vi aj[100005];
+int group[100005]; // the region/team of node
+int cnt=0; // team number
+string s; // type
+void dfs(int n, int team){
+    vis[n]=true;
+    group[n] = team;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            if(s[n] == s[aj[n][i]]){ // if the other path has same type, they belong to same region
+                dfs(aj[n][i],group[n]);
+            }
+            else{ // create new region/team
+                cnt++;
+                dfs(aj[n][i],cnt);
+            }
+            
+        }
+    }
+}
+
+void solve(){
+    int n,q;cin>>n>>q;
+    cin>>s;
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;a--;b--;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    dfs(0,cnt);
+    while(q--){
+        int a,b;cin>>a>>b;a--;b--;
+        char c;cin>>c;
+        if(group[a] != group[b]){ // different regions
+            cout<<1;
+        }
+        else if(s[a] == c){ // same preference 
+            cout<<1;
+        }
+        else{ // different preference, in same region
+            cout<<0;
+        }
+    }
+
+}
+```
+
+
+**Problem 5:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1062
+
+Time: 15 minutes
+
+Self Editorial:
+We first note that if we need more cows, it is always better to double current cow instead of moving a cow to this node. This is because we get at most one cow if we move, but at least one cow if we double. Moreover, it is always optimal to add/double least needed possible. This will minimize the moving of node. For example: A -> B -> C, it is better to do 4 operations: double A, move one to B, double B, move one to C instead of: double A, double A, move one to B, move one to B, move one to C. This is because A move one to B then double B, is the same as double A, move one to B, move one to B. However the first one has less operations(**Formal proof??**).
+```cpp
+int vis[100005]={0};
+vi aj[100005];
+int ans=0;
+
+void dfs(int n){
+    vis[n]=true;
+    int cnt = 1; // currently there is 1 cow from previous barn moving here
+    int sz = 0;
+    
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            sz++; // number of nodes we must go by moving 1 cow
+            ans++; // thus we add total days
+            dfs(aj[n][i]); 
+        }
+    }
+    while(cnt <= sz){ // we must also leave 1 to stay in current node, so we double until cnt > sz+1
+        cnt*=2; // double current cow in barn
+        ans++; // add days
+    }
+}
+
+void solve(){
+    int n;cin>>n;
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    dfs(1);
+    cout<<ans<<endl;
+
+}
+```
+
+**Problem 8:** 
+
+Self Editorial:
+Pretty much, we just calculate the two diameters. We note that if we add some edge to combine the two trees, the minimum possible connectiion of the maximum length that USES that additional edge is when we connect exactly half of each diameter together. Thus the length is half of first diameter + half of second diameter + additional edge = (ans1+1)/2 + (ans2+1)/2+1. Otherwise if we don't use that edge, the maximum length either diameter and that remains unchanged no matter what edge we add. Thus, the max length is max(max length that goes through added edge, max of 2 diameters) = max((ans1+1)/2 + (ans2+1)/2+1, max(ans1,ans2)).
+**How to prove that the min of the max length that goes through 2 edge is just the sum of half of both diameters + 1?**
+
+```cpp
+int toleaf[200005];
+int maxlen[200005];
+vi aj[200005];
+int vis[200005];
+int ans = 0;
+void dfs(int n){
+	vis[n] = true;
+    vector <int> len; len.pb(0); len.pb(0); // if n is a leaf
+	rep(i,0,aj[n].size()){
+		if(!vis[aj[n][i]]){
+			dfs(aj[n][i]);
+            len.pb(toleaf[aj[n][i]]); // after dfs we have already calculated toleaf[child]
+		}
+	}
+    sort(len.rbegin(),len.rend());
+    toleaf[n] = len[0] + 1;
+    maxlen[n] = len[0] + len[1] + 1;
+    ans = max(ans,maxlen[n]);
+}
+
+void solve(){
+    int n;cin>>n;
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    dfs(1);
+    int ans1 = ans-1;
+    int m;cin>>m;
+    //reset
+    ans = 0;
+    rep(i,0,m+1){
+        maxlen[i]=0;
+        toleaf[i]=0;
+        vis[i]=0;
+        aj[i].clear();
+    }
+
+    rep(i,0,m-1){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    dfs(1);
+
+    int ans2 = ans-1;
+    cout<<max(ans2,max(ans1,(ans1+1)/2 + (ans2+1)/2+1))<<endl;
+
+}
+```
