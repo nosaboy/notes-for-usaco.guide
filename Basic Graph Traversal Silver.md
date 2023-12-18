@@ -504,6 +504,74 @@ void solve(){
     cout<<ans<<endl;
 }
 ```
+**Problem 6:** https://cses.fi/problemset/task/1682
+
+Self Editorial:
+Pick some random node A. If node A this vertex cannot reach every other node through some path, we have found the answer is NO: A B where A cannot reach B. Else, we know that every other node can be reached by this node A. Now, if we have a node B that cannot reach A, we know that the answer is NO: B A. Now assume that every node can reach this A and A can reach every node. Therefore, the graph must be connected.
+
+What I learned:
+Here, we found that if there is a graph such that every node can visit every other node, it must mean that for ANY node in the graph, it can reach all other nodes, and it can be reached by all other nodes.
+^**This is the literal definition**
+To check this, we dfs with normal direction with A -> B(this visits all nodes B that can be reached by A), then reverse the directions so we go from A to B if B -> A(this visits all nodes B that can reach A). Moreover, if ONE of these nodes satisfied this condition^, they will all satisfy
+```cpp
+int vis[100005];
+vi aj[100005];
+vi opaj[100005];
+
+void dfs(int n){
+    vis[n]=true;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+        }
+    }
+}
+void opdfs(int n){
+    vis[n]=true;
+    rep(i,0,opaj[n].size()){
+        if(!vis[opaj[n][i]]){
+            opdfs(opaj[n][i]);
+        }
+    }
+}
+
+void solve(){
+    int n,m;cin>>n>>m;
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        opaj[b].pb(a);
+    }
+    rep(i,1,n+1){
+        vis[i]=0;
+    }
+	// dfs in same direction as edge
+    dfs(1);
+    rep(i,1,n+1){
+        if(vis[i] == 0){
+            cout<<"NO\n";
+            cout<<1<<" "<<i<<endl;
+            return;
+        }
+    }
+    rep(i,1,n+1){
+        vis[i]=0;
+    }
+	// dfs in diff direction as edge
+    opdfs(1);
+    rep(i,1,n+1){
+        if(vis[i] == 0){
+            cout<<"NO\n";
+            cout<<i<<" "<<1<<endl;
+            return;
+        }
+    }
+    cout<<"YES\n";
+}
+```
+
+**Problem 7:** http://www.usaco.org/index.php?page=viewproblem2&cpid=669
+
 ### Two Colouring Problems
 **Problem 1:** https://codeforces.com/contest/862/problem/B
 We can first find the number of red and blue nodes by simulating colouring as above. Then, we know that it is safe to add an edge to two nodes if they have different colours. In order to maximize edges, we must connect each red node to as many blue nodes possible if they are not connected already. This means the max is just the sum of the number of blue nodes not connected to a red node for every red node. So sum of # of blue - neighbour of x for every red node x.
