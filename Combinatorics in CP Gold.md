@@ -1,4 +1,10 @@
+## CPH Chapter 22 Combo
+We can use recursion to solve combination problems. However, some recursion can be **generalized into close formula** just like in contest math combinatorics.
 
+### Binomial Coefficients
+We can calculate $\binom{n}{k}$ using the following two formulas:
+- $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$, base case - $\binom{n}{0} = \binom{n}{1} = 1$, using recursion
+- $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ by precomputing factorials
 
 **Problem 4:** https://codeforces.com/contest/1462/problem/E2
 
