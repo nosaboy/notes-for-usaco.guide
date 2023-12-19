@@ -353,6 +353,12 @@ void solve(){
 ```
 
 **Problem 9:** https://cses.fi/problemset/task/1132
-See [[Tree DP Gold]]
+See [[Tree DP Gold]] for alternative solution involving dp.
+
+Self Editorial(Tree diameter solution):
+We first make observation: The longest path from a node x must be the distance from x to one of the endpoints of the diameter. If this is not the case, then the diameter will not be the diameter. Let a and b be the enpoints of diameter. If x -> y > x -> a and y != b, then this must mean b -> y > b -> a.**Formal proof^? Check editorial**. 
+Thus, we first find diameter(the two endpoints), then run two dfs that calculates the distance from a and b to all the other nodes in the tree. Then for every node, we just pick max(dist to a, dist to b).
+
+
 
 **Problem 10:** https://cses.fi/problemset/task/1133
