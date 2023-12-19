@@ -6,6 +6,30 @@ We can calculate $\binom{n}{k}$ using the following two formulas:
 - $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$, base case - $\binom{n}{0} = \binom{n}{1} = 1$, using recursion
 - $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ by precomputing factorials
 
+### Basic Properties:
+- $\binom{n}{k} = \binom{n}{n-k}$
+- $\binom{n}{0} + \binom{n}{1} + \binom{n}{2} + \cdots + \binom{n}{n} = 2^n$
+- Pascals Triangle
+
+### Balls and Boxes: ways to place k balls in n boxes
+
+- If each box can contain at most 1 ball: We choose k boxes from n boxes - $\binom{n}{k}$
+- If each box can contain multiple balls: We place n-1 dividers for n boxes and k stars for k balls(Stars and Bars) - $\binom{n-1+k}{k}$
+- If each box can contain multiple balls but no two adjacent boxes both contain a ball:$\binom{n-k+1}{n-2k+1}$
+
+**Multivariable Coefficient(generalizatiobn of binomial coefficient):** $\binom{n}{k_1,k_2,...,k_m} = \frac{n!}{k_1!k_2!...k_m!}$ where $k_1 + k_2 + ... + k_m = n$
+
+is the number of ways to split n objects into boxes/subsets of sizes $k_1, k_2, ..., k_m$ at once.
+
+### Catalan Numbers
+$C_n$ = number of valid parenthesis expressions with n left brackets and n right brackets
+Valid parenthesis expression: an expression with exactly n left and n right brackets such that if we chose any prefix of the expression, the number of right brackets <= number of left brackets -> Follows:
+- empty expression is valid
+- if expression A is valid, (A) is valid
+- if expression A and B are both valid, AB is valid
+
+
+
 **Problem 4:** https://codeforces.com/contest/1462/problem/E2
 
 Time: 20 minutes
