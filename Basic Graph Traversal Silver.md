@@ -631,11 +631,11 @@ void solve(){
 
 **Problem 8:** http://www.usaco.org/index.php?page=viewproblem2&cpid=992
 
-Time: 20 minutes
+Time: 20 minutes. Thought this was pretty ez solve.
 
 Self Editorial:
 
-We can binary search for weight. 
+We note that given some swaps, every number at position i can only go to position a_i if there is a series of wormholes that connects i to a_i. Thus, for every cow at i to go to its desired position at a_i, i must be in the same connected component as a_i. Thus, we can create a graph where a wormhole is the edge that connects two positions(nodes). And therefore, the problem turns into finding that max width such that all wormholes with w_i >= width. This hints for binary search since less width than the maximum will still create the same edges(and even more). Thus, we binary search the maximum width. Then, we add an edge/wormhole if the width >= mid. Then, we do dfs and see for every i if i and a_i are in the same connected component. If every i is satisfied, we know that the cows can sort themselves, otherwise they cannot.
 ```cpp
 int team[200005]={0};
 int vis[200005]={0};
@@ -673,7 +673,8 @@ void solve(){
             vis[i+1]=0;
             team[i+1]=0;
         }
-	
+
+	// go through each wormhole and connect edges based on mid
         rep(i,0,m){
             if(get<0>(v[i]) >= mid){ // we can connect this edge
                 aj[get<1>(v[i])].pb(get<2>(v[i])); 
@@ -702,12 +703,175 @@ void solve(){
 			hi = mid - 1;
 		}
 	}
-    if(lo == 1000000005){
+    if(lo == 1000000005){ // its impossible
         cout<<-1<<endl;
     }
     else{
         cout<<lo<<endl;
     }
+}
+```
+
+**Problem 9:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1159
+
+Time: a long time
+
+Mistakes:
+- Wasted a while cause I had the wrong idea about the greedily solution
+   - I thought you can just choose a node A in connected component of 1 and a node C in connected component of n, then choose any node B. The answer is min(A -> B -> C)
+^^^ like 1 hr i think?
+- use long long
+
+Self Editorial:
+We first note that 1 can travel to all nodes in the cc(connected component) of 1 and n can travel to all nodes in the cc of n. More generally, if we connect a cc A with another cc V, then all nodes in A can go to all nodes in B. We can only build at most 2 other edges. Thus, we cannot connect to more than 2 cc other than A(cc containing 1) and D(cc containing 2): A -> B -> C -> D which needs at least 3 edges. Thus, we can only choose one cc to connect A and D to.
+Thus, we iterate through every cc and calculate the minimum difference i - j between any node in the chosen cc and the nodes in cc of 1 and cc of n. We achieve this by storing the nodes in cc of 1 and cc of n in multisets then using binary search(lower_bound) to check the biggest number of the left of curr node in current cc and the smallest number of the right( the two closest numbers). Also we note that choosing to build 2 roads(even if tehy connect to themselves, costing 0) will always be better. Thus we just go through every cc and find the minimum cost to connect cc of 1 to curr cc and cc of n to curr cc. 
+
+```cpp
+int team[200005]={0}; // cc
+int vis[200005]={0};
+vi aj[200005];
+// assign nodes to cc
+void dfs(int n, int group){
+    vis[n] = 1;
+    team[n] = group; // assigns to ccc
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i],group);
+        }
+    }
+
+
+}
+void solve(){
+    int n,m;cin>>n>>m;
+    // reset
+    rep(i,0,n+1){
+        vis[i]=0;
+        aj[i].clear();
+        team[i]=0;
+    }
+
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    int cnt = 1; // number of cc
+    
+    rep(i,1,n+1){
+        if(!vis[i]){
+            dfs(i,cnt);
+            cnt++;
+        }
+    }
+    vector<ll> cc[cnt]; // store nodes contains in each cc
+    multiset <ll> a; // connected comonent for 1
+    multiset <ll> b; // connected component for n
+    rep(i,1,n+1){
+        if(team[i] == team[1]){
+            a.insert(i);
+        }
+        if(team[i] == team[n]){
+            b.insert(i);
+        }
+        cc[team[i]].pb(i); // insert node into its team
+    }
+    ll ans = 100000000000000005;
+    rep(i,1,cnt){ // for every connected component
+        ll osa = 100000000000000005; // minimum i - j between curr cc and cc of 1
+        ll nosa = 100000000000000005; // minimum i - j between curr cc and cc of n
+        rep(j,0,cc[i].size()){ // for each node in connected component
+            // check closest left and right elements in cc of 1
+            auto it = a.lower_bound(cc[i][j]);
+            if(it != a.end()){
+                osa = min(osa, *it - cc[i][j]); // difference of something >= v_i
+
+            }
+            if(it != a.begin()){
+                --it;
+                osa = min(osa, cc[i][j]-*it); // difference of soemthing < v_i
+            }
+            // check closest left and right elements in cc of n
+            auto itr = b.lower_bound(cc[i][j]);
+            if(itr != b.end()){
+                nosa = min(nosa, *itr - cc[i][j]); // difference of something >= v_i
+
+            }
+            if(itr != b.begin()){
+                --itr;
+                nosa = min(nosa, cc[i][j]-*itr); // difference of soemthing < v_i
+            }
+        }
+        ans = min(ans, osa*osa + nosa*nosa); // smallest dist with curr cc i
+    }
+    cout<<ans<<endl;
+}
+
+```
+
+**Problem 10:**
+Time: 20 - 30 minutes
+
+- Solutions / constructing the graph kinda hard to come up with
+- We have to think about what makes taking a number invalid for some cow
+	- answer: we cannot take a number a_i if its path does not produce a cycle back to i since someone must take i.
+ - TLEd because I didnt put "break" even though both are O(n^3)? Kinda sus 500^3 time limit idk.
+
+
+Self Editorial:
+We first see for each cow what numbers will be illegal(not answer). We note that all numbers to the right of i in the array will be useless, since we can just choose i which will not affect any other choosings and be done. Since this is ranked higher than all numbers to the right of it, it is better to pick i. Now we look at all the numbers to the left of i(ranked higher). We note that if we pick some number a_i, then the a_ith cow cannot pick a_i anymore, so it will have to pick some other number ranked higher than it in teh a_ith row. Moreover, i must now be picked by some other cow. Therefore, we note that if we pick the a_i, a number in front of i for the ith cow, then we must go to a_ith cow and always pick some cow in front of its a_i. We must do this until we arrive at a_i for which i is in front of a_i at the a_ith row/cow, at which we complete the cycle and everyone is happy and nothing is left out. We can find for some a_i in the ith row if it goes back to i in a cycle by first creating a directed edge fir the ith cow: i -> a_i for all a_i in front of the number i. Then, for every a_i we dfs(a_i) and see if we can arrive back to node i. If we can, we pick this present as the max since there will be a colmbination that works since we completed the cycle.
+
+```cpp
+int vis[200005]={0};
+vi aj[200005];
+// visits all nodes to see if it goes back and visits original node(cycles)
+void dfs(int n){
+    vis[n] = 1;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+        }
+    }
+
+
+}
+void solve(){
+    int n;cin>>n;
+    vi v[n];
+    rep(i,0,n){
+        rep(j,0,n){
+            int u;cin>>u;v[i].pb(u);
+        }
+    }
+    rep(i,0,n){
+        rep(j,0,n){
+            if(v[i][j] == i+1){ 
+                break;
+            }
+            aj[i+1].pb(v[i][j]); // make directed edge with all numbers a_i in front of i
+        }
+    }
+
+    rep(i,0,n){
+        int ans = i+1; // note that we can just pick i and create a cycle of 1 and be done
+        rep(j,0,n){
+            if(v[i][j] == i+1){
+                break;
+            }
+            // reset visited
+            rep(i,1,n+1){
+                vis[i]=0;
+            }
+            dfs(v[i][j]); // we picked this number, so some path starting from this number must cycle and go back to i
+            if(vis[i+1] == 1){ // if i was visited, it mean this was cycled
+                ans = v[i][j]; // this is the earliest number that cycles, so we found ans
+                break;
+            }
+
+        }
+        cout<<ans<<endl;
+    }
+    
 }
 ```
 ### Two Colouring Problems
