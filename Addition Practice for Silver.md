@@ -65,7 +65,86 @@ void solve(){
 
 }
 ```
+**Problem 3:** https://oj.uz/problem/view/CEOI12_jobs
+Time: More than I should have
 
+Mistakes:
+- Didnt really read problem too clearly which costed like 30mins
+- Came up with binary search easily
+- Spent most time debugging since I didnt account for the case where if a request comes before the current chosen greedy day, we cannot process this request, so we must increase days to the current day
+
+
+Self Editorial:
+This is pretty similar to factory problem. We notice monotonicity of answer since more machines = better chance of accomplishing requests, so we can binary search.
+It is always greedy for each tasks to squeeze in and use a robot if possible. 
+We sort the tasks by request deadline since it is always more optimal to choose earlier tasks to complete in order to mazimize chances.
+During binary search, we pick a machine to accomplish task if: there is an avaliable machine on that day and the day is >= request time since we cannot process a task before its request.
+We then process and find min using binary search.
+
+```cpp
+void solve(){
+    int n,d,m;cin>>n>>d>>m;
+    vector <pi> v;
+    rep(i,0,m){
+        int u;cin>>u;v.pb({u,i});
+    }
+    sort(v.begin(),v.end()); // greedily choose earliest request time
+    int lo = 0; int hi = 1000000005;
+    hi++;
+	while (lo < hi) {
+		int mid = lo + (hi - lo) / 2;
+        int day = 1;
+        int cnt = 0;
+        bool yn = true;
+        rep(i,0,m){
+            if(cnt == mid){ // we reached max compacity for this day
+                // reset
+                day++;
+                cnt = 0; 
+            }
+            if(v[i].first > day){ // this task is here before the current day
+		// we must make the day to the current day in order to process it
+                day = v[i].first;
+                cnt = 0;
+            }
+            if(day - v[i].first > d){ // past expiration
+                yn = false;
+            }
+            cnt++;
+        }
+		if (yn) {
+			hi = mid;
+		} else {
+			lo = mid + 1;
+		}
+	}
+    int day = 0;
+    int cnt = 0;
+    bool yn = true;
+    vi aj[n]; // for every day
+    rep(i,0,m){
+        if(cnt == hi){
+            // reset
+            day++;
+            cnt = 0; 
+        }
+	if(v[i].first > day){
+            day = v[i].first-1; // adjust for 0 indexed
+            cnt = 0;
+        }
+        aj[day].pb(v[i].second);
+        cnt++;
+    }
+    cout<<hi<<endl;
+    rep(i,0,n){
+        rep(j,0,aj[i].size()){
+            cout<<aj[i][j]+1<<" ";
+        }
+        cout<<0<<endl;
+    }
+    
+}
+```
 **Problem 4:** https://codeforces.com/contest/803/problem/D
 We can binary search on answer(maximum length of the ad). We fix this length, then any line cannot go past this length. We then simulate fitting the strings greedily, trying to fit the maximum possible string length without exceeding aans length. Then check if its possible to fit everything in it without exceeding k lines. The simulation is kinda weird & messy cause you have to deal with strings, but idea is simple.
 
