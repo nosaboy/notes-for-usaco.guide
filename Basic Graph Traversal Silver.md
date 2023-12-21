@@ -629,7 +629,87 @@ void solve(){
     
 ```
 
-**Problem 
+**Problem 8:** http://www.usaco.org/index.php?page=viewproblem2&cpid=992
+
+Time: 20 minutes
+
+Self Editorial:
+
+We can binary search for weight. 
+```cpp
+int team[200005]={0};
+int vis[200005]={0};
+vi aj[200005];
+void dfs(int n, int group){
+    vis[n] = 1;
+    team[n] = group;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i],group);
+        }
+    }
+
+
+}
+void solve(){
+    int n,m;cin>>n>>m;
+    int a[n];
+    rep(i,0,n){
+        cin>>a[i];
+    }
+    vector <tuple<int,int,int>> v;
+    rep(i,0,m){
+        int x,y,w;cin>>x>>y>>w;
+        v.pb({w,x,y});
+    }
+   
+    int lo = 0; int hi = 1000000005;
+    lo--;
+    while (lo < hi) {
+	int mid = lo + (hi - lo + 1) / 2; 
+        // reset edges
+        rep(i,0,n){
+            aj[i+1].clear();
+            vis[i+1]=0;
+            team[i+1]=0;
+        }
+	
+        rep(i,0,m){
+            if(get<0>(v[i]) >= mid){ // we can connect this edge
+                aj[get<1>(v[i])].pb(get<2>(v[i])); 
+                aj[get<2>(v[i])].pb(get<1>(v[i]));
+            }
+        }
+        int cnt = 1; // team for connected components
+        rep(i,0,n){
+            if(!vis[i+1]){
+                dfs(i+1, cnt); // node, team
+                cnt++;
+            }
+        }
+        bool yn = 1; // can all node go to its desired position
+        rep(i,0,n){
+            if(team[a[i]] == team[i+1]){ // a_i can go to position i+1 through some connected edges
+
+            }
+            else{
+                yn = 0;
+            }
+        }
+		if (yn) {
+			lo = mid;
+		} else {
+			hi = mid - 1;
+		}
+	}
+    if(lo == 1000000005){
+        cout<<-1<<endl;
+    }
+    else{
+        cout<<lo<<endl;
+    }
+}
+```
 ### Two Colouring Problems
 **Problem 1:** https://codeforces.com/contest/862/problem/B
 We can first find the number of red and blue nodes by simulating colouring as above. Then, we know that it is safe to add an edge to two nodes if they have different colours. In order to maximize edges, we must connect each red node to as many blue nodes possible if they are not connected already. This means the max is just the sum of the number of blue nodes not connected to a red node for every red node. So sum of # of blue - neighbour of x for every red node x.
