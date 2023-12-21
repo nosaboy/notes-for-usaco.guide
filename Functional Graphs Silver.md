@@ -54,5 +54,9 @@ This can also be solved in O(n):
 ```
 
 
+## Problems
+
+**Problem 1:** https://cses.fi/problemset/task/1751
+
 
   
