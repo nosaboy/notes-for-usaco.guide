@@ -362,3 +362,8 @@ Thus, we first find diameter(the two endpoints), then run two dfs that calculate
 
 
 **Problem 10:** https://cses.fi/problemset/task/1133
+
+
+
+**Problem 11:** http://www.usaco.org/index.php?page=viewproblem2&cpid=1016
+Since N <= 2500, we can solve for every starting node and root the tree. Now its left to determine if starting at node x will make the tree good in O(n).
