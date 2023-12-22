@@ -122,7 +122,154 @@ void flood(int r,int c){
 }
 	
 ```
-**Floodfill Problem 2:** https://codeforces.com/contest/1365/problem/D
+
+### Iterative Floodfill
+- Uses stack or queues like BFS to store which cells to visit
+- Generally uses less memory than recursive floodfill(wont MLE as much)
+```cpp
+int row_num;
+int col_num;
+bool vis[2500][2500];
+char a[2500][2500];
+const int R_CHANGE[]{0, 1, 0, -1};
+const int C_CHANGE[]{1, 0, -1, 0};
+void ff(int r, int c) { // start from (r,c)
+	// Note: you can also use a queue and pop from the front for a BFS-based approach
+	stack<pi> st;
+	st.push({r, c});
+	while (!st.empty()) {
+		r = st.top().first;
+		c = st.top().second;
+		st.pop();
+		if (r < 0 || r >= row_num || c < 0 || c >= col_num || a[r][c] == '#' || vis[r][c])
+			continue;
+
+		vis[r][c] = true;
+		for (int i = 0; i < 4; i++) {
+			st.push({r + R_CHANGE[i], c + C_CHANGE[i]});
+		}
+	}
+}
+```
+
+**Example 1:**
+
+Self Editorial:
+This is just find number of connected components using floodfill
+```cpp
+int row_num;
+int col_num;
+bool vis[2500][2500]={0};
+char a[1005][1005];
+const int R_CHANGE[]{0, 1, 0, -1};
+const int C_CHANGE[]{1, 0, -1, 0};
+int ans = 0;
+void ff(int r, int c) { // start from (r,c)
+	// Note: you can also use a queue and pop from the front for a BFS-based approach
+	stack<pi> st;
+	st.push({r, c});
+	// visit every floor '.' possible to contain in cc
+	while (!st.empty()) {
+		r = st.top().first;
+		c = st.top().second;
+		st.pop();
+        if (r < 0 || r >= row_num || c < 0 || c >= col_num || a[r][c] == '#' || vis[r][c] == 1){
+            continue; 
+        }
+		vis[r][c] = true;
+		for (int i = 0; i < 4; i++) {
+            st.push({r + R_CHANGE[i], c + C_CHANGE[i]});     
+		}
+	}
+}
+void solve(){
+    
+    int n,m;cin>>n>>m;
+    row_num = n; col_num = m;
+    rep(i,0,n){
+        string s;cin>>s;
+        rep(j,0,m){
+            a[i][j] = s[j];
+        }
+    }
+    rep(i,0,n){
+        rep(j,0,m){
+            if(vis[i][j] == 0 && a[i][j] == '.'){
+                ans++; // connected component++
+                ff(i,j);
+            }
+        }
+    }
+    cout<<ans<<endl;
+
+}
+```
+### Floodfill Problems
+**Problem 1:** http://www.usaco.org/index.php?page=viewproblem2&cpid=895
+
+Self Editorial:
+**NOTE: Whenever they say "you can reach one node from any other node", it means they are in the same connectedd component** 
+- Moreover, you can visit from any node in this cc, and visit all node through some paths.
+
+We can go through each cc and note the max area/max blocks visited when doing floodfill. For perimeter, a side is a perimeter if we cannot go to it(it has '.' or it doesnt exist on the map). Thus, if we find a perimeter for each block '#', we add it. We then sort the area and perimeter of each cc, and get biggest area smallest perimeter.
+```cpp
+int row_num;
+int col_num;
+bool vis[2500][2500]={0};
+char a[1005][1005];
+const int R_CHANGE[]{0, 1, 0, -1};
+const int C_CHANGE[]{1, 0, -1, 0};
+int cnt = 0; // perimeter
+int area = 0;
+void ff(int r, int c) { // start from (r,c)
+	// Note: you can also use a queue and pop from the front for a BFS-based approach
+	stack<pi> st;
+	st.push({r, c});
+	while (!st.empty()) {
+		r = st.top().first;
+		c = st.top().second;
+        area++; // we visit this block, so we document the area
+		st.pop();
+		vis[r][c] = true;
+		for (int i = 0; i < 4; i++) {
+            if (r + R_CHANGE[i] < 0 || r + R_CHANGE[i] >= row_num || c + C_CHANGE[i] < 0 || c + C_CHANGE[i] >= col_num || a[r + R_CHANGE[i]][c + C_CHANGE[i]] == '.'){ // we cannot visit/go through this side, so it must be a perimeter side
+                cnt++;  
+            }
+            else if(vis[r + R_CHANGE[i]][c + C_CHANGE[i]] == 0){ // we can visit this block
+                vis[r + R_CHANGE[i]][c + C_CHANGE[i]] = 1;
+                st.push({r + R_CHANGE[i], c + C_CHANGE[i]}); // visit it
+            }
+                
+		}
+	}
+}
+void solve(){
+    
+    int n;cin>>n;
+    row_num = n; col_num = n;
+    rep(i,0,n){
+        string s;cin>>s;
+        rep(j,0,n){
+            a[i][j] = s[j];
+        }
+    }
+    vector <pi> v; v.pb({0,1000000005}); // if everything was '.'
+    rep(i,0,n){
+        rep(j,0,n){
+            if(vis[i][j] == 0 && a[i][j] == '#'){
+                // reset area and perimeter
+                cnt = 0; area = 0;
+                ff(i,j);
+                v.pb({area,1000000005-cnt}); // trick so that when we sort, we can get biggest area smallest perimeter
+            }
+        }
+    }
+    sort(v.rbegin(),v.rend());
+    cout<<v[0].first<<" "<<-(v[0].second-1000000005)<<endl;
+
+}
+```
+**Problem 2:** https://codeforces.com/contest/1365/problem/D
 We make an obervation that if a BAD is next to a GOOD, it is impossible since the BAD can just take one step and follow the GOOD. Then, we make a greedy assumption that it is most optimal to just "circle" every bad by covering all 4 sides. Everything bigger which blocks BAD will only result in a worse case(**How to prove this?**). Thus, we just circle every BAD, then try to see if we can reach every GOOD from (n,m) using floodfill.
 ```cpp
 const int R_CHANGE[]{0, 1, 0, -1};
@@ -196,6 +343,92 @@ void solve(){
     
 }
 ```
+
+**Problem 3:**
+
+Self Editorial:
+This is clearly a binary search problem, since more rating = more chance of visiting nodes. We can just do binary search for answer(D). For each mid, we run flood fill and only visit node if abs difference <= mid. Then we just check if we can visit all waypoints. If we can, we decrease since it is possible solution. Else we must increase.
+```cpp
+int row_num;
+int col_num;
+bool vis[2500][2500]={0};
+int d;
+int a[505][505];
+bool way[505][505];
+const int R_CHANGE[]{0, 1, 0, -1};
+const int C_CHANGE[]{1, 0, -1, 0};
+int cnt = 0;
+void ff(int r, int c) { // start from (r,c)
+	// Note: you can also use a queue and pop from the front for a BFS-based approach
+	stack<pi> st;
+	st.push({r, c});
+	while (!st.empty()) {
+		r = st.top().first;
+		c = st.top().second;
+        
+		st.pop();
+		if (r < 0 || r >= row_num || c < 0 || c >= col_num || vis[r][c]){
+			continue;
+        }
+        if(way[r][c] == 1){ // reached a waypoint
+            cnt++;
+        }
+		vis[r][c] = true;
+		for (int i = 0; i < 4; i++) {
+            if(abs(a[r][c] - a[r + R_CHANGE[i]][c + C_CHANGE[i]]) <= d){ // if difference is smaller than mid we can visit it(problem description)
+                st.push({r + R_CHANGE[i], c + C_CHANGE[i]});
+            }
+			
+		}
+	}
+}
+void solve(){
+    
+    int n,m;cin>>n>>m;
+    row_num = n; col_num = m;
+    rep(i,0,n){
+        rep(j,0,m){
+            cin>>a[i][j];
+        }
+    }
+    int x = 0;
+    int y = 0;
+    int sz = 0; // how many waypoints there are
+    rep(i,0,n){
+        rep(j,0,m){
+            cin>>way[i][j];
+            if(way[i][j] == 1){
+                sz++;
+                x = i; y = j; // finding a waypoint
+            }
+        }
+    }
+    int lo = 0;
+    int hi = 1000000005;
+    while(lo < hi){
+
+        int mid = lo + (hi - lo)/2;
+        // reset
+        cnt = 0;
+        d = mid;
+        rep(i,0,n){
+            rep(j,0,m){
+                vis[i][j] = 0;
+            }
+        }
+        ff(x,y); // starting from a waypoint
+        if(sz == cnt){ // we have found exactly sz waypoints, meaning we can visit all of them
+            hi = mid; // satisfies function, so binary search
+        }
+        else{
+            lo = mid+1;
+        }
+    }
+    cout<<hi<<endl;
+}
+```
+
+
 ### BFS impl
 Searches by "flooding", visiting the earliests node(s) first, used for calculating distance of unweighted graph.
 **Queues:** First in, first out - moves like a waiting line. O(1) operations:
