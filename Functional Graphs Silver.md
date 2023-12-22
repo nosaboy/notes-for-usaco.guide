@@ -55,8 +55,109 @@ This can also be solved in O(n):
 
 
 ## Problems
+**Problem 1:** http://www.usaco.org/index.php?page=viewproblem2&cpid=764
 
-**Problem 1:** https://cses.fi/problemset/task/1751
+Self Editorial:
+We construct a directed functional graph based on given shuffles. Then, we realize that if a position is not contained in some cycle, it will eventually be empty. This is because the leaf has no positions pointing to it, so it will disappear in time 1. Then the node it goes to will become a leaf eventually unless its in a cycle where some node will always point to a node for every node. If its not, eventually every node that points to this node will be empty.
+Thus, we can just find all nodes that belongs in a cycle and print that.
+```cpp
+int p[200005];
+int vis[200005];
+int it[200005];
 
+void solve(){
+    
+    int n;cin>>n;
+    rep(i,0,n){
+        cin>>p[i+1];
+    }
+    int ans = 0;
+    int cnt = 1; // colour
+    rep(i,1,n+1){
+        if(!vis[i]){
+            int osa = i;
+            // find a cycle
+            int nosa = 1; // time
+            while(!vis[osa]){ // visit until cycle found
+                vis[osa]=cnt;
+                it[osa] = nosa;
+                nosa++;
+                osa = p[osa];
+                
+            }     
+            if(vis[osa] == cnt){ // was cycle found during current iteration
+                ans += nosa - it[osa]; 
+            }
+            // if cycle was not found in current iteration, we dont have to check it again                          
+            cnt++;
+        }
+    }
+    cout<<ans<<endl;
 
+}
+```
+**Problem 2:** https://cses.fi/problemset/task/1751
+
+Self Editorial:
+This is just a classic cycle detection & distance problem. We can start at some node to find a cycle(since it will always exist) after some moves. After finding a cycle starting at node x(osa), we find the distance/size of the cycle using timer it as describe in book. We thus have the size is timer_final(nosa) - timer_initial(it_x). We then fill up every node in the cycle starting at x with size. Then, we start from the original node i and dfs until we reach some node that is a part of a cycle and recursively calculate distance(how far is node n away from some cycle, the answer is cycle_size + distance).
+If after going through the node i we directly find some cycle that was visited in another iteration, we simply dfs on that and find dist.
+
+```cpp
+
+int p[200005];
+int vis[200005];
+int it[200005];
+int ans[200005];
+void dfs(int n){ // places distance.
+    if(!ans[p[n]]){
+        dfs(p[n]); 
+    }
+    ans[n] = ans[p[n]]+1;
+        
+}
+
+void solve(){
+    
+    int n;cin>>n;
+    rep(i,0,n){
+        cin>>p[i+1];
+    }
+    rep(i,1,n+1){ // for every node
+        if(!vis[i]){ // if it wasnt visited before
+            int osa = i;
+            // find a cycle
+            int nosa = 1; // time
+            while(!vis[osa]){ // vist stuff until we reach a cycle
+                vis[osa]=true;
+                it[osa] = nosa;
+                nosa++;
+                osa = p[osa];
+                
+            }                                                                                                                                                                                                                                                                                                                                                           
+            if(ans[osa] == 0){ // if visited node was not a part of a cycle we've already visited(we havent filled out ans yet)
+                // fill cycle with dist
+                int diff = nosa - it[osa]; // size of cycle using timer
+                while(ans[osa] == 0){ // fil cycle ans with size
+                    ans[osa] = diff;
+                    osa = p[osa];
+
+                }
+                if(!ans[i]){ // if there are still some nodes left over: 1 -> 2 -> 3 -> 2. We put answers on 2 and 3 since it is part of a cycle, but we didnt put answer on 1 yet since we only filled the cycle
+                    dfs(i); // we recursively find distance using dfs(dist from cycle + cycle size)
+                }
+                
+            }
+            else{ // visited node was already a part of some cycle we visited before, so we dont have to place answer again, we can just dfs directly
+                dfs(i);
+            }
+            
+        }
+    }
+    rep(i,1,n+1){   
+        cout<<ans[i]<<" ";
+    }
+    cout<<endl;
+
+}
+```
   
