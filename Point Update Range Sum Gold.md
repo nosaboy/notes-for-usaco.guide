@@ -477,9 +477,525 @@ void solve(){
 **Example 6:** https://codeforces.com/edu/course/2/lesson/4/3/practice/contest/274545/problem/C
 Given segments, determine number of pairs of segments such that pair j is completely contained inside pair i.
 
-We note that a pair x is contained in pair y if ly <= lx <= rx <= ry. Thus, we can for each segment interval store the count of segments inside it and query using segtree. 
+We note that a pair x is contained in pair y in the following case: y...x...x...y, so if ly <= lx <= rx <= ry. Thus, we can for each segment interval store the count of segments inside it and query using segtree. We can calculate for each y the number of x inside its range. To do this, we first iterate through the first y and store its position as $start[y]=i.$ Then, when we get to the second y(right border of segment), we first calculate the number of segments x inside the range ly...ry using our segtree, then we store this count in our segtree. We note that if some range z encompasses ly...ry, then lz must be before ly and rz must be after ry. We know that after this we will only process elements after ry, so we only need to satisfy for every element z we process that lz < ly. To do this, we can just increase position ly in the segtree by 1. This way, whenever lz < ly, then querying sum of segtree on range lz...rz will add 1 to our sum.
 
+```cpp
+// create segtree struct
+struct segtree{
+    int sz;
+    vector <ll> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <int> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <int> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = a[lx];
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    void set(int i, int u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, int u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            sum[x] = u;
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    ll dfs(int l, int r){
+        return dfs(l,r,0,0,sz);
+    }
+    ll dfs(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return 0;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        ll osa = dfs(l,r,2*x+1,lx,m);
+        ll nosa = dfs(l,r,2*x+2,m,rx);
+        return osa + nosa;
+    }
+ 
+};
+ 
+void solve(){
+    int n,q;cin>>n;
+    vi v;
+    segtree st; // create segtree
+    st.init(2*n); // initialize segtree to size n
+    int vis[n+1]; // starting point of segment
+    rep(i,0,2*n){
+        int u;cin>>u;v.pb(u);
+        vis[u]=-1;
+        
+    }
+    // the segtree is originally 0 since it represents the number of each value
+    int ans[n+1];
+    rep(i,0,2*n){
+        if(vis[v[i]] >= 0){ // process segment
+            ans[v[i]] = st.dfs(vis[v[i]], i); // query sum of all elements from v_i to
+            st.set(vis[v[i]],1); // all values distinct(v is permutation)
+        }
+        else{
+            vis[v[i]]=i;
+        }
+    }
+    rep(i,1,n+1){
+        cout<<ans[i]<<" ";
+    }
+ 
+ 
+}
 
+```
+
+**Example 7:** https://codeforces.com/edu/course/2/lesson/4/3/practice/contest/274545/problem/D
+We note that there are two cases where 2 segments intersect: x...y...x...y, or y...x...y...x. We compute each case seperately and add up answer.
+Lets do the first case then the second case is just the array reversed.
+For every y we calculate x, then we process into segtree. For every right y, we can only the right x to be inside the range ly...ry. This way we know the left range must be smaller than ly which means they intersect since we cannot go past ry. Then we must account for the case where left range is bigger than ly, so for the left range we add -1 to segtree and right range we add 1. If in the range ly...ry it only contains right range x, the ans++. Else, it must contain both so we dont count it so the answer stays teh same(1-1 = 0 so we add 0).
+```cpp
+// create segtree struct
+struct segtree{
+    int sz;
+    vector <ll> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <int> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <int> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = a[lx];
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    void set(int i, int u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, int u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            sum[x] = u;
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    ll dfs(int l, int r){
+        return dfs(l,r,0,0,sz);
+    }
+    ll dfs(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return 0;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        ll osa = dfs(l,r,2*x+1,lx,m);
+        ll nosa = dfs(l,r,2*x+2,m,rx);
+        return osa + nosa;
+    }
+ 
+};
+ 
+void solve(){
+    int n,q;cin>>n;
+    vi v;
+    segtree st; // create segtree
+    st.init(2*n); // initialize segtree to size n
+    int vis[n+1]; // starting point of segment
+    rep(i,0,2*n){
+        int u;cin>>u;v.pb(u);
+        vis[u]=-1;
+        
+    }
+    // the segtree is originally 0 since it represents the number of each value
+    int ans[n+1];
+    rep(i,0,2*n){
+        if(vis[v[i]] >= 0){ // process segment
+            ans[v[i]] = st.dfs(vis[v[i]], i); // query sum of all elements from v_i to
+            st.set(vis[v[i]],-1); // all values distinct(v is permutation)
+            st.set(i,1); // all values distinct(v is permutation)
+        }
+        else{
+            vis[v[i]]=i; // mark start point
+        }
+    }
+    segtree tst; // new segtree for right to left
+    tst.init(2*n);
+    //reset
+    rep(i,1,n+1){
+        vis[i]=-1;
+    }
+    for(int i = 2*n-1;i>=0;i--){
+        if(vis[v[i]] >= 0){ // process segment
+            ans[v[i]] += tst.dfs(i, vis[v[i]]); // query sum of all elements from v_i to
+            tst.set(vis[v[i]],-1); // all values distinct(v is permutation)
+            tst.set(i,1); // all values distinct(v is permutation)
+        }
+        else{
+            vis[v[i]]=i; // start point
+        }
+    }
+    rep(i,1,n+1){
+        cout<<ans[i]<<" ";
+    }
+}
+
+```
+**Example 8:** https://codeforces.com/edu/course/2/lesson/4/3/practice/contest/274545/problem/E
+This problem is pretty much halbale stacking, but now you must calculate prefix sum(to add all value l...r with x) and query single element both in logn time.
+We can achieve calculating prefix sum using segtree.
+To process the first query, we just do the same thing for prefix sums and add x to l and subtract x from r(since we add x to all in range l...r-1).
+To process the second query, we just calculate the sum of all values from 1...i. If i is included in some range, we will add that value x to the sum. Otherwise, we sum up + x - x = 0 if i is not in that range.
+```cpp
+// SEGTREE TO QUERY SUM 
+struct segtree{
+    int sz;
+    vector <ll> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <int> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <int> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = a[lx];
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    void set(int i, ll u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, ll u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            sum[x] = u;
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    ll dfs(int l, int r){
+        return dfs(l,r,0,0,sz);
+    }
+    ll dfs(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return 0;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        ll osa = dfs(l,r,2*x+1,lx,m);
+        ll nosa = dfs(l,r,2*x+2,m,rx);
+        return osa + nosa;
+    }
+ 
+};
+ 
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st;
+    st.init(n+1);// we start off with 0s
+    while(q--){
+        int c;cin>>c;
+        if(c==1){
+            ll l,r,x;cin>>l>>r>>x;
+            ll left = st.dfs(l,l+1); // get left value node
+            ll right = st.dfs(r,r+1); // get right value node
+            st.set(l,left+x); // make it the same value as in array
+            st.set(r,right-x); // subtract
+           
+        }
+        else{ // c == 2
+            int i;cin>>i;
+            cout<<st.dfs(0,i+1)<<endl; // prefix sum of position i = curr value
+        }
+    }
+    
+}
+
+```
+
+**Example 9:** https://codeforces.com/edu/course/2/lesson/4/4/practice/contest/274684/problem/A
+Query segtree sums but signs alternate.
+
+We can just set the element at index 0 as +, index 1 as -, and alternate elements.So, every even indexed element is positive while every oddindexed element is negative Then, for teh first query we update the value with signs based on its index. If it is even, we make it positive, else we make it negative.
+For the second query, we look at the left bound. Since the left border element must be positive, and each proceeding element must alternate signs, we look at if the left border is negative in segment tree. If it is, then teh segment tree sum is -a+b-c+... so we must flip the signs of every element, which means we multiply the whole sum by -1. Else if the first element is positive we just have a-b+c... so we just print it out normally(multiply by 1)
+
+```cpp
+// SEGTREE TO QUERY SUM 
+struct segtree{
+    int sz;
+    vector <ll> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <int> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <int> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                // we have to minus or plus. We set index 0 is +, then 1 is -, and alternate
+                if(lx%2==0){ // even index +
+                    sum[x] = a[lx];
+                }
+                else{ // odd index -
+                    sum[x] = -a[lx];
+                }
+                
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    void set(int i, ll u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, ll u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            sum[x] = u;
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    ll dfs(int l, int r){
+        return dfs(l,r,0,0,sz);
+    }
+    ll dfs(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return 0;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        ll osa = dfs(l,r,2*x+1,lx,m);
+        ll nosa = dfs(l,r,2*x+2,m,rx);
+        return osa + nosa;
+    }
+ 
+};
+ 
+void solve(){
+    int n,q;cin>>n;
+    segtree st;
+    st.init(n+1);
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    st.build(v);
+    
+    cin>>q;
+    while(q--){
+        int c;cin>>c;
+        if(c==0){
+            int u,i; cin>>i>>u;
+            if((i-1)%2==0){ // 1 indexed, si we have to adjust
+                st.set(i-1,u);
+            }
+            else{
+                st.set(i-1,-u);
+            }
+        }
+        else{ // c == 2
+            int l,r;cin>>l>>r;
+            int sign = 1;
+            if(st.dfs(l-1,l) < 0){ // if the first number is negative, we have to reverse signs
+                sign = -1;
+            }
+            cout<<sign * st.dfs(l-1,r)<<endl; // input is 1 indexed
+        }
+    }
+    
+}
+```
+**Example 10:** https://codeforces.com/edu/course/2/lesson/4/4/practice/contest/274684/problem/B
+
+Multiplying two matrix together just means:
+|a b| |e f|   |ae+bg  af+bh|
+|c d| |g h| = |ce+dg  cf+dh|
+This function is associative, so we can use segtrees. This is just normal segtree sum but we replace our operation with this multiplying function. 
+We note that the base case(cancel case where we dont count it) is the matrix
+|1 0|
+|0 1|
+since any matrix multiplied by this will return the original matrix
+```cpp
+// SEGTREE TO QUERY SUM 
+struct segtree{
+    int sz;
+    vector <tuple<ll,ll,ll,ll>> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,{0LL,0LL,0LL,0LL}); // create empty segtree size 2*sz and fill with 0s
+    }
+    tuple<ll,ll,ll,ll> addd(tuple<ll,ll,ll,ll> a, tuple<ll,ll,ll,ll> b){ // returns product of two matrix
+        // multiply 2x2 matrix
+        // tuple<(0,0), (0,1), (1,0), (1,1)>
+ 
+        ll w = add(mult(get<0>(a), get<0>(b)), mult(get<1>(a), get<2>(b))); // top left
+        ll x = add(mult(get<0>(a), get<1>(b)), mult(get<1>(a), get<3>(b))); // top right
+        ll y = add(mult(get<2>(a), get<0>(b)), mult(get<3>(a), get<2>(b))); // bottom left
+        ll z = add(mult(get<2>(a), get<1>(b)), mult(get<3>(a), get<3>(b))); // bottom right
+        return {w,x,y,z};
+    }
+    void build(vector <tuple<ll,ll,ll,ll>> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <tuple<ll,ll,ll,ll>> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                
+                sum[x] = a[lx];
+                
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        // add
+        sum[x] = addd(sum[2*x+1], sum[2*x+2]); // multiplying funciton
+        
+    }
+    
+    tuple<ll,ll,ll,ll> dfs(int l, int r){
+        return dfs(l,r,0,0,sz);
+    }
+    tuple<ll,ll,ll,ll> dfs(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return {1,0,0,1}; // BASE CASE MATRIX: DOING NOTHING TO ANS
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        tuple<ll,ll,ll,ll> osa = dfs(l,r,2*x+1,lx,m);
+        tuple<ll,ll,ll,ll> nosa = dfs(l,r,2*x+2,m,rx);
+        return addd(osa, nosa); // multiplying function
+    }
+ 
+};
+ 
+void solve(){
+    int n,q;cin>>MOD>>n>>q;
+    segtree st;
+    st.init(n+1);
+    vector <tuple<ll,ll,ll,ll>> v;
+    rep(i,0,n){
+        ll a,b,c,d;cin>>a>>b>>c>>d;
+        v.pb({a,b,c,d});
+    }
+    st.build(v);
+    while(q--){
+        int l,r;cin>>l>>r;
+        tuple<ll,ll,ll,ll> ans = st.dfs(l-1,r); // input is 1 indexed
+        cout<<get<0>(ans)%MOD<<" "<<get<1>(ans)%MOD<<"\n";
+        cout<<get<2>(ans)%MOD<<" "<<get<3>(ans)%MOD<<"\n";
+        cout<<endl;
+    }
+    
+}
+```
 ## Ordered Sets
 
 Include the following lines to have ordered multiset where we can use two functions both logn:
