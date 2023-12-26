@@ -1248,6 +1248,43 @@ void solve(){
     
 }
 ```
+## BIT/Fenwick Tree
+Same operations as segtree, just different impl.
+Common technique unrelated: Given that steps of an operation can be both x and n/x, it is best to set x = sqrt(n) to minimize worst case.
+
+### Implementation
+For every position $i$, the interval that it encompasses is the interval that ENDS AT $i$ and has length of x = the maximum power of 2 that divides $i$. Note $i$ is 1 indexed. 
+To calculate x, we use a math trick: 
+Represent that number in binary, the maxium power of 2 that divides $i$ is at the position of the last 1 bit. After finding the position the length is then $2^{pos}$. 
+We use a math trick to find position:$pos = i & -i$.Then $x=(i & -i)$.
+
+We can interpret this set of intervals as a tree, since all intervals are disjoint(not intersecting) or some interval completely contains another.
+
+Note the father of pos $i$ always has a bigger index than $i$. Moreover, the father of interval at position $i$ is just $i$ length of interval $i$ = $i+x = i + (i&-i).$
+Thus, we can update elements in O(logn) time by updating its parents using this calculation.
+
+```cpp
+void update(int pos, int val) { // updates position with new value(val = new_value - original value)
+    while (pos <= N) { // while we havent gone out of BIT
+        fenwick[pos] += val; // add value
+        pos += (pos&-pos); // go to its parent
+    }
+}
+```
+
+We can also query sum from range $[1...i]$. We do this by first considering some position $i$ and calculate the range of that([i-x...i]). Then, we decrease our pointer so that we calculate the range starting at $i-x$ and then we just sum the whole thing up until we reach index 0.
+```cpp
+int query(int pos) { // calculates sum from 1...pos
+   int sum = 0;
+   while (pos > 0) { 
+      sum += fenwick[pos]; // adds to sum
+      pos -= lsb(pos); // decreases itr so it goes to the first position whose sum we havent calculated
+   }
+   return sum;
+}
+```
+**Both operations work in O(logn)**
+
 ## Ordered Sets
 
 Include the following lines to have ordered multiset where we can use two functions both logn:
