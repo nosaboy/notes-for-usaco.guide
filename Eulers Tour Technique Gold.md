@@ -20,9 +20,129 @@ We want to maintain 3 arrays:
 
 To get ordering, we just dfs through the tree normally and keep the ordering vector. For each unvisited node, we push it into the vector, then visit its children.
 To get subtree size, we just do dp.
-To update value, we get position of node in the segtree, then update the segtree.
+To update value, we get position of node in the segtree($start[i]$), then update the segtree.
 To get sum of interval, we first get position of node $i$ and size of nodes subtree $x$, then query segment tree for $sum[i...i+x).$
 Thus, we can update and query subtrees in O(logn).
+```cpp
+// SEGTREE TO QUERY SUM 
+// create segtree struct
+struct segtree{
+    int sz;
+    vector <ll> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <ll> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <ll> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = a[lx];
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    void set(int i, int u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, int u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            sum[x] = u;
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        sum[x] = sum[2*x+1] + sum[2*x+2];
+    }
+    ll query(int l, int r){
+        return query(l,r,0,0,sz);
+    }
+    ll query(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return 0;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        ll osa = query(l,r,2*x+1,lx,m);
+        ll nosa = query(l,r,2*x+2,m,rx);
+        return osa + nosa;
+    }
+ 
+};
+ 
+vi order; int start[200005]; int sz[200005]; ll val[200005]; // value of node
+vi aj[200005]; int vis[200005];
+void dfs(int n){
+    vis[n] = true;
+    order.pb(n); // next node in ordering
+    start[n] = (int)order.size()-1; // 0 indexed
+    sz[n]=1;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs(aj[n][i]);
+            sz[n] += sz[aj[n][i]];
+        }
+    }
+}
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st;
+    st.init(n+1);
+    vi v;
+    rep(i,0,n){
+        cin>>val[i];
+    }
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;
+        a--;b--;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    dfs(0);
+    vector <ll> a; // value of each node in its position in ordering array
+    rep(i,0,n){
+        a.pb(val[order[i]]); 
+    }
+    st.build(a);
+    while(q--){
+        int c;cin>>c;
+        if(c==1){
+            int i,u;cin>>i>>u; 
+            i--;
+            st.set(start[i],u); // start[i] = position of node i in segtree
+        }
+        else{
+            int i;cin>>i; 
+            i--;
+            cout<<st.query(start[i], start[i]+sz[i])<<endl; 
+        }
+    }
+    
+}
+```
+**Alternative implementation:** to calculate range of a node i, we can also use a timer. We first set $start[i]$ as node i's position in the array. After we visited all its neighbours and we come back from our dfs, we set $end[i]$ as the time at the end. This way, if we want to query range it will just be $st.query(start[i], end[i])$. We also note that $end[i]-start[i] = subtreesize[i].$
+
 #### Path Queries
 **Problem 2:** https://cses.fi/problemset/task/1138
 We want to calculate assoiative operations on paths instead of subtrees.
