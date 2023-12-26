@@ -694,7 +694,8 @@ void solve(){
 
 ```
 **Example 8:** https://codeforces.com/edu/course/2/lesson/4/3/practice/contest/274545/problem/E
-This problem is pretty much halbale stacking, but now you must calculate prefix sum(to add all value l...r with x) and query single element both in logn time.
+**Range update problem:** 
+This problem is pretty much halbale stacking, but now you must calculate prefix sum(to add all value l...r with x) and query the value of a single element both in logn time.
 We can achieve calculating prefix sum using segtree.
 To process the first query, we just do the same thing for prefix sums and add x to l and subtract x from r(since we add x to all in range l...r-1).
 To process the second query, we just calculate the sum of all values from 1...i. If i is included in some range, we will add that value x to the sum. Otherwise, we sum up + x - x = 0 if i is not in that range.
@@ -1253,7 +1254,9 @@ Same operations as segtree, just different impl.
 Common technique unrelated: Given that steps of an operation can be both x and n/x, it is best to set x = sqrt(n) to minimize worst case.
 
 ### Implementation
-For every position $i$, the interval that it encompasses is the interval that ENDS AT $i$ and has length of x = the maximum power of 2 that divides $i$. Note $i$ is 1 indexed. 
+For every position $i$, the interval that it encompasses is the interval that ENDS AT $i$ and has length of x = the maximum power of 2 that divides $i$. Note $i$ is 1 indexed. So, $fenwick[pos] = sum[i-x+1,i].$ Therefore, any range $[1...n]$ can be divided into logn subranges.
+
+
 To calculate x, we use a math trick: 
 Represent that number in binary, the maxium power of 2 that divides $i$ is at the position of the last 1 bit. After finding the position the length is then $2^{pos}$. 
 We use a math trick to find position:$pos = i & -i$.Then $x=(i & -i)$.
@@ -1284,6 +1287,8 @@ int query(int pos) { // calculates sum from 1...pos
 }
 ```
 **Both operations work in O(logn)**
+
+Both BIT and Segtrees are based on consecutive index of elements. Thus, we must first compress the index of our elements if necessary before putting them into the data structure.
 
 ## Ordered Sets
 
