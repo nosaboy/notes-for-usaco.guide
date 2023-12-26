@@ -996,6 +996,258 @@ void solve(){
     
 }
 ```
+**Problem 11:** https://codeforces.com/edu/course/2/lesson/4/4/practice/contest/274684/problem/C
+
+Since ai <= 40, we can take advantage by going through each pair of numbers (x,y) where x < y and count number of ways such that i < j an ai = y, aj = x. To do this, we count for each range the frequency of each number from 1 to 40. Then, if we merge two ranges we count for each (x,y) pair, freq_y from the left range * freq_x from the right range. This will count every inversion that is a mix of the two ranges, meaning y is from left range and x is from right range, since we brute forced over each y bigger than some x where all values are to the left of x so the inversions is multiplied. 
+We then add this to inversion_left(x and y are both from left) and inversion_right(x and y are both from right) to get the total inversion for this range. To keep track of frequency, we create a vector. In this implementation, position 1...40 represents the frequency of each value as we go through segtree, while position 0 represent the total inversion. After querying segtree, we just return v_0.
+
+
+```cpp
+// SEGTREE TO QUERY SUM 
+struct segtree{
+    int sz;
+    vector <ll> sum; // number of inversions for each node
+    vector <ll> freq[41]; // frequency number x in node 
+    
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+        rep(i,0,41){ // set everything to 0
+            freq[i].assign(2*sz,0LL);
+        }
+    }
+    void build(vector <int> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <int> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = 0; // reset sum = 0 since we only have 1 value
+                freq[a[lx]][x]=1; // there is exactly 1 value of a[lx]
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        ll inv = 0;
+        // mixed inversions
+        rep(i,1,41){
+            rep(j,1,i){
+                inv += freq[i][2*x+1] * freq[j][2*x+2]; // x in the first half to y in the second half
+            }
+        }
+        rep(i,1,41){ // merge two nodes(sum their frequencies for each x)
+            freq[i][x] = freq[i][2*x+1] + freq[i][2*x+2];
+        }
+        sum[x] = sum[2*x+1] + sum[2*x+2] + inv;
+    }
+    void set(int i, ll u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, ll u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            rep(i,0,41){ // reset
+                freq[i][x]=0;
+            }
+            freq[u][x]=1; // set this to 1 instead
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        ll inv = 0;
+        rep(i,1,41){
+            rep(j,1,i){
+                inv += freq[i][2*x+1] * freq[j][2*x+2]; // x in the first half to y in the second half
+            }
+        }
+        rep(i,1,41){ // merge two nodes(sum their frequencies for each x)
+            freq[i][x] = freq[i][2*x+1] + freq[i][2*x+2];
+        }
+        sum[x] = sum[2*x+1] + sum[2*x+2] + inv;
+    }
+    vector<ll> dfs(int l, int r){
+        return dfs(l,r,0,0,sz);
+    }
+    vector<ll> dfs(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            // BASE CASE: everything is 0
+            vector <ll> v;
+            rep(i,0,41){
+                v.pb(0);
+            }
+            return v;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            // everything is inside, so ans is just curr node vector
+            vector <ll> v;
+            v.pb(sum[x]); 
+            rep(i,1,41){
+                v.pb(freq[i][x]);
+            }
+            return v;
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        vector <ll> osa = dfs(l,r,2*x+1,lx,m); // left_inversions
+        vector <ll> nosa = dfs(l,r,2*x+2,m,rx); // right_inversions
+        ll inv = 0;
+        ll cnt = 0;
+        // calculate number of "mixed" inversions
+        rep(i,1,41){
+            inv += osa[i]*cnt;
+            cnt += nosa[i];
+            /*
+            rep(j,1,i){
+                inv += osa[i] * nosa[j]; // x in the first half to y in the second half
+            }
+            */
+        }
+        
+        vector <ll> v;
+        v.pb(osa[0] + nosa[0] + inv); // ans
+        rep(i,1,41){ // merge two nodes(sum their frequencies for each x)
+            v.pb(osa[i] + nosa[i]);
+        }
+        return v;
+    }
+ 
+};
+ 
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st;
+    st.init(n+1);
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    st.build(v);
+    while(q--){
+        int c;cin>>c;
+        if(c==1){
+            int l,r;cin>>l>>r; 
+            vector <ll> v = st.dfs(l-1,r);
+            cout<<v[0]<<endl; 
+        }
+        else{ // c == 2
+            int i,u;cin>>i>>u;
+            st.set(i-1,u); // input is 1 indexed
+        }
+    }
+    
+}
+```
+
+**Problem 12:** https://codeforces.com/edu/course/2/lesson/4/4/practice/contest/274684/problem/D
+We can use binary to represent whether each element occurs in this range since the elements are only 1...40, so at most 2^40 so ll needed.
+If we are at a single element x, we just set the xth bit to 1: 1<<x. Else we merge the set of two ranges by doing OR operation on their binary. This will make sure the set contains union of the sets of the nodes below it. Then the answer is just the number of values in the set of the final range, meaning the number of 1s in its binary representation.
+
+```cpp
+struct segtree{
+    int sz;
+    vector <ll> sum; // number of inversions
+    
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+ 
+    }
+    void build(vector <int> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <int> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = 1LL<<(a[lx]); // there is 1 value of a[lx], set a[lx]th bit to 1
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+       
+        sum[x] = (sum[2*x+1]|sum[2*x+2]); // merge
+    }
+    void set(int i, ll u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, ll u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            sum[x] = 1LL<<(u); // set only 1 to u(changes value in bit representation)
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        sum[x] = (sum[2*x+1]|sum[2*x+2]);
+    }
+    ll dfs(int l, int r){
+        return dfs(l,r,0,0,sz);
+    }
+    ll dfs(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return 0; // base case
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        ll osa = dfs(l,r,2*x+1,lx,m);
+        ll nosa = dfs(l,r,2*x+2,m,rx);
+ 
+        return (osa|nosa); // OR
+    }
+ 
+};
+ 
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st;
+    st.init(n+1);
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    st.build(v);
+    while(q--){
+        int c;cin>>c;
+        if(c==1){
+            int l,r;cin>>l>>r; 
+            cout<<__builtin_popcountll(st.dfs(l-1,r))<<endl; // count number of 1s(number of distinct occurances)
+        }
+        else{ // c == 2
+            int i,u;cin>>i>>u;
+            st.set(i-1,u); // input is 1 indexed
+        }
+    }
+    
+}
+```
 ## Ordered Sets
 
 Include the following lines to have ordered multiset where we can use two functions both logn:
