@@ -2,7 +2,7 @@
 - Query on subtrees
   - Just Segtree but on trees
  
-- 
+- Query LCA 
 
 ### How it works
 We visit the tree starting form the root using dfs. We then store the **order** of nodes we've visited in a 1D array. Thus, any subtree will be a continous segment on the array since we are visiting all children of a node before dfsing back. 
@@ -291,12 +291,126 @@ vector <pi> order; // pair = {id index of node, depth of node}
 For each query to find LCA of node a and b, the LCA is the node that has the **minimum depth in segment between a and b** on the order array. 
 This is because after going to a, we traverse back to the LCA, then go down to b. We will not visit any higher nodes than the LCA during this time.
 We can query this using RMQ data structure such as segtree or sparse table since the **array is static**.
-Note: In this case that there are multiple a and b in the array, we can just take any index of a and b. This is because all depths after the first visit of node a will be lower than node a until the last visit of node a. Similar for node b due to order which we traverse the tree. Thus, we dont have to worry about that.
-Therefore, we can just store the first position of node i in order in $first[i.]$ So the LCA is just $RMQ(first[a],first[b])$ where RMQ compares its depths.
+Note: In this case that there are multiple a and b in the array, we can just take any index of a and b. This is because all depths after the first visit of node a will be lower than node a until the last visit of node a. Similar for node b due to order which we traverse the tree. Thus, we dont have to worry about that. Moreover, LCA must be unqiue, so we can just find the smallest without worrying about anything else.
+Therefore, we can just store the first position of node i in order in $start[i.]$ So the LCA is just $RMQ(start[a],start[b])$ where RMQ compares its depths.
 
 **Example 2:** https://cses.fi/problemset/task/1688
 LCA queries implementation:
+```cpp
+// MIN SEGTREE ON DEPTH(pair)
+struct segtree{
+    int sz;
+    vector <pi> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,{0,0}); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <pi> &a){ // {depth, node id}
+        build(a,0,0,sz);
+    }
+    void build(vector <pi> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = {a[lx].first,a[lx].second};
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        if(sum[2*x+1].first < sum[2*x+2].first){
+            sum[x] = sum[2*x+1];
+        }
+        else{
+            sum[x] = sum[2*x+2];
+        }
+        
+    }
+    // static, doesnt need set()
+    pi query(int l, int r){
+        return query(l,r,0,0,sz);
+    }
+    pi query(int l, int r, int x, int lx, int rx){ // min of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return {1000000000,1000000000}; // base
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        pi osa = query(l,r,2*x+1,lx,m);
+        pi nosa = query(l,r,2*x+2,m,rx);
+        // return whichever node is smaller
+        if(osa.first < nosa.first){ 
+            return osa;
+        }
+        else{
+            return nosa;
+        }
+    
+    }
+ 
+};
 
+// EULERS TOUR TO FIND ORDER
+vi order; int start[200005]; int sz[200005]; int depth[200005];
+vi aj[200005]; int vis[200005];
+void dfs(int n){
+    vis[n] = true;
+    order.pb(n); // next node in ordering
+    start[n] = (int)order.size()-1; // 0 indexed
+    sz[n]=1;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            depth[aj[n][i]]=depth[n]+1; // dp calc depth of node
+            dfs(aj[n][i]);
+            order.pb(n); // came back
+            sz[n] += sz[aj[n][i]];
+            
+        }
+    }
+}
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st;
+    st.init(2*n-1); // there is at most 2n-1 nodes in order arr
+
+    rep(i,2,n+1){
+        int u;cin>>u;
+        aj[u].pb(i);
+        aj[i].pb(u);
+    }
+    depth[1]=0;
+    dfs(1);
+    vector <pi> a;
+    rep(i,0,order.size()){
+        a.pb({depth[order[i]],order[i]});
+    }
+    st.build(a);
+    while(q--){
+        int x,y;
+        cin>>x>>y;
+        // make sure they are in correct order
+        int l,r;
+        if(start[x] < start[y]){
+            l = start[x];
+            r = start[y];
+        }
+        else{
+            r = start[x];
+            l = start[y];
+        }
+        pi ans = st.query(l,r+1);
+        cout<<ans.second<<endl;
+    }
+}
+```
 **Problem of Interest:** https://codeforces.com/problemset/problem/1702/G2
 
 ### Distance of Two Nodes in Tree
