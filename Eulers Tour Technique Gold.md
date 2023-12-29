@@ -279,3 +279,35 @@ void solve(){
     
 }
 ```
+
+
+## Lowest Common Ancestor
+Given two nodes a and b, find the lowest node(furthest away from root) such that its subtree contains both a and b. 
+Efficient query LCA of two nodes using Eulers Tour Technique:
+We traverse through tree using Eulers Tour. However, everytime we revisit a node while walking(doesnt have to be just the first time), we add it to order vector. Thus, a node with k children will be visited k+1 times(and thus there are k+1 instances in the array). In total, the array size is 2n-1. In the array, we will also store its depth from root. Thus, the array is
+```cpp
+vector <pi> order; // pair = {id index of node, depth of node}
+```
+For each query to find LCA of node a and b, the LCA is the node that has the **minimum depth in segment between a and b** on the order array. 
+This is because after going to a, we traverse back to the LCA, then go down to b. We will not visit any higher nodes than the LCA during this time.
+We can query this using RMQ data structure such as segtree or sparse table since the **array is static**.
+Note: In this case that there are multiple a and b in the array, we can just take any index of a and b. This is because all depths after the first visit of node a will be lower than node a until the last visit of node a. Similar for node b due to order which we traverse the tree. Thus, we dont have to worry about that.
+Therefore, we can just store the first position of node i in order in $first[i.]$ So the LCA is just $RMQ(first[a],first[b])$ where RMQ compares its depths.
+
+**Example 2:** https://cses.fi/problemset/task/1688
+LCA queries implementation:
+
+**Problem of Interest:** https://codeforces.com/problemset/problem/1702/G2
+
+### Distance of Two Nodes in Tree
+Distance of a and b = length of path from a to b in a tree.
+We can calculate using LCA, since path of a -> b = a -> LCA(a,b) -> b.
+Thus, the distance formula for a and b is dist(a,LCA(a,b)) + dist(LCA(a,b),b) = depth(a) + depth(b) - 2*depth(LCA(a,b)). Depth(x) = dist(x,root). Depth can be calculated using dp.
+
+**Example 3:** https://cses.fi/problemset/task/1135
+
+
+
+## Sparse Table
+
+**Example 4:** https://judge.yosupo.jp/problem/staticrmq
