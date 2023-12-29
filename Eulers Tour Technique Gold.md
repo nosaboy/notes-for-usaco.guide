@@ -406,13 +406,202 @@ void solve(){
             r = start[x];
             l = start[y];
         }
-        pi ans = st.query(l,r+1);
+        pi ans = st.query(l,r+1); // find LCA
         cout<<ans.second<<endl;
     }
 }
 ```
 **Problem of Interest:** https://codeforces.com/problemset/problem/1702/G2
+We can see if all nodes satisfy some lca property. First, we see if every node is on a straight line to the top without going up, then going down. If it is, we just print YES. Else, we know that we must go up to some lca node, then go down. To get lca, we find the two nodes such that they have the lowest depth, and they have different lca. These two nodes x and y will be out ending points. Meaning the path is going from x to lca(x,y), then going back down to y.
+Now we just need to check if all nodes is on this path. To do this, we note that for each node, that node and lca(x,y) must = lca(x,y). Else, its lca has smaller depth than lca(x,y), which means it is not on the path. Moreover, it must either be on the path from x to lca(x,y) or on the path from y to lca(x,y). Thus, we check if lca(v_i,x) = lca(x,y), which means it is on path x -> lca(x,y), or check if lca(v_i,y) = lca(x,y), which means it is on path y -> lca(x,y). 
+If all these conditions do not satisfy, this node is not on the path so we print NO and break.
+At the end if every node satisfies these conditions we print YES.
 
+```cpp
+// MIN SEGTREE ON DEPTH(pair)
+struct segtree{
+    int sz;
+    vector <pi> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,{0,0}); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <pi> &a){ // {depth, node id}
+        build(a,0,0,sz);
+    }
+    void build(vector <pi> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = {a[lx].first,a[lx].second};
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        if(sum[2*x+1].first < sum[2*x+2].first){
+            sum[x] = sum[2*x+1];
+        }
+        else{
+            sum[x] = sum[2*x+2];
+        }
+        
+    }
+    // static, doesnt need set()
+    pi query(int l, int r){
+        return query(l,r,0,0,sz);
+    }
+    pi query(int l, int r, int x, int lx, int rx){ // min of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return {1000000000,1000000000}; // base
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        pi osa = query(l,r,2*x+1,lx,m);
+        pi nosa = query(l,r,2*x+2,m,rx);
+        // return whichever node is smaller
+        if(osa.first < nosa.first){ 
+            return osa;
+        }
+        else{
+            return nosa;
+        }
+    
+    }
+ 
+};
+// EULERS TOUR TO FIND ORDER
+vi order; int start[200005]; int sz[200005]; int depth[200005];
+vi aj[200005]; int vis[200005];
+void dfs(int n){
+    vis[n] = true;
+    order.pb(n); // next node in ordering
+    start[n] = (int)order.size()-1; // 0 indexed
+    sz[n]=1;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            depth[aj[n][i]]=depth[n]+1; // dp calc depth of node
+            dfs(aj[n][i]);
+            order.pb(n); // came back
+            sz[n] += sz[aj[n][i]];
+            
+        }
+    }
+}
+ 
+void solve(){
+    int n,q;cin>>n;
+    segtree st;
+    st.init(2*n-1); // there is at most 2n-1 nodes in order arr
+ 
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    depth[1]=0;
+    dfs(1);
+    vector <pi> a;
+    rep(i,0,order.size()){
+        a.pb({depth[order[i]],order[i]});
+    }
+    st.build(a);
+    cin>>q;
+    while(q--){
+        int m; cin>>m;
+        vector <pi> v;
+        rep(i,0,m){
+            int u;cin>>u;v.pb({depth[u],u});
+        }
+        sort(v.rbegin(),v.rend());
+        int x = v[0].second;
+        int y;
+        bool yn = true;
+        int osa = 0; // best lca
+        rep(i,1,m){
+            // make sure they are in correct order
+            int l,r;
+            y = v[i].second;
+            if(start[x] < start[y]){
+                l = start[x];
+                r = start[y];
+            }
+            else{
+                r = start[x];
+                l = start[y];
+            }
+            pi ans = st.query(l,r+1);
+            int lca = ans.second; // lca node 
+            if(lca != x && lca != y){
+                osa = lca;
+                yn = false;
+                break;
+            }
+        }
+        if(yn){ // same line
+            cout<<"YES\n";
+        }
+        else{
+            //cout<<x<<" "<<y<<endl;
+            rep(i,0,m){
+                // lca(x,v[i])
+                int l,r;
+                if(start[x] < start[v[i].second]){
+                    l = start[x];
+                    r = start[v[i].second];
+                }
+                else{
+                    r = start[x];
+                    l = start[v[i].second];
+                }
+                pi ans = st.query(l,r+1);
+                int lca1 = ans.second; 
+                // lca(y,v[i])
+                if(start[y] < start[v[i].second]){
+                    l = start[y];
+                    r = start[v[i].second];
+                }
+                else{
+                    r = start[y];
+                    l = start[v[i].second];
+                }
+                ans = st.query(l,r+1);
+                int lca2 = ans.second; 
+                // lca(osa,v[i])
+                if(start[osa] < start[v[i].second]){
+                    l = start[osa];
+                    r = start[v[i].second];
+                }
+                else{
+                    r = start[osa];
+                    l = start[v[i].second];
+                }
+                ans = st.query(l,r+1);
+                int lca3 = ans.second; 
+                //cout<<v[i].second<<" "<<lca1<<" "<<lca2<<" "<<lca3<<endl;
+                if(depth[lca3] < depth[osa] || (lca1 != v[i].second && lca2 != v[i].second)){
+                    yn = true;
+                    cout<<"NO\n";
+                    break;
+                }
+ 
+            }
+            if(!yn){
+                cout<<"YES\n";
+            }
+            
+        }
+    }
+}
+```
 ### Distance of Two Nodes in Tree
 Distance of a and b = length of path from a to b in a tree.
 We can calculate using LCA, since path of a -> b = a -> LCA(a,b) -> b.
@@ -420,7 +609,123 @@ Thus, the distance formula for a and b is dist(a,LCA(a,b)) + dist(LCA(a,b),b) = 
 
 **Example 3:** https://cses.fi/problemset/task/1135
 
+```cpp
+// MIN SEGTREE ON DEPTH(pair)
+struct segtree{
+    int sz;
+    vector <pi> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,{0,0}); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <pi> &a){ // {depth, node id}
+        build(a,0,0,sz);
+    }
+    void build(vector <pi> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = {a[lx].first,a[lx].second};
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        if(sum[2*x+1].first < sum[2*x+2].first){
+            sum[x] = sum[2*x+1];
+        }
+        else{
+            sum[x] = sum[2*x+2];
+        }
+        
+    }
+    // static, doesnt need set()
+    pi query(int l, int r){
+        return query(l,r,0,0,sz);
+    }
+    pi query(int l, int r, int x, int lx, int rx){ // min of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return {1000000000,1000000000}; // base
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        pi osa = query(l,r,2*x+1,lx,m);
+        pi nosa = query(l,r,2*x+2,m,rx);
+        // return whichever node is smaller
+        if(osa.first < nosa.first){ 
+            return osa;
+        }
+        else{
+            return nosa;
+        }
+    
+    }
+ 
+};
+// EULERS TOUR TO FIND ORDER
+vi order; int start[200005]; int sz[200005]; int depth[200005];
+vi aj[200005]; int vis[200005];
+void dfs(int n){
+    vis[n] = true;
+    order.pb(n); // next node in ordering
+    start[n] = (int)order.size()-1; // 0 indexed
+    sz[n]=1;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            depth[aj[n][i]]=depth[n]+1; // dp calc depth of node
+            dfs(aj[n][i]);
+            order.pb(n); // came back
+            sz[n] += sz[aj[n][i]];
+            
+        }
+    }
+}
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st;
+    st.init(2*n-1); // there is at most 2n-1 nodes in order arr
 
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    depth[1]=0;
+    dfs(1);
+    vector <pi> a;
+    rep(i,0,order.size()){
+        a.pb({depth[order[i]],order[i]});
+    }
+    st.build(a);
+    while(q--){
+        int x,y;
+        cin>>x>>y;
+        // make sure they are in correct order
+        int l,r;
+        if(start[x] < start[y]){
+            l = start[x];
+            r = start[y];
+        }
+        else{
+            r = start[x];
+            l = start[y];
+        }
+        pi ans = st.query(l,r+1); // find LCA
+        // THE CODE BELOW IS EVERYTHING ADDED FROM EXAMPLE 2
+        int lca = ans.second; // lca node 
+
+        cout<<depth[x] + depth[y] - 2*depth[lca]<<endl; // dist formula
+    }
+}
+```
 
 ## Sparse Table
 
