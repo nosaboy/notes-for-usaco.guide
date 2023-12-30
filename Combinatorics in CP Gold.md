@@ -137,7 +137,27 @@ Thus, the final answer is
 
 $$n!\sum_{k=0}^n\frac{(-1)^k}{k!}$$
 
+NOTE ON IMPLEMENTATION: We cannot calculate division(1/k!) since **the problem inputs the mod** which may cause k! to not have an inverse since k! and m **may not be coprime**. Thus, we have to use a slick trick instead of doing $divide(1,fact[k])$ every time.
+Lets transition from prev answer to curr answer.
+We have $$prev = (n-1)! * sum_{k=0}^{n-1} (-1)^k/k!$$ and we want curr = $$(n)! * sum_{k=0}^{n} (-1)^k/k!$$.
+First multiply prev by n, so $$sum = (n)! * sum_{k=0}^{n-1} (-1)^k/k!$$
+Then add $$n! * (-1)^n/n! = (-1)^n$$ since we want $$sum_{k=0}^{n} (-1)^k/k!$$, so $$(n)! * sum_{k=0}^{n-1} (-1)^k/k! + n! * (-1)^n/n! = n! * (sum_{k=0}^{n-1} (-1)^k/k! + (-1)^n/n!) = n! * (sum_{k=0}^{n} (-1)^k/k!).$$
+Thus, the transition is simply just $$curr = prev * n + (-1)^n$$ which spares us from any division by MOD.
 
+```cpp
+void solve(){
+    int n; cin>>n>>MOD;
+    int sum = 1;
+    precompute(n+1);
+    
+    rep(i,1,n+1){
+        int one = (i%2==0) ? 1:-1; // (-1)^i
+        sum = add(mult(sum,i), one); // transition from prev 
+        cout<<sum<<" ";
+    }
+    cout<<endl;
+}   
+```
 
 
 **Problem 4:** https://codeforces.com/contest/1462/problem/E2
