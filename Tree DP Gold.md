@@ -52,16 +52,101 @@ We can just greedily fill edges, since not filling edges will only make the answ
 
 ## Solving For All Roots
 
-**Example 1:** 
-
 ### All longest path in O(n): https://cses.fi/problemset/task/1132
 Calculate for every node the maximum length of a path beginning at that node: If we can find the maximum length starting at every node, the tree diameter problem turns into the max of these lengths.
-
+**Generalization of Diameter Problem**
 For every node x, we cam split this into 2 cases: The longest path either goes through a child of x or the parent of x.
-For the maximum path length that goes through child of x. Since this path from child x cannot then go back to x, this path is toleaf(x) = max(toleaf(child of x) + 1). We can use dp approach to calculate toleaf(x). 
+
+If maximum path length that goes through child of x, this path from child x cannot then go back to x. This path is dp(x) = max(dp(child of x) + 1) for all children. We can use dp approach to calculate dp(x). 
 
 For the maximum path length that goes through parent of x, we can just calculate max path length of parent and second max path length of parent. This is so if the max length path from parent goes through x itself, we know that this path is impossible since we are constructing x -> parent of x -> x, thus we take the second longest path from parent that **does not go back to x**(goes in a different direction). If the first longest path does not pass through x, we take that path.
-
+Thus, 
+- if $fir[parent] == ans[n]+1$, return $second[parent]+1$
+- else, return $first[parent]=1$
 ```cpp
+vector<int> aj[200005]; int vis[200005];
+int fir[200005], sec[200005], ans[200001];
+ 
+void dfs1(int n) {
+    vis[n]=true;
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            dfs1(aj[n][i]);
+            ans[n] = max(ans[n], ans[aj[n][i]]+1); // max path that goes through child
+            int x = fir[n]; int y = ans[aj[n][i]]+1;
+            if(x <= y){
+                sec[n]=x;
+                fir[n]=y;
+            }
+            else if(sec[n] <= y){
+                sec[n]=y;
+            }
+        }
+    }
 
+}
+ 
+void dfs2(int n) {
+    vis[n]=true;
+    
+    rep(i,0,aj[n].size()){
+        if(!vis[aj[n][i]]){
+            if(fir[n]==ans[aj[n][i]]+1){
+                ans[aj[n][i]] = max(ans[aj[n][i]],sec[n]+1);
+                // update first and second
+                int x = fir[aj[n][i]]; int y = sec[n]+1;
+                if(x <= y){
+                    sec[aj[n][i]]=x;
+                    fir[aj[n][i]]=y;
+                }
+                else if(sec[aj[n][i]] <= y){
+                    sec[aj[n][i]]=y;
+                }
+            }
+            else{
+                ans[aj[n][i]] = max(ans[aj[n][i]],fir[n]+1);
+                int x = fir[aj[n][i]]; int y = fir[n]+1;
+                if(x <= y){
+                    sec[aj[n][i]]=x;
+                    fir[aj[n][i]]=y;
+                }
+                else if(sec[aj[n][i]] <= y){
+                    sec[aj[n][i]]=y;
+                }
+            }
+            dfs2(aj[n][i]);
+            
+        }
+    }
+}
+ 
+void solve(){
+    int n; cin>>n;
+    // reset
+    rep(i,1,n+1){
+        vis[i]=0;
+        ans[i]=0;
+        fir[i]=0;
+        sec[i]=0;
+        aj[n].clear();
+    }
+    rep(i,0,n-1){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b);
+        aj[b].pb(a);
+    }
+    
+    dfs1(1);
+    rep(i,1,n+1){
+        vis[i]=0;
+    }
+    dfs2(1);
+
+    rep(i,1,n+1){
+        cout<<ans[i]<<" ";
+    }
+}   
 ```
+
+**Problem of Self Interest:** https://codeforces.com/contest/1881/submission/227959112
+
