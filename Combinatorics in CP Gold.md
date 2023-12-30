@@ -38,26 +38,8 @@ The number of binary trees with n nodes is $C_n$
 The number of normal trees(rooted at some node) with n nodes is $C_{n-1}$
 
 
-### PIE
 
-
-
-#### Derangements: a permutation of 1...n such that no numbers are in their original sorted spot
-We can use PIE and count the number of ways at least 1 number is in its sorted spot, then complementary counting.
-
-This is just we fix one of the values, then two of the values, and so on: n choose 1 * (n-1)! - n choose 2 * (n-2)! + ... + n choose n * 1
-
-**Recursion to calculate derangements of permutation n(f(n)):** 
-if n = 0: return 1;
-if n = 1: return 2;
-else if n > 1: return (n-1)(f(n-1) + f(n-2))
-
-### Burnsides Lemma
-
-
-
-
-**Example 1:**
+**Example 1:** https://cses.fi/problemset/task/1079
 
 ```cpp
 
@@ -104,8 +86,36 @@ void solve(){
 
 // make sure to do precompute(1000005 = 10^6) in main
 ```
+### PIE
 
 
+
+### Derangements: a permutation of 1...n such that no numbers are in their original sorted spot
+
+#### Calculate derangements of permutation n using DP:
+Proof: Let $i$ be at position 1 in the final arrangement, where $i$ is any number from 1 to n. Then there are two case:
+- If 1 is in position $i$, it means that 1 and i switched positions - This turns into subproblem with size n-2. 
+- If 1 is not in position $i$, consider the following:
+    - We have i in the 1st position. Now, we **don't want 1 in the ith position** since thats what we are counting.
+    - Thus, let the ith position be a substitue for the 1st position(since its the same as not wanting 1 in the 1st position, but now we look at i as the 1st position AKA the position that we dont want 1 to be in).
+    -  This then turns into subproblem with size n-1 since we do not want 1 to be in the ith position.
+
+There are $n-1$ ways to choose $i$. For each $i$, there are $dp[n-1] + dp[n-2]$ ways to construct a derrangement. Thus, the answer is $dp[n] = (n-1)*(dp[n-1]+dp[n-2]);$
+The base case is $dp[1] = 0, dp[2] = 1;$
+Thus, we have the following **recursive formula**:
+
+if n = 1: return 0;
+if n = 2: return 1;
+else if n > 1: return (n-1)(f(n-1) + f(n-2))
+
+#### Calculate derangements using PIE
+We can use PIE and count the number of ways at least 1 number is in its sorted spot, then complementary counting.
+So we want $n! - \lvert E_1 \cup E_2 \cup \dots \cup E_n \rvert.$
+This is just we fix one of the values, then two of the values, and so on: n choose 1 * (n-1)! - n choose 2 * (n-2)! + ... + n choose n * 1
+
+
+**Example 2:** https://judge.yosupo.jp/problem/montmort_number_mod
+Count the number of derangements
 **Problem 4:** https://codeforces.com/contest/1462/problem/E2
 
 Time: 20 minutes
