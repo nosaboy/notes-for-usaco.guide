@@ -110,12 +110,20 @@ else if n > 1: return (n-1)(f(n-1) + f(n-2))
 
 #### Calculate derangements using PIE
 We can use PIE and count the number of ways at least 1 number is in its sorted spot, then complementary counting.
-So we want $n! - \lvert E_1 \cup E_2 \cup \dots \cup E_n \rvert.$
-This is just we fix one of the values, then two of the values, and so on: n choose 1 * (n-1)! - n choose 2 * (n-2)! + ... + n choose n * 1
+So we want $n! - \lvert E_1 \cup E_2 \cup \dots \cup E_n \rvert =\sum_{k=1}^n(−1)^k\cdot(number_of_permutations_with_k_fixed_points).$
+This is just we fix one of the values, then two of the values, and so on: n choose 1 * (n-1)! - n choose 2 * (n-2)! + ... + n choose n * 1.
+
+For each $k$ we have $\binom{n}{k}(n-k)! = \frac{n!(n-k)!}{k!(n-k)!} = \frac{n!}{k!}.$
+Thus, the final answer is
+
+$$n!\sum_{k=0}^n\frac{(-1)^k}{k!}$$
 
 
 **Example 2:** https://judge.yosupo.jp/problem/montmort_number_mod
 Count the number of derangements
+
+
+
 **Problem 4:** https://codeforces.com/contest/1462/problem/E2
 
 Time: 20 minutes
