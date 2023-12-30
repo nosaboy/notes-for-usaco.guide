@@ -63,6 +63,7 @@ For the maximum path length that goes through parent of x, we can just calculate
 Thus, 
 - if $fir[parent] == ans[n]+1$, return $second[parent]+1$
 - else, return $first[parent]=1$
+Then, we want to transition. For every node, we want to store its first and second. This is just first and second of $ans[parent]$ and $ans[child]$ where child has not been calculated yet because we are dfsing down.
 ```cpp
 vector<int> aj[200005]; int vis[200005];
 int fir[200005], sec[200005], ans[200001];
@@ -73,6 +74,7 @@ void dfs1(int n) {
         if(!vis[aj[n][i]]){
             dfs1(aj[n][i]);
             ans[n] = max(ans[n], ans[aj[n][i]]+1); // max path that goes through child
+            // update first and second
             int x = fir[n]; int y = ans[aj[n][i]]+1;
             if(x <= y){
                 sec[n]=x;
@@ -91,7 +93,7 @@ void dfs2(int n) {
     
     rep(i,0,aj[n].size()){
         if(!vis[aj[n][i]]){
-            if(fir[n]==ans[aj[n][i]]+1){
+            if(fir[n]==ans[aj[n][i]]+1){ // we can only take second[n] for its child since it contributed to first[n]
                 ans[aj[n][i]] = max(ans[aj[n][i]],sec[n]+1);
                 // update first and second
                 int x = fir[aj[n][i]]; int y = sec[n]+1;
@@ -103,8 +105,9 @@ void dfs2(int n) {
                     sec[aj[n][i]]=y;
                 }
             }
-            else{
+            else{ // we can just take first[n] for child as our max
                 ans[aj[n][i]] = max(ans[aj[n][i]],fir[n]+1);
+                // update first and second
                 int x = fir[aj[n][i]]; int y = fir[n]+1;
                 if(x <= y){
                     sec[aj[n][i]]=x;
@@ -137,6 +140,7 @@ void solve(){
     }
     
     dfs1(1);
+    // reset vis
     rep(i,1,n+1){
         vis[i]=0;
     }
