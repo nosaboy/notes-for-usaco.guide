@@ -91,6 +91,8 @@ void solve(){
 
 
 ### Derangements: a permutation of 1...n such that no numbers are in their original sorted spot
+**Example 2:** https://judge.yosupo.jp/problem/montmort_number_mod
+Count the number of derangements from 1 to n.
 
 #### Calculate derangements of permutation n using DP:
 Proof: Let $i$ be at position 1 in the final arrangement, where $i$ is any number from 1 to n. Then there are two case:
@@ -108,6 +110,23 @@ if n = 1: return 0;
 if n = 2: return 1;
 else if n > 1: return (n-1)(f(n-1) + f(n-2))
 
+```cpp
+void solve(){
+    int n; cin>>n>>MOD;
+    int dp[n+1]={0};
+    dp[1]=0; dp[2]=1; // base case
+    rep(i,3,n+1){
+        dp[i] = mult(i-1, add(dp[i-1],dp[i-2])); // recursion
+    }
+    rep(i,1,n+1){
+        cout<<dp[i]<<" ";
+    }
+    cout<<endl;
+}   
+
+```
+
+
 #### Calculate derangements using PIE
 We can use PIE and count the number of ways at least 1 number is in its sorted spot, then complementary counting.
 So we want $$n! - \lvert E_1 \cup E_2 \cup \dots \cup E_n \rvert =\sum_{k=1}^n(−1)^k\cdot(number-of-permutations-with-k-fixed-points).$$
@@ -118,9 +137,6 @@ Thus, the final answer is
 
 $$n!\sum_{k=0}^n\frac{(-1)^k}{k!}$$
 
-
-**Example 2:** https://judge.yosupo.jp/problem/montmort_number_mod
-Count the number of derangements
 
 
 
