@@ -728,5 +728,27 @@ void solve(){
 ```
 
 ## Sparse Table
+- RMQ On static(not changing) arrays: O(nlogn) preprocessing, **O(1) query**
 
+Implementation:
+Precompute minimum for all range $[a,b]$ whose length b-a+1 is a power of 2. This can be done in O(nlogn).
+```cpp
+int lg2(int n){ // calculate floor(log2(n)) in O(1)
+    return 31 - __builtin_clz(n);
+}
+vector<vi> ST(const vi& v) {
+  int n = v.size();
+  vector<vi> ST(lg2(n)+1,vi (n,INT_MAX)); // ST[log2(n)][n]
+  ST[0] = v; // min for length 2^0 = 1 is just the number
+  rep(len,1,ST.size()) { // for every power of 2
+    rep(i,0,n - (1 << len) + 1) { // for every index starting at i with length 2^len
+      ST[len][i] = min(ST[len - 1][i], ST[len - 1][i + 1 << (len - 1)]); 
+      // divide range into two since we calculated previous power of 2
+      // min(i...i+(2^len-1)-1, i+(2^len-1)...i+(2^len)-1)
+    }
+  }
+
+  return ST;
+}
+```
 **Example 4:** https://judge.yosupo.jp/problem/staticrmq
