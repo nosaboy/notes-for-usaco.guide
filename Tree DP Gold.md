@@ -153,4 +153,22 @@ void solve(){
 ```
 
 **Problem of Self Interest:** https://codeforces.com/contest/1881/submission/227959112
-
+We can only get the max distance from **some nodes.** We can use the following trick:
+For each "marked node", we set our initial distance as 0 like normal(so $first[u]$ = 0). For every "unmarked node", meaning we dont consider it, we mark the distance as -INF. This way, any unmarked node to any other node will have NO CHANCE since its distance is so small. Putting this at the beginning, then running normal all longest paths will suffice:
+```cpp
+// reset
+rep(i,1,n+1){
+    // make both dist = -INF
+    fir[i]=-1000000000;
+    sec[i] = -1000000000; 
+    ans[i]=0;
+    mark[i]=0;
+    graph[i].clear();
+}
+rep(i,0,k){
+        int u;
+        cin>>u;
+        mark[u]=1;
+        fir[u]=0; // make dist = 0(normal)
+}
+```
