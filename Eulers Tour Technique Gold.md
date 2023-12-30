@@ -731,7 +731,8 @@ void solve(){
 - RMQ On static(not changing) arrays: O(nlogn) preprocessing, **O(1) query**
 
 Implementation:
-Precompute minimum for all range $[a,b]$ whose length b-a+1 is a power of 2. This can be done in O(nlogn).
+Precompute minimum for all range $[a,b]$ whose length b-a+1 is a power of 2. This can be done in O(nlogn) using clever dp.
+We first calculate all ranges whose length is 2^0 to 2^{x-1}. To calculate all ranges whose length is 2^x, we go through array. For every index possible, we do min(first half, second half) = min(i...i+(2^{x-1})-1, i+(2^{x-1})...i+(2^x)-1).
 ```cpp
 int lg2(int n){ // calculate floor(log2(n)) in O(1)
     return 31 - __builtin_clz(n);
@@ -742,7 +743,7 @@ vector<vi> ST(const vi& v) {
   ST[0] = v; // min for length 2^0 = 1 is just the number
   rep(len,1,ST.size()) { // for every power of 2
     rep(i,0,n - (1 << len) + 1) { // for every index starting at i with length 2^len
-      ST[len][i] = min(ST[len - 1][i], ST[len - 1][i + 1 << (len - 1)]); 
+      ST[len][i] = min(ST[len - 1][i], ST[len - 1][i+(1<<(len - 1))]); 
       // divide range into two since we calculated previous power of 2
       // min(i...i+(2^len-1)-1, i+(2^len-1)...i+(2^len)-1)
     }
@@ -751,4 +752,42 @@ vector<vi> ST(const vi& v) {
   return ST;
 }
 ```
+We can then query **ANY** pair of (a,b): find the minimum value in range $[a,b]$. 
+We find the maximum power of two 2^x <= length of array b-a+1. Since we calculated all lengths that are powers of two, we can get the minimum value of range $[a,a+2^x-1]$ and $[b-2^x+1,b]$. These two ranges will cover all numbers $[a,b]$ since 2^x will be at least half of $b-a+1$. Thus, 
+```cpp
+ans = min(sparse[maxLen][a], sparse[maxLen][b - (1 << maxLen)+1]); // calculates range [a,b]
+```
+
 **Example 4:** https://judge.yosupo.jp/problem/staticrmq
+Range Minimum Query using Sparse Table.
+```cpp
+int lg2(int n){ // calculate floor(log2(n)) in O(1)
+    return 31 - __builtin_clz(n);
+}
+vector<vi> ST(const vi& v) {
+  int n = v.size();
+  vector<vi> ST(lg2(n)+1,vi (n,INT_MAX)); 
+  ST[0] = v;
+  rep(len,1,ST.size()) {
+    rep(i,0,n - (1 << len) + 1) {
+      ST[len][i] = min(ST[len - 1][i], ST[len - 1][i + (1<<(len - 1))]); 
+    }
+  }
+
+  return ST;
+}
+void solve(){
+    int n,q;cin>>n>>q;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    vector <vi> sparse = ST(v);
+    while(q--){
+        int a,b;cin>>a>>b; b--; // we query range [a...b]
+        int maxLen = lg2(b - a + 1);
+        cout<<min(sparse[maxLen][a], sparse[maxLen][b - (1 << maxLen)+1])<<"\n";
+    }
+}
+
+```
