@@ -37,25 +37,26 @@ We can speed this up using the above trick. We always link the smaller set with 
 We can optimize further using path compression. For every node we visit which going up, we set its parent as the root after we found it. This way, we dont have to reiterate through paths for every get(). To do this, we make get(x) recursive:
 ```cpp
 int rdsu[200005]; // stores rank of leader based on size of set
-
+int pdsu[200005]; // stores parent of each node
+ 
 int get(int x){
-  if(a != parent[a]){
-    parent[a] = get(parent[a]); // set parent[a] as the root
+  if(x != pdsu[x]){
+    pdsu[x] = get(pdsu[x]); // set parent[x] as the root
   }
-  return a; // else we know this is root
+  return pdsu[x]; // else we know this is root
 }
-
-void union(int x, int y){
+ 
+void unite(int x, int y){
   x = get(x);
   y = get(y);
   if(rdsu[x] == rdsu[y]){ // two sets equal size
     rdsu[x]++; // break equality so set y connects to x
   }
   if(rdsu[x] > rdsu[y]){ // x has bigger size
-    parent[y] = x; // connect root y with x
+    pdsu[y] = x; // connect root y with x
   }
   else{
-    parent[x] = y; // connect x to y
+    pdsu[x] = y; // connect x to y
   }
   
 }
@@ -68,6 +69,60 @@ Let n = 2^20. Then the algorithm will terminate if we reach anything < 1. The st
 
 Thus, **algorithm works in constant time** for any reasonable n.
 
+**Example 1:** https://codeforces.com/edu/course/2/lesson/7/1/practice/contest/289390/problem/A
+https://judge.yosupo.jp/problem/unionfind: we change up query code to match
+
+DSU queries
+```cpp
+int rdsu[200005]; // stores rank of leader based on size of set
+int pdsu[200005]; // stores parent of each node
+ 
+int get(int x){
+  if(x != pdsu[x]){
+    pdsu[x] = get(pdsu[x]); // set parent[x] as the root
+  }
+  return pdsu[x]; // else we know this is root
+}
+ 
+void unite(int x, int y){
+  x = get(x);
+  y = get(y);
+  if(rdsu[x] == rdsu[y]){ // two sets equal size
+    rdsu[x]++; // break equality so set y connects to x
+  }
+  if(rdsu[x] > rdsu[y]){ // x has bigger size
+    pdsu[y] = x; // connect root y with x
+  }
+  else{
+    pdsu[x] = y; // connect x to y
+  }
+  
+}
+ 
+void solve(){
+    int n,q;cin>>n>>q;
+    // reset
+    rep(i,1,n+1){
+        rdsu[i]=0; // at the start all ranks are 0 since all size = 1
+        pdsu[i]=i; // at the start every element is in a set by themselves
+    }
+    while(q--){
+        string s;cin>>s;
+        int x,y;cin>>x>>y;
+        if(s=="union"){
+            unite(x,y);
+        }
+        else{
+            if(get(x) == get(y)){
+                cout<<"YES\n";
+            }
+            else{
+                cout<<"NO\n";
+            }
+        }
+    }
+}  
+```
 #### Associative and Commutative functions
 We can perform these function in a set and get the answer using dfs. So we can find sum, min, max of sets and join them together. To do this we only need to modify union.
 
