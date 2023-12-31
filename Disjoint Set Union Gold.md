@@ -68,6 +68,10 @@ Let n = 2^20. Then the algorithm will terminate if we reach anything < 1. The st
 
 Thus, **algorithm works in constant time** for any reasonable n.
 
-W
+#### Associative and Commutative functions
+We can perform these function in a set and get the answer using dfs. So we can find sum, min, max of sets and join them together. To do this we only need to modify union.
+
+
+
 
 
