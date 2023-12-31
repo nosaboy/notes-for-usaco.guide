@@ -35,7 +35,7 @@ union(x,y):
 
 We can speed this up using the above trick. We always link the smaller set with the bigger one. The time complexity is number of links we have to go through to find root. This will work in **precisely logn time** for each query.
 We can optimize further using path compression. For every node we visit which going up, we set its parent as the root after we found it. This way, we dont have to reiterate through paths for every get(). To do this, we make get(x) recursive:
-``cpp
+```cpp
 int get(int x){
   if(a != parent[a]){
     parent[a] = get(parent[a]); // set parent[a] as the root
@@ -52,7 +52,7 @@ void union(int x, int y){
 
 From Source: get and union work in O(α(m,n)) time amortized, where α(m,n) is the inverse Ackermann function, m is the number of performed operations get and n is the number of elements. This is around log*(n) which works like this:
 
-Let n = 2^20. Then the algorithm will terminate if we reach anything <1. The steps are:
+Let n = 2^20. Then the algorithm will terminate if we reach anything < 1. The steps are:
 2^20 -> 20 = 2^4. -> 4. = 2^2. -> 2. = 2^1. -> 1. = 2^0. -> 0.smth then we terminate. We can see we only took like 5 steps.
 
 Thus, **algorithm works in constant time** for any reasonable n.
