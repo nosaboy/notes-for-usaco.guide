@@ -36,7 +36,7 @@ union(x,y):
 We can speed this up using the above trick. We always link the smaller set with the bigger one. The time complexity is number of links we have to go through to find root. This will work in **precisely logn time** for each query.
 We can optimize further using path compression. For every node we visit which going up, we set its parent as the root after we found it. This way, we dont have to reiterate through paths for every get(). To do this, we make get(x) recursive:
 ```cpp
-int rank[200005]; // stores rank of leader based on size of set
+int rdsu[200005]; // stores rank of leader based on size of set
 
 int get(int x){
   if(a != parent[a]){
@@ -48,10 +48,10 @@ int get(int x){
 void union(int x, int y){
   x = get(x);
   y = get(y);
-  if(rank[x] == rank[y]){ // two sets equal size
-    rank[x]++; // break equality so set y connects to x
+  if(rdsu[x] == rdsu[y]){ // two sets equal size
+    rdsu[x]++; // break equality so set y connects to x
   }
-  if(rank[x] > rank[y]){ // x has bigger size
+  if(rdsu[x] > rdsu[y]){ // x has bigger size
     parent[y] = x; // connect root y with x
   }
   else{
