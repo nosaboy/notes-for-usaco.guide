@@ -57,3 +57,74 @@ void solve(){
 
 
 ```
+
+### 0-1 BFS
+- Find the shortest path where every edge has weight **0 or 1**
+
+**Implementation:**
+We must optimally store and process edges with weights 0 or 1. The BFS idea is to process the smallest current distance in the queue. This way we will always get shortest paths.
+
+Lets store the most optimal dist and second most optimal dist in the **deque**. Then we can account for either 0 or 1 weight. We obvious proess the node with most optimal dist. 
+For every edge that has weight 0: We want to push this adjacent node to the **front** of the deque since the dist to this node is still the most optimal current dist.
+For every edge that has weight 1: We want to push this node to the **back** of the deque since the dist to this node is 1 more than the most optimal which means its the second most optimal dist.
+In order to support both push_front() and push_back() in O(1), **we must use deque**.
+
+**Example 2:** https://oj.uz/problem/view/BOI13_tracks
+
+We know the last animal is the animal at top left corner, and its path is the connected component from top left to bottom right. Then, the other animal must be in the connected component that borders our current animal. If our current is rabbit, fox is the previous animal and it will fill all F connected components that are next to our current connected component.
+RRRRR                   FFFFF
+RFFFR                   FFFFF
+RFRFR        ->         FFRFF
+RFFFR                   FFFFF 
+RRRRR                   FFFFF
+
+
+Thus, we can dfs through and just create edges between connected components, then calculate shortest path from the first connected component(at the start) to any other connected component through edges(since colour will be R -> F -> R -> ...)
+
+**However, we can also do this using O-1 BFS**
+Let edges between cells with same footprint be 0(they are in the same connected component) and let edges between cells with different footprints be 1(they are in different cc). Then, everytime we reach a different cc by going to a adjacent cell with diff footprint we add 1 to our dist. Similarily if we go to an adjacent cell with the same footprint we are staying in the current cc so we add 0 to our dist.  Thus, the distance from initial cc to current cell's cc is just the shortest path from top left cell to current cell in the O-1 BFS.
+The answer will just be the maximum distance cell.
+
+```cpp
+int vis[4005][4005]; int dist[4005][4005];
+const int R_CHANGE[]{0, 1, 0, -1};
+const int C_CHANGE[]{1, 0, -1, 0};
+void solve(){
+    int n,m;cin>>n>>m;
+    char v[n][m];
+    rep(i,0,n){
+        rep(j,0,m){
+            cin>>v[i][j];
+        }
+    }
+    int ans = 0;
+    // bfs shortest path
+    dist[0][0]=1; // start from top left
+    deque<pi> q; q.push_front({0,0});
+    while(!q.empty()){
+        pi a = q.front(); q.pop_front(); // access and pop most optimal element
+        int x = a.first; int y = a.second; // current cell
+        ans = max(ans,dist[x][y]); // MAX of shortest dist
+        rep(i,0,4){
+            int r = x+R_CHANGE[i]; int c = y+C_CHANGE[i]; // new coord
+            if (r < 0 || r >= n || c < 0 || c >= m || v[r][c] == '.' || vis[r][c]){
+                // we do not want to visit
+                continue;
+            }
+            if(!vis[r][c]){
+                vis[r][c]=true;
+                if(v[x][y] == v[r][c]){ // same cc, weight = 0
+                    q.push_front({r,c}); // push to front since weight = 0 more optimal dist than weight = 1
+                    dist[r][c] = dist[x][y]; // change distance
+                }
+                else{ // weight = 1
+                    q.push_back({r,c}); // push to back since dist + 1 less optimal than dist + 0
+                    dist[r][c] = dist[x][y]+1; // change distance to dist + 1 since weight of edge = 1
+                }
+                
+            }
+        }
+    }
+    cout<<ans<<endl;
+}   
+```
