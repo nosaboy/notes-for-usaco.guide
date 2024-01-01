@@ -8,12 +8,25 @@ Direct Acrylic Graph is a graph with directed edges and no cycles.
 
 ## Implementation
 **Example 1:** https://cses.fi/problemset/task/1679
+Sort the graph topologically or determine its impossible(there is cycle).
 
 ### DFS
-At any point during DFS, a node is:
-- 
+At any point during DFS, a node can be:
+- Already processed
+- Currently processing
+- Yet to be discovered
+In the DFS traversal, we will traverse the graph until we reach an end point. Then, after visiting all its neighbours and dfsing back, we will push our current node into the sorted array and mark it processed.
+If current node a has an outgoing edge to node b, then b can be one of the above:
+If b was already processed(all its neighbours have been visited and processed), we ignore it.
+If b is currently processing, meaning that we havent gone through all its neighbours yet, we note that since b can go back to a through some other path, the graph contains a cycle.
+  - We can also think about it this way: if b -> ... -> a, then all nodes after b must come after b in the sorted array. However, a -> b means a comes before b, a contradition.
+If b is yet to be discovered we dfs(b).
+After everything, we will reverse the sorted array since dfs pushed the deepest(right most) node in first.
 
 
+```cpp
+
+```
 
 
 ### BFS: Kahn's Algorithm
