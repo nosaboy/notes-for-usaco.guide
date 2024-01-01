@@ -271,5 +271,81 @@ void solve(){
 }   
 ```
 
-**Example 4:**
-This is pretty much "reverse DSU". At the start all nodes are connected and we are erasing edges instead of adding them.
+**Example 4:** https://codeforces.com/edu/course/2/lesson/7/1/practice/contest/289390/problem/D
+This is pretty much "reverse DSU". At the start some nodes are connected and we are erasing edges instead of adding them.
+Because we are **only answering queries**, it is possible to solve this by **processing queries in reverse order**. 
+
+```cpp
+int rdsu[300005]; // stores rank of leader based on size of set
+int pdsu[300005]; // stores parent of each node
+int sum[300005]; // experience points for each node
+ 
+ 
+int get(int x){ // get leader
+    while(x != pdsu[x]){
+        // dont path compress
+        x = pdsu[x];
+    }
+    return x;
+}
+ 
+void unite(int x, int y){
+    x = get(x);
+    y = get(y);
+    if(x == y){ // same leader
+        return; // skip since they are already connected
+    }
+    if(rdsu[x] == rdsu[y]){ // two sets equal size
+        rdsu[x]++; // break equality so set y connects to x
+    }
+    if(rdsu[x] > rdsu[y]){ // x has bigger size
+        pdsu[y] = x; // connect root y with x
+    }
+    else{
+        pdsu[x] = y; // connect x to y 
+    }
+  
+}
+ 
+void solve(){
+    int n,m,q;cin>>n>>m>>q;
+    // reset
+    rep(i,1,n+1){
+        rdsu[i]=0; // at the start all ranks are 0 since all size = 1
+        pdsu[i]=i; // at the start every element is in a set by themselves        
+    }
+    rep(i,0,m){
+        int x,y;cin>>x>>y;
+        
+    }
+    vector <tuple<string,int,int>> v;
+    while(q--){
+        string s;cin>>s;
+        int x,y;cin>>x>>y;
+        v.pb({s,x,y});
+        
+    }
+    reverse(v.begin(),v.end()); // reverse process query
+    vector <string> ans;
+    rep(i,0,v.size()){
+        if(get<0>(v[i]) == "ask"){
+            if(get(get<1>(v[i])) == get(get<2>(v[i]))){
+                ans.pb({"YES"});
+            }
+            else{
+                ans.pb({"NO"});
+            }
+        }
+        else{ // unite
+            unite(get<1>(v[i]), get<2>(v[i]));
+        }   
+    }
+    reverse(ans.begin(),ans.end()); // reverse answer
+    rep(i,0,ans.size()){
+        cout<<ans[i]<<"\n";
+    }
+}   
+ 
+```
+
+**Example 5:** 
