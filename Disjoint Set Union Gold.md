@@ -87,6 +87,9 @@ int get(int x){
 void unite(int x, int y){
   x = get(x);
   y = get(y);
+  if(x==y){ // same leader
+    return; // skip since they are already connected
+  }
   if(rdsu[x] == rdsu[y]){ // two sets equal size
     rdsu[x]++; // break equality so set y connects to x
   }
@@ -124,9 +127,70 @@ void solve(){
 }  
 ```
 #### Associative and Commutative functions
-We can perform these function in a set and get the answer using dfs. So we can find sum, min, max of sets and join them together. To do this we only need to modify union.
-
-
-
+**Example 2:** https://codeforces.com/edu/course/2/lesson/7/1/practice/contest/289390/problem/B
+We can perform these function in a set and get the answer using dfs. So we can find sum, min, max of sets and join them together. To do this we only need to modify union. For each function, we will union the two sets together and perform that function.
+```cpp
+int rdsu[300005]; // stores rank of leader based on size of set
+int pdsu[300005]; // stores parent of each node
+int mn[300005]; // stores minimum element for each set
+int mx[300005]; // max element
+int tot[300005]; // stores total element of each set
+ 
+int get(int x){
+    if(x != pdsu[x]){
+        pdsu[x] = get(pdsu[x]); // set parent[x] as the root
+    }
+    return pdsu[x]; // else we know this is root
+}
+ 
+void unite(int x, int y){
+    x = get(x);
+    y = get(y);
+    if(x == y){ // same leader
+        return; // skip since they are already connected
+    }
+    if(rdsu[x] == rdsu[y]){ // two sets equal size
+        rdsu[x]++; // break equality so set y connects to x
+    }
+    if(rdsu[x] > rdsu[y]){ // x has bigger size
+        pdsu[y] = x; // connect root y with x
+        tot[x] += tot[y]; // add total of y to x since y -> x
+        mn[x] = min(mn[x], mn[y]); // calc min of union
+        mx[x] = max(mx[x], mx[y]); // calc max
+    }
+    else{
+        pdsu[x] = y; // connect x to y
+        tot[y] += tot[x]; // add total of x to y since its connected
+        mn[y] = min(mn[y], mn[x]); // calc min
+        mx[y] = max(mx[y], mx[x]); // calc max
+    }
+  
+}
+ 
+void solve(){
+    int n,q;cin>>n>>q;
+    // reset
+    rep(i,1,n+1){
+        rdsu[i]=0; // at the start all ranks are 0 since all size = 1
+        pdsu[i]=i; // at the start every element is in a set by themselves
+        tot[i]=1; // initally, number of elements in each set is 1
+        mn[i]=i; // min is i
+        mx[i]=i; // max is also i
+    }
+    while(q--){
+        string s;cin>>s;
+        if(s=="union"){
+            int x,y;cin>>x>>y;
+            unite(x,y);
+        }
+        else{
+            int x;cin>>x;
+            x = get(x); // get leader
+            cout<<mn[x]<<" "<<mx[x]<<" "<<tot[x]<<endl;
+        }
+    }
+}   
+```
+**Example 3:** 
 
 
