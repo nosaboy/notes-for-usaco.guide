@@ -191,6 +191,85 @@ void solve(){
     }
 }   
 ```
-**Example 3:** 
+**Example 3:** https://codeforces.com/edu/course/2/lesson/7/1/practice/contest/289390/problem/C
+We Note that DSU is just traversing up a tree. For add, we just add the experience to the leader of the set. Let the answer be the sum of values from current node to the root(leader) node. To calculate experience, we traverse up the tree and add the value of each node.
+For unite(), we want to add an edge connecting smaller leader to bigger leader. We know that any node in the smaller set must go through the small leader. If we combine with big leader, then we DO NOT want all the previous experiences added to big leader. Thus, we just subtract the previous of the big leader from the small leader then connect them. Therefore, we avoid overcounting since every path inside small leader set will not count the previous experience by the bigger set and everytime we add experience to the big leader(leader of this combined set), we add experience to the whole thing.
 
+```cpp
+int rdsu[300005]; // stores rank of leader based on size of set
+int pdsu[300005]; // stores parent of each node
+int sum[300005]; // experience points for each node
+ 
+ 
+int get(int x){ // get leader
+    while(x != pdsu[x]){
+        // dont path compress cause we want to calculate sum
+        x = pdsu[x];
+    }
+    return x;
+}
+ 
+void unite(int x, int y){
+    x = get(x);
+    y = get(y);
+    if(x == y){ // same leader
+        return; // skip since they are already connected
+    }
+    if(rdsu[x] == rdsu[y]){ // two sets equal size
+        rdsu[x]++; // break equality so set y connects to x
+    }
+    if(rdsu[x] > rdsu[y]){ // x has bigger size
+        pdsu[y] = x; // connect root y with x
+        int prev = sum[x]; // previously acculumlated experience of big set
+        sum[y] -= prev; // adjust since we are summing up path from node to leader
+        // this is so when we go up the path, we do not count prev
+ 
+    }
+    else{
+        pdsu[x] = y; // connect x to y
+        int prev = sum[y];
+        sum[x] -= prev; // adj, previous experience does not belong to added set
+    }
+  
+}
+ 
+void solve(){
+    int n,q;cin>>n>>q;
+    // reset
+    rep(i,1,n+1){
+        rdsu[i]=0; // at the start all ranks are 0 since all size = 1
+        pdsu[i]=i; // at the start every element is in a set by themselves
+        sum[i]=0; // initally, every node has 0 experience
+        
+    }
+    while(q--){
+        string s;cin>>s;
+        if(s=="join"){ // unite two nodes
+            int x,y;cin>>x>>y;
+            unite(x,y); // join two nodes
+        }
+        else if(s=="add"){
+            int x,y;cin>>x>>y; // node, value
+            // add experience to leader of node x
+            while(x != pdsu[x]){ // going up
+                x = pdsu[x];
+            }
+            sum[x]+=y; // add experience to leader of x
+        }
+        else{
+            int x;cin>>x;
+            int ans = 0; // sum of experience
+            while(x != pdsu[x]){ // going up
+                ans += sum[x];
+                x = pdsu[x];
+            }
+            ans += sum[x]; // adds leader experience
+            cout<<ans<<endl;
+        }
+    }
+    
+}   
+```
 
+**Example 4:**
+This is pretty much "reverse DSU". At the start all nodes are connected and we are erasing edges instead of adding them.
