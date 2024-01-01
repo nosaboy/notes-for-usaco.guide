@@ -208,7 +208,7 @@ void solve(){
 ### Dynamic Programming
 
 All DP problems are essentially DP on DAG. A DP state always points to another DP state. Push DP calculates $dp[i+x]$ using $dp[i].$ Thus, we can view this as a directed edge from i to i+x. Then, i points to i+x in the DAG.
-After topological sorting, we can perform DP on the graph by going through the sorted array. This way, for some node x all nodes that point to it would have been visited and processed(its dp value) before visiting x.
+After topological sorting, we can perform DP on the graph by going through the sorted array. This way, for every u -> v, $dp[u]$ would be processed before $dp[v]$
 Thus, we can calculate longest path, number of paths, shortest path(extended dijkstras), etc. 
 **Example 3:** https://cses.fi/problemset/task/1680
 Longest Path in DAG using DP
