@@ -5,6 +5,10 @@ Direct Acrylic Graph is a graph with directed edges and no cycles.
   - Sorting is not always unique
 - Find cycle in DAG graph
 - Perform dp on DAG graphs like Tree
+  • how many different paths are there?
+  • what is the shortest/longest path?
+  • what is the minimum/maximum number of edges in a path?
+  • which nodes certainly appear in any path?
 
 
 ## Implementation
@@ -106,7 +110,7 @@ void solve(){
         int x = q.front(); q.pop();
         sorted.pb(x); // process and erase curr node
         rep(i,0,aj[x].size()){
-            indeg[aj[x][i]]--; // indegree of neighboue subtract 1
+            indeg[aj[x][i]]--; // indegree of neighbour subtract 1
             if(indeg[aj[x][i]] == 0){ // indegree of neighbour = 0
                 q.push(aj[x][i]); // process this node next
             }
@@ -203,6 +207,84 @@ void solve(){
 
 ### Dynamic Programming
 
+All DP problems are essentially DP on DAG. A DP state always points to another DP state. Push DP calculates $dp[i+x]$ using $dp[i].$ Thus, we can view this as a directed edge from i to i+x. Then, i points to i+x in the DAG.
+After topological sorting, we can perform DP on the graph by going through the sorted array. This way, for some node x all nodes that point to it would have been visited and processed(its dp value) before visiting x.
+Thus, we can calculate longest path, number of paths, shortest path(extended dijkstras), etc. 
 **Example 3:** https://cses.fi/problemset/task/1680
 Longest Path in DAG using DP
 
+Flatten the graph using topological sort, then for each node push its DP value to all nodes its pointing to.
+
+```cpp
+void solve(){
+    int n,m; cin>>n>>m;
+    vi aj[n+1];
+    int vis[n+1];
+    int indeg[n+1]={0}; // initally 0
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b); // course a points to course b
+        indeg[b]++;
+    }
+    queue <int> q;
+    // insert all nodes with indegree 0 first
+    rep(i,1,n+1){ 
+        if(indeg[i] == 0){
+            q.push(i);
+        }
+    }
+    vi sorted; 
+    // BFS for topological sort
+    while(!q.empty()){
+        int x = q.front(); q.pop();
+        sorted.pb(x); // process and erase curr node
+        rep(i,0,aj[x].size()){
+            indeg[aj[x][i]]--; // indegree of neighbour subtract 1
+            if(indeg[aj[x][i]] == 0){ // indegree of neighbour = 0
+                q.push(aj[x][i]); // process this node next
+            }
+        }
+    }
+    int idx[n+1];
+    rep(i,0,sorted.size()){ // get index for each node inr sorted arr
+        idx[sorted[i]] = i;
+    }
+    int dp[n+1]; // based on index in sorted array
+    rep(i,0,n){
+        dp[i] = -1000000005; // set everything to -INF
+        // so that there is no chance for any path other than starting from 1
+    }
+    dp[idx[1]] = 1; // base case, we start at 1
+    int p[n+1]; // parent of each node for backtracking paths
+    rep(i,0,sorted.size()){ // perform DP
+        int node = sorted[i]; // current node
+        rep(j,0,aj[node].size()){ // push DP
+            // dp[idx[aj[node][j]]] = max(dp[idx[aj[node][j]]], dp[i]+1); // calc max
+            if(dp[i]+1 > dp[idx[aj[node][j]]]){
+                dp[idx[aj[node][j]]] = dp[i] + 1;
+                p[aj[node][j]] = node; // we can backtrack since this is max path
+            }
+        }
+    }
+    if(dp[idx[n]] < 0){
+        cout<<"IMPOSSIBLE\n";
+        return;
+    }
+    cout<<dp[idx[n]]<<endl; // size
+    vi ans;
+    // backtrack
+    int node = n;
+    while(node != 1){
+        ans.pb(node);
+        node = p[node];
+    }
+    ans.pb(1);
+    reverse(ans.begin(),ans.end()); // we processed back to front so we flip
+    rep(i,0,ans.size()){
+        cout<<ans[i]<<" ";
+    }
+    cout<<endl;
+    
+}   
+
+```
