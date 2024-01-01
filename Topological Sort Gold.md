@@ -3,7 +3,8 @@ Direct Acrylic Graph is a graph with directed edges and no cycles.
 - Ordering the vertices of a directed acyclic graph such that each vertex is visited before its children.
   - For every pair of nodes (u,v) such that u -> v, u comes before v in the sort
   - Sorting is not always unique
-- We can perform dp on DAG graphs like Tree
+- Find cycle in DAG graph
+- Perform dp on DAG graphs like Tree
 
 
 ## Implementation
@@ -91,8 +92,71 @@ Note that using BFS and a priority queue we can **break ties** in processing and
 
 
 ### Finding Cycles
+**Example 2:** https://cses.fi/problemset/task/1678
 
+We can use DFS topological sorting to find cycle in DAG.
+We maintain a stack that store the current path as we traverse using DFS. If we get the second case above(neighbour is a node we are currently processing), we know that this node is currently stored deep down in the stack. We can then pop the stack until we find this node, and store each node in this path in an array. This will be our cycle.
 
+```cpp
+vi aj[200005];
+int vis[200005];
+stack <int> st; // current path
+bool instack[200005]; // is current node in stack
+vi cycle; // answer
+void dfs(int n){
+    vis[n] = 1;
+    st.push(n); instack[n]=1;
+    rep(i,0,aj[n].size()){
+        if(cycle.size() == 0 && instack[aj[n][i]]){ // found a cycle
+            // we didnt find a cycle yet
+            int start = aj[n][i];
+            cycle.pb(start);
+            while(!st.empty() && st.top() != start){ // backtrack path
+                cycle.pb(st.top()); 
+                st.pop();
+            }
+            cycle.pb(start);
+
+        }
+        if(!vis[aj[n][i]]){ // not yet discovered
+            dfs(aj[n][i]); // visit and process it
+        }
+        
+    }
+    instack[n] = 0; // we are finished processing all neighbours
+    if(!st.empty()){ // not doing this will cause RTE 
+        // while storing cycle we mightve popped more elements from stack
+        st.pop(); // we pop current node from stack
+    }
+    
+}
+void solve(){
+    int n,m; cin>>n>>m;
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b); // course a points to course b
+    }
+    rep(i,1,n+1){
+        if(!vis[i]){ // go through every node with indegree 0
+            dfs(i);
+        }
+    }
+    if(cycle.size() == 0){ // no nodes in cycle, didnt find cycle
+        cout<<"IMPOSSIBLE\n";
+        return;
+    }
+    reverse(cycle.begin(),cycle.end());
+    cout<<cycle.size()<<endl;
+    rep(i,0,cycle.size()){
+        cout<<cycle[i]<<" ";
+    }
+    cout<<endl;
+}   
+```
 
 
 ### Dynamic Programming
+
+**Example 3:** https://cses.fi/problemset/task/1680
+Longest Path in DAG using DP
+
