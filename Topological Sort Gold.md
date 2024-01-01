@@ -82,10 +82,56 @@ void solve(){
 We note that the first node always has an indegree of 0. Since nothing points to this node, nothing comes before it. Thus, we start with these nodes with indegree 0 and push them into the queue. Then, if we erase all of these nodes from the graph, we get a new DAG with some new nodes whose indegree is 0. Then we repeat the process until we erased and processed everything. 
 
 We can run normal BFS. First we push all starting nodes whose indegree is 0 into the queue and keep track of the indegree of every node. When we process a node, we will first push it into topological sort array, then subtract the indegree of all nodes adjacent to current node by 1(erasing this node). If the indegree of an adjacent node is 0 we will push this into the queue and we run until queue is empty. Based on the nature of BFS, we will always process the node that took 0 nodes to erase first(starting nodes), then 1 node to erase, then 2 nodes to erase, etc.
-In the end, if the graph still have edges(going through indegree array, some element is positive), the graph contains a cycle.
-
+In the end, if the graph still have edges(going through indegree array, some element is positive), the graph contains a cycle. If the final sorted array size != n, the graph contains a cycle.
 ```cpp
-
+void solve(){
+    int n,m; cin>>n>>m;
+    vi aj[n+1];
+    int vis[n+1];
+    int indeg[n+1]={0}; // initally 0
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        aj[a].pb(b); // course a points to course b
+        indeg[b]++;
+    }
+    queue <int> q;
+    // insert all nodes with indegree 0 first
+    rep(i,1,n+1){ 
+        if(indeg[i] == 0){
+            q.push(i);
+        }
+    }
+    vi sorted; // ans
+    while(!q.empty()){
+        int x = q.front(); q.pop();
+        sorted.pb(x); // process and erase curr node
+        rep(i,0,aj[x].size()){
+            indeg[aj[x][i]]--; // indegree of neighboue subtract 1
+            if(indeg[aj[x][i]] == 0){ // indegree of neighbour = 0
+                q.push(aj[x][i]); // process this node next
+            }
+        }
+    }
+    // IMPOSSIBLE check: if there are still indegree > 0
+    // we havent erased every node
+    rep(i,1,n+1){
+        if(indeg[i] > 0){
+            cout<<"IMPOSSIBLE\n";
+            return;
+        }
+    }
+  /* alternatively, if size of final sorted array != n, there is a cycle
+    if(sorted.size != n){
+      cout<<"IMPOSSIBLE\n";
+      return;
+    }
+  */
+    rep(i,0,sorted.size()){
+        cout<<sorted[i]<<" ";
+    }
+    cout<<endl;
+    
+}   
 ```
 
 Note that using BFS and a priority queue we can **break ties** in processing and find **lexicographically smallest topological sort**.
