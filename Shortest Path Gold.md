@@ -128,3 +128,11 @@ void solve(){
     cout<<ans<<endl;
 }   
 ```
+
+
+
+# Shortest Path with Weighted Edges
+
+### Bellman Ford
+Finds shortest path from starting node to every other node in a weighted graph provided that the graph **doesnt have a negative cycle**.
+
