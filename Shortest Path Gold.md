@@ -135,7 +135,7 @@ void solve(){
 
 ### Bellman Ford
 Finds shortest path from starting node to every other node in a weighted graph provided that the graph **doesnt have a negative cycle**.
-
+- Use over Dijkstra when there are **negative edges**
 #### Implementation
 Initially, set distance of start node = 0, and all other nodes distance = INF.
 At each instance, we will go through every edge a - b to see if going through this edge will decrease any of the distances a or b. If it does, we will update distance.
@@ -161,6 +161,7 @@ rep(i,0,n-1){
 
 ### Floyd-Warshall
 Find distance of every pair of nodes (a,b) of weighted graph in O(n^3).
+- Used for querying distance (a,b) given small number of nodes - O(n^3)
 
 We store shortest distance of pairs in 2D array. Then, we go through n rounds. For kth round, the $dist[a][b]$ will contain the shortest path from a to b containing only nodes 1...k.
 In the kth round we see how the kth node changes all distance. To do this, k must be in the path. Thus we loop through all pair of nodes (a,b) and see if k is in the shortest path using nodes 1...k:
@@ -264,3 +265,9 @@ void solve(){
 }   
 ```
 
+## Dijkstra’s Algorithm
+Find shortest path from starting node to all other nodes in O(n+mlogn)
+- Use over Bellman Ford when all edges are **nonnegative** since its faster
+
+Dijkstra maintains distance of every node and reduces them during search(like Bellman Ford), but only visits each edge exactly once.
+Initially, we set starting node dist = 0 and every other node dist = INF.
