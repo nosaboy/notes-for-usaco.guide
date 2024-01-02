@@ -278,7 +278,6 @@ There can be multiple weights of the same node in the pq if there are several wa
 This way, the smallest weighted path will always get to a node first.
 
 ```cpp
-// Dijkstra's algorithm
 rep(i,1,n+1){
 	distance[i] = INF;
 	vis[i] = 0;
@@ -291,18 +290,67 @@ int start = 0;
 dist[start] = 0;  // The shortest path from a node to itself is 0
 pq.push({0, start}); // 0 weight
 while (!pq.empty()) {
-	pair<long long,int> x = pq.top();
-	int cdist = x.first; // curr min dist of node
-	int node = x.second; // cur node
-	pq.pop();
-	if (vis[node]) { continue; } // we already processed node
-	rep(i,0,aj[node].size()){
+        pair<ll,int> x = pq.top(); // {curr min dist of node, curr node}
+        ll cdist = x.first; // 
+        int node = x.second; // cur node
+        pq.pop();
+        if (vis[node]) { continue; } // we already processed node
+        vis[node]=1; // visit node(otherwise TLE)
+        rep(i,0,aj[node].size()){
 		pi y = aj[node][i]; // {node, weight}
 		// If we can reach a neighbouring node faster, we update its min dist
 		if (cdist + y.second < dist[y.first]) {
 			pq.push({dist[y.first] = cdist + y.second, y.first}); // push neighbour into pq
 		}
-	}
+        }
 }
+
+```
+
+**Example 2:** https://cses.fi/problemset/task/1671
+
+Print shortest path from node 1 to every other node
+
+WARNING: I TLEd quite a bit because I didnt put vis = 1 after( so "continue" didnt work).
+Putting continue allows us to only process each node once. 
+```cpp
+void solve(){
+    int n,m;cin>>n>>m;
+    vector <pi> aj[n+1];
+    ll dist[n+1]; int vis[n+1];
+    rep(i,0,m){
+        ll a,b,w; cin>>a>>b>>w;
+        aj[a].pb({b,w});
+    }
+    rep(i,1,n+1){
+        dist[i] = 1000000000000000005;
+        vis[i] = 0;
+    }
+    // pq that sorts smallest weight to largest
+    priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>> pq;
+
+    int start = 1;
+    dist[start] = 0;  // The shortest path from a node to itself is 0
+    pq.push({0, start}); // 0 weight
+    while (!pq.empty()) {
+        pair<ll,int> x = pq.top(); // {curr min dist of node, curr node}
+        ll cdist = x.first; // 
+        int node = x.second; // cur node
+        pq.pop();
+        if (vis[node]) { continue; } // we already processed node
+        vis[node]=1; // visit node(otherwise TLE)
+        rep(i,0,aj[node].size()){
+            pi y = aj[node][i]; // {node, weight}
+            // If we can reach a neighbouring node faster, we update its min dist
+            if (cdist + y.second < dist[y.first]) {
+                pq.push({dist[y.first] = cdist + y.second, y.first}); // push neighbour into pq
+            }
+        }
+    }
+    rep(i,1,n+1){
+        cout<<dist[i]<<" ";
+    }
+    cout<<"\n";
+}   
 
 ```
