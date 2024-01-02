@@ -136,3 +136,28 @@ void solve(){
 ### Bellman Ford
 Finds shortest path from starting node to every other node in a weighted graph provided that the graph **doesnt have a negative cycle**.
 
+#### Implementation
+Initially, set distance of start node = 0, and all other nodes distance = INF.
+At each instance, we will go through every edge a - b to see if going through this edge will decrease any of the distances a or b. If it does, we will update distance.
+Since the number of edges of a shortest path is at most n-1, we will take n-1 rounds. So time is O(nm).
+We can speed this up a little bit by breaking if no change occurs for all edge during some round.
+```cpp
+rep(i,1,n+1){
+    dist[i] = 1000000005; // INF
+}
+dist[1] = 0; // start
+rep(i,0,n-1){
+    for (auto e : edges) {
+	int a = get<0>(e); // node 1
+	int b = get<1>(e); // node 2
+	int w = get<2>(e); // weight
+	// update dist	
+	distance[a] = min(distance[a], distance[b]+w);
+	distance[b] = min(distance[b], distance[a]+w);
+    }
+
+}
+```
+
+### 
+
