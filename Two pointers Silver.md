@@ -66,6 +66,12 @@ void solve(){
 }
 
 ```
+
+**Example 3:** https://codeforces.com/edu/course/2/lesson/9/1/practice/contest/307092/problem/C
+Find number of pairs (i,j) such that ai = aj
+Not intended: Use map and set and just multiply and add.
+
+We can two pointer through and increase whichever one is smaller. If they are the same 
 ## Subarray/segment of "good" sums
 - Calculating the max/min length of segements/subarray that satisfy some condition
 - Caculate the number of segments/subarrays that satisfy some condition
