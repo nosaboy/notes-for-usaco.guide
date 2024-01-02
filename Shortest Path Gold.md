@@ -159,5 +159,44 @@ rep(i,0,n-1){
 }
 ```
 
-### 
+### Floyd-Warshall
+Find distance of every pair of nodes (a,b) of weighted graph in O(n^3).
+
+We store shortest distance of pairs in 2D array. Then, we go through n rounds. For kth round, the $dist[a][b]$ will contain the shortest path from a to b containing only nodes 1...k.
+In the kth round we see how the kth node changes all distance. To do this, k must be in the path. Thus we loop through all pair of nodes (a,b) and see if k is in the shortest path using nodes 1...k:
+- If k is in the shortest path of a -> b using only 1...k, then we know that k is an intermediate node in the path. Thus, $dist[a][b] = dist[a][k] + dist[k][b]$ which means that a->k and k->b is the shortest path.
+- If k is not in the shortest path(currently shortest path a-> b only uses nodes 1...k-1), $dist[a][b]$ will not change.
+
+After the nth round, we have found shortest path that uses nodes 1...n, thus finding the shortest path for every pair.
+
+**Implementation:**
+
+Use a 2D array to store the most optimal distance of every pair of nodes (a,b). Intially, we set the dist of every node to itself = 0. Then, we set every adjacent edge dist = its weight. Finally we set everything else INF. This is our base case before running algorithm.
+```cpp
+int dist[n+1][n+1];
+for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= n; j++) {
+	if (i == j) dist[i][j] = 0; // dist(a,a) = 0
+	else if (adj[i][j]) dist[i][j] = adj[i][j]; // there is an edge between 2 nodes
+	else dist[i][j] = INF; // else we set to INF
+    }
+}
+```
+We go through n round, each round we pick a node that acts as an "intermediate node." We can then go through each pair using nested for loops. Then we can update dist by considering above two choices:
+$$dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);$$
+Each round will not worsen the answer.
+```cpp
+for (int k = 1; k <= n; k++) { // for every round we pick node k as middle
+    for (int i = 1; i <= n; i++) {
+	for (int j = 1; j <= n; j++) {
+ 	    // for every pair of nodes we see if k is in the path
+            // if it was only constructed form nodes 1...k
+	    dist[i][j] = min(distance[i][j], dist[i][k]+distance[k][j]);
+	}
+    }
+}
+```
+**Negative cycles:** If at the end of the algorithm, the distance from a vertex  
+$v$  to itself is negative, the graph contains a negative cycle.
+
 
