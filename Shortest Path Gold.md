@@ -288,11 +288,11 @@ priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<
 
 int start = 0;
 dist[start] = 0;  // The shortest path from a node to itself is 0
-pq.push({0, start}); // 0 weight
+pq.push({0, start}); // 0 dist
 while (!pq.empty()) {
         pair<ll,int> x = pq.top(); // {curr min dist of node, curr node}
-        ll cdist = x.first; // 
-        int node = x.second; // cur node
+        ll cdist = x.first;  
+        int node = x.second;
         pq.pop();
         if (vis[node]) { continue; } // we already processed node
         vis[node]=1; // visit node(otherwise TLE)
@@ -331,11 +331,11 @@ void solve(){
 
     int start = 1;
     dist[start] = 0;  // The shortest path from a node to itself is 0
-    pq.push({0, start}); // 0 weight
+    pq.push({0, start}); // 0 dist
     while (!pq.empty()) {
         pair<ll,int> x = pq.top(); // {curr min dist of node, curr node}
-        ll cdist = x.first; // 
-        int node = x.second; // cur node
+        ll cdist = x.first; 
+        int node = x.second; 
         pq.pop();
         if (vis[node]) { continue; } // we already processed node
         vis[node]=1; // visit node(otherwise TLE)
@@ -352,5 +352,70 @@ void solve(){
     }
     cout<<"\n";
 }   
+
+**Problem of Interest:** https://codeforces.com/problemset/problem/1915/G
+
+Constrains tells us O(n^2) is possible. We think about brute force something.
+We know that the bike itself will affect the answer. There is no easy way to know going foward if going down a path will lead to a good bike that will make up for length of path already lost. Thus, we think about this more bruteforcy. We know that we cannot predict if going down a path will lead to a better bike. Thus, we think what would be the most optimal path if the last bike we used was fixed. This leads to brute force solution. We Dijkstra but store the last bike. Then, we know that we will never have a bad solution since in the end we can just get the min of dist n and every last bike from 1 to n.
+We store $dist[node][bike]$ then at every step in queue well take the minimum dist. If the bike of the current node is more optimal, we'll take that bike. Else we go through its neighbours and compare it with the min dist using this bike as last bike.
+
+```cpp
+void solve(){
+    int n,m;cin>>n>>m;
+    vector <pi> aj[n+1];
+    ll dist[n+1][n+1]; ll vis[n+1][n+1]; // dp (node, bike)
+    // min dist going to node x using y bike last
+    ll bike[n+1];
+    rep(i,0,m){
+        ll a,b,w; cin>>a>>b>>w;
+        // undirected
+        aj[a].pb({b,w});
+        aj[b].pb({a,w});
+    }
+    rep(i,0,n){
+        cin>>bike[i+1];
+    }
+    rep(i,1,n+1){
+        rep(j,1,n+1){
+            dist[i][j] = 1000000000000000005;
+            vis[i][j] = 0;
+        }
+        
+    }
+    // pq that sorts smallest weight to largest
+    priority_queue<tuple<ll, int, int>, vector<tuple<ll, int, int>>, greater<tuple<ll, int, int>>> pq;
+    // {dist, node, bike}
+    int start = 1;
+    dist[start][1] = 0;  // forced to take bike at start
+    pq.push({0, start, start}); // 0 dist, start bike
+    while (!pq.empty()) {
+        tuple<ll,int,int> x = pq.top(); // {curr min dist of node, curr node}
+        ll cdist = get<0>(x); 
+        int node = get<1>(x); 
+        int curr = get<2>(x); // current bike 
+        if(bike[node] < bike[curr]){ // if more optimal bike we'll take it
+            curr = node;
+        }   
+        pq.pop();
+        if (vis[node][curr]) { continue; } // we already processed node
+        vis[node][curr]=1; // visit node(otherwise TLE)
+        rep(i,0,aj[node].size()){
+            
+            pi y = aj[node][i]; // {node, weight}
+            // If we can reach a neighbouring node faster, we update its min dist
+            if (cdist + y.second*bike[curr] < dist[y.first][curr]) {  // compare curr bike
+                pq.push({dist[y.first][curr] = cdist + y.second*bike[curr], y.first, curr}); // push neighbour into pq
+            }
+        }
+    }
+    ll ans = 1000000000000000005;
+    rep(i,1,n+1){ // find min bike
+        ans = min(ans, dist[n][i]); // all bikes
+    }
+    cout<<ans<<"\n";
+}   
+ 
+
+``` 
 
 ```
