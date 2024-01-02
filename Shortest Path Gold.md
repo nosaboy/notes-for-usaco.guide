@@ -196,7 +196,19 @@ for (int k = 1; k <= n; k++) { // for every round we pick node k as middle
     }
 }
 ```
+
+We can also find the nodes that make up the shortest path. Maintain a 2D array $p[i][j]$ that stores the last node that made up the path. That is, the last k such that $dist[i][j]$ was changed to $dist[i][k] + dist[k][j].$ We can then split this into path i -> k, k, k -> j. Then we determine $p[i][k]$ and $p[k][j]$ and recursively find the path.
+
+
+**When working with real weights:** there is bound be error which accumulates quickly. Thus we adjust using constant epsilon:
+```cpp
+if (d[i][k] + d[k][j] < d[i][j] - eps) // adjust comparison
+    d[i][j] = d[i][k] + d[k][j]; 
+```
 **Negative cycles:** If at the end of the algorithm, the distance from a vertex  
 $v$  to itself is negative, the graph contains a negative cycle.
+
+We can use the above to **find negative cycles:** https://cp-algorithms.com/graph/finding-negative-cycle-in-graph.html
+
 
 
