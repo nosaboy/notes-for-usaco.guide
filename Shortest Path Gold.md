@@ -191,7 +191,7 @@ for (int k = 1; k <= n; k++) { // for every round we pick node k as middle
 	for (int j = 1; j <= n; j++) {
  	    // for every pair of nodes we see if k is in the path
             // if it was only constructed form nodes 1...k
-	    dist[i][j] = min(distance[i][j], dist[i][k]+distance[k][j]);
+	    dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j]);
 	}
     }
 }
@@ -211,4 +211,56 @@ $v$  to itself is negative, the graph contains a negative cycle.
 We can use the above to **find negative cycles:** https://cp-algorithms.com/graph/finding-negative-cycle-in-graph.html
 
 
+**Example 1:** https://cses.fi/problemset/task/1672
+
+Query shortest path of any two nodes.
+
+O(n^3) is doable, so we use Floyd-Warshall.
+
+```cpp
+void solve(){
+    int n,m,q;cin>>n>>m>>q;
+    ll adj[n+1][n+1]={0}; //adjacency matrix
+    rep(i,1,n+1){
+	rep(j,1,n+1){
+	    adj[i][j]=1000000000000000005;
+        }
+    }
+    rep(i,0,m){
+        ll a,b,w; cin>>a>>b>>w;
+        adj[a][b]=min(adj[a][b],w); // account for multiple edges
+        adj[b][a]=min(adj[a][b],w);
+    }
+    // process dist
+    ll dist[n+1][n+1];
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (i == j) dist[i][j] = 0; // dist(a,a) = 0
+            else if (adj[i][j]!=1000000000000000005) dist[i][j] = adj[i][j]; // there is an edge between 2 nodes
+            else dist[i][j] = 1000000000000000005; // else we set to INF
+        }
+    }
+    
+    
+    for (int k = 1; k <= n; k++) { // for every round we pick node k as middle
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                // for every pair of nodes we see if k is in the path
+                // if it was only constructed form nodes 1...k
+                dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j]);
+            }
+        }
+    }
+    while(q--){
+        int a,b;cin>>a>>b;
+        if(dist[a][b]==1000000000000000005){ // = INF
+            cout<<-1<<"\n";
+        }
+        else{
+            cout<<dist[a][b]<<"\n";
+        }
+        
+    }
+}   
+```
 
