@@ -419,7 +419,106 @@ void solve(){
 }
 
 ```
+**Find the minimum length segment whose gcd is 1 and print -1 if there are no such segments.**
+https://codeforces.com/edu/course/2/lesson/9/2/practice/contest/307093/problem/G
 
+First, we know that the longer the subarray, the more chance it will be gcd = 1. Since we are finding the minimum length segment, for every l we will stop at the first time gcd hits 1, then go to the next l. All thats left is to calculate gcd of range efficiently. We can do this using segtree fo gcd queries.
+```cpp
+// SEGTREE FOR GCD QUERIES
+struct segtree{
+    int sz;
+    vector <ll> sum; // store sum of nodes
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        sum.assign(2*sz,0LL); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <ll> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <ll> &a, int x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                sum[x] = a[lx];
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        sum[x] = __gcd(sum[2*x+1], sum[2*x+2]);
+    }
+    void set(int i, ll u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, ll u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            sum[x] = u;
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        sum[x] = __gcd(sum[2*x+1], sum[2*x+2]);
+    }
+    ll query(int l, int r){
+        return query(l,r,0,0,sz);
+    }
+    ll query(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return 0;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return sum[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        ll osa = query(l,r,2*x+1,lx,m);
+        ll nosa = query(l,r,2*x+2,m,rx);
+        return __gcd(osa,nosa);
+    }
+ 
+};
+
+
+void solve(){
+    int n;cin>>n;
+    vector <ll> v;
+    rep(i,0,n){
+        ll u; cin>>u; v.pb(u);
+    }
+    segtree st;
+    st.init(n+1);
+    st.build(v);
+    int ans = 1000000005;
+    int r = 0;
+    rep(l,0,n){
+        r = max(r, l);
+        while(r < n && st.query(l,r+1) > 1LL){
+            r++;
+        }
+        if(st.query(l,r+1) == 1LL){
+            ans = min(ans, r-l+1);
+        }
+        
+    }
+    if(ans == 1000000005){ // didnt find segment
+        cout<<-1<<endl;
+        return;
+    }
+    cout<<ans<<endl;
+}   
+```
 
 **Example 1:** https://codeforces.com/contest/279/problem/B
 Keep a two-pointer the represents the sum of the current subarray. As we add the next value by right++, we only subtract values if we have to, meaning we subtract until we have sum <= t again, then we just print max(right - left + 1).
