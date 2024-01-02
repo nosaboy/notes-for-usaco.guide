@@ -265,9 +265,44 @@ void solve(){
 }   
 ```
 
-## Dijkstra’s Algorithm
+### Dijkstra’s Algorithm
 Find shortest path from starting node to all other nodes in O(n+mlogn)
 - Use over Bellman Ford when all edges are **nonnegative** since its faster
 
 Dijkstra maintains distance of every node and reduces them during search(like Bellman Ford), but only visits each edge exactly once.
+
+**Implementation:**
 Initially, we set starting node dist = 0 and every other node dist = INF.
+Then, Dijkstra is pretty much BFS on steriods(with weights). At each step, we will visit the node whose current path has the smallest dist. Thus we must maintain a priority queue.
+There can be multiple weights of the same node in the pq if there are several ways to go to this node. Thus, the pq allows us to always take the min weight, which will be the final weight of this ndoe. Then for every other instance of this node we'll just skip it. Then, we go through all neighbours and push their distance using current edge weight if unvisited.
+This way, the smallest weighted path will always get to a node first.
+
+```cpp
+// Dijkstra's algorithm
+rep(i,1,n+1){
+	distance[i] = INF;
+	vis[i] = 0;
+}
+distance[x] = 0;
+// pq that sorts smallest weight to largest
+priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
+
+int start = 0;
+dist[start] = 0;  // The shortest path from a node to itself is 0
+pq.push({0, start}); // 0 weight
+while (!pq.empty()) {
+	pair<long long,int> x = pq.top();
+	int cdist = x.first; // curr min dist of node
+	int node = x.second; // cur node
+	pq.pop();
+	if (vis[node]) { continue; } // we already processed node
+	rep(i,0,aj[node].size()){
+		pi y = aj[node][i]; // {node, weight}
+		// If we can reach a neighbouring node faster, we update its min dist
+		if (cdist + y.second < dist[y.first]) {
+			pq.push({dist[y.first] = cdist + y.second, y.first}); // push neighbour into pq
+		}
+	}
+}
+
+```
