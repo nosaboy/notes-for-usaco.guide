@@ -92,5 +92,14 @@ For every cell, the pull DP relation is as follows:
 - If $A[i] != B[j],$ $DP[i][j] = max(DP[i-1][j], DP[i][j-1]);$
     - This is because we dont do diagonal since it will only worsen our answer. If diagonal is our best answer, then we can get the same answer by going down then right because the answer wont increase if we go diagonal, so it wont increase if we do it the other way
     - Thus $DP[i-1][j], DP[i][j-1]) \ge DP[i-1][j-1]$ always holds
- 
+
+ - If $A[i] == B[j],$ $DP[i][j] = DP[i-1][j-1]+1;$
+     - This will always give us the maximum answer.
+     - Note that $DP[i-1][j-1]$ differs from $DP[i-1][j],DP[i][j-1]$ by at most 1 based on construction of paths
+     - Thus, we can always get $DP[i-1][j-1]+1 \ge DP[i-1][j],DP[i][j-1]$.
   
+**Implementation:**
+```cpp
+
+
+```
