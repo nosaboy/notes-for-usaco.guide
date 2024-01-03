@@ -64,7 +64,7 @@ Start at a random node with no edges added. Our current tree now only contains t
 
 **Implementation:**
 
-We keep a pq to store the minimum weight node to visit during this time. For every node we visit if we've already visited/processed this node, we ignore it. Else, we add the weight(which is minimum) to answer and go and push all its neighbours + its weights to see if any of them will be the minimum. Therefore at all times we will have all the possible reachable nodes(by a node in the current tree) and their weights. This way, we can always get the smallest weight node in the pq.
+We keep a pq to store the minimum weight node to visit during this time. For every node we visit if we've already visited/processed this node, we ignore it. Else, we add the weight(which is minimum) to answer and go and push all its neighbours that is not in current tree and its weight to see if any of them will be the minimum. Therefore at all times we will have all the possible reachable nodes(by a node in the current tree) and their weights. This way, we can always get the smallest weight node in the pq.
 
 Time complexity is O(n+mlogm).
 ```cpp
@@ -93,7 +93,9 @@ void solve(){
         rep(i,0,aj[node].size()){ // push every neighbour into pq 
         // hope that the weight is minimum
             pi y = aj[node][i]; // {node, weight}
-            pq.push({y.second, y.first}); // sort node by weight
+            if(!vis[y.first]){ // neighbour not in tree
+                pq.push({y.second, y.first}); // sort node by weight
+            }
         }
     }
     // check IMPOSSIBLE
