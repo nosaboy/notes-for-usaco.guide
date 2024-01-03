@@ -100,6 +100,29 @@ For every cell, the pull DP relation is as follows:
   
 **Implementation:**
 ```cpp
-
-
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int n = text1.size(); int m = text2.size();
+        int dp[n+1][m+1]; // 1 indexed to account for out of bounds
+        memset(dp,0,sizeof(dp));
+        for(int i = 1;i<=n;i++){
+            for(int j = 1;j<=m;j++){
+                if(text1[i-1] == text2[j-1]){ // A[i] = B[j]
+                    dp[i][j] = dp[i-1][j-1]+1; // optimal ans
+                }
+                else{
+                    dp[i][j] = max(dp[i-1][j], dp[i][j-1]); // other case
+                }
+            }
+        }
+        return dp[n][m]; // final dp value
+    }
+};
 ```
+
+**NOTE:** If we add parent(every cell points to the cell it came from), we can **get the longest common subsequence itself** along with its length.
+
+**NOTEx2:** It is possible to solve this using only min(n,m) memory instead of nm memory. However, we can only print the maximum length in this case( see Users Solutions).
+
+
