@@ -90,4 +90,7 @@ Lets say we are at some cell. Then, we always want to increase our answer. The m
 To move diagonally, $A[i+1] = B[j+1]$ must hold.
 For every cell, the pull DP relation is as follows:
 - If $A[i] != B[j],$ $DP[i][j] = max(DP[i-1][j], DP[i][j-1]);$
-    - This is because 
+    - This is because we dont do diagonal since it will only worsen our answer. If diagonal is our best answer, then we can get the same answer by going down then right because the answer wont increase if we go diagonal, so it wont increase if we do it the other way
+    - Thus $DP[i-1][j], DP[i][j-1]) \ge DP[i-1][j-1]$ always holds
+ 
+  
