@@ -16,7 +16,25 @@ To find the LIS that ends at each i, we just take the biggest $L[i][j]$ such tha
 For each i transition, we only need to change at most 1 element of $L[i]$ to get $L[i+1]$. This is because it is only optimal to add $a[i]$ to the end of $L[i][j]$. If we add $a[i]$ to anything smaller it isnt optimal cause $L[i][l+1] < a[i]$. However, we know that $L[i][j+1] >= a[i]$. Thus, it is always optimal to add to $a[i]$ to the back of $L[i][j]$ and change to $L[i][j] = a[i]$. In the case that $L[i][j+1]$ is a new value, it means that we have never gotten a subsequence length j+1 before. Thus we push_back a new value in the set.
 
 ```cpp
-
+void solve(){
+    int n;cin>>n;
+    vi a;
+    rep(i,0,n){
+        int u;cin>>u;a.pb(u);
+    }
+    vi dp; // store current L values
+    rep(i,0,n){
+        int pos = lower_bound(dp.begin(), dp.end(), a[i]) - dp.begin();
+        // position of the j+1 such that L[j+1] >= a[i]
+        if(pos == dp.size()){ // j+1 not in array
+            dp.pb(a[i]); // first time j+1 length, make new value in L
+        }
+        else{
+            dp[pos] = a[i]; // we just set curr L[j+1] = a[i]
+        }
+    }
+    cout<<dp.size()<<endl; // longest length is just biggest j(size)
+}   
 
 ```
 
