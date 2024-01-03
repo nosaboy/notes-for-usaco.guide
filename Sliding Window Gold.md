@@ -30,7 +30,9 @@ public:
     }
 };
 ```
-
+This runs in O(nlogn) time. 
+### Monotonic Queue
+We can use a queue to do this is O(n) - linear time. 
 **Example 2:** https://cses.fi/problemset/task/1141
 
 This is a dynamic sliding window problem( just two pointers), meaning the window size changes. We fix the left bound. Then we get the maximum possible right bound. To do this, we maintain a map of elements in the window. 
