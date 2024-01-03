@@ -22,7 +22,7 @@ void solve(){
     rep(i,0,n){
         int u;cin>>u;a.pb(u);
     }
-    vi dp; // store current L values
+    vi dp; // store current L values: min ending element of LIS length j
     rep(i,0,n){
         int pos = lower_bound(dp.begin(), dp.end(), a[i]) - dp.begin();
         // position of the j+1 such that L[j+1] >= a[i]
