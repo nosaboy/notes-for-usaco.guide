@@ -31,3 +31,30 @@ public:
 };
 ```
 
+**Example 2:** https://cses.fi/problemset/task/1141
+
+This is a dynamic sliding window problem( just two pointers), meaning the window size changes. We fix the left bound. Then we get the maximum possible right bound. To do this, we maintain a map of elements in the window. 
+The left pointer transition is losing the leftmost value. Since all values in the window are distinct, we only need to say $map[value]=0$ meaning that the window no longer contains this value.
+The right pointer transition is adding a new value. We check if its possible to add this value using the map and if it is we set $map[value]=1$ meaning the value is in the window. We add as much as possible until we reach the first value that we cant add cause its already in the window.
+```cpp
+void solve(){
+    int n;cin>>n;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    int ans = 0;
+    int r = 0;
+    map <int,int> mp; // is value in current window
+    rep(i,0,n){
+        while(r < n && mp[v[r]]==0){
+            mp[v[r]]=1;
+            r++;
+        }
+        ans = max(ans, r-i); // length, since r is pointing to the value we cant add
+        mp[v[i]]=0; // set back to 0 since we're moving window
+    }
+    cout<<ans<<endl;
+}   
+
+```
