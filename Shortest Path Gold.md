@@ -283,7 +283,7 @@ rep(i,1,n+1){
 	vis[i] = 0;
 }
 distance[x] = 0;
-// pq that sorts smallest weight to largest
+// pq that sorts shortest path to longest
 priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
 
 int start = 0;
@@ -326,7 +326,7 @@ void solve(){
         dist[i] = 1000000000000000005;
         vis[i] = 0;
     }
-    // pq that sorts smallest weight to largest
+    // pq that sorts shortest path to longest
     priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>> pq;
 
     int start = 1;
@@ -382,7 +382,7 @@ void solve(){
         }
         
     }
-    // pq that sorts smallest weight to largest
+    // pq that sorts shortest path to longest
     priority_queue<tuple<ll, int, int>, vector<tuple<ll, int, int>>, greater<tuple<ll, int, int>>> pq;
     // {dist, node, bike}
     int start = 1;
