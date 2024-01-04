@@ -74,6 +74,9 @@ We note that two wires i and j where $l_i < l_j$do not intersect if $r_i < r_j$ 
 #### Minimum number of increasing subsequences to colour the whole array
 Claim:
 The minimum number of increasing subsequences required to cover $A$ is equal to the size of **longest non-increasing subsequence** of $A$.
+
+Proof: Trust me bro...
+
 We calculate longest non-increasing subsequence by reversing array then calculate longest non-decreasing subsequence.
 ```cpp
 void solve(){
