@@ -15,7 +15,7 @@ for (int i = 0; i < s.size(); i++) {
 }
 ```
 We can then calculate the hash value of any **subtring S[a...b]:**
-$$\left(\sum_{i=a}^{b}  r^{b-i} * s[i]\right) \pmod{M}$$
+$$\left(\sum_{i=a}^{b}  r^{b-i} * s[i]\right) \pmod{M} = \left(\sum_{i=0}^{b}  r^{b-i} * s[i] - (\sum_{i=0}^{a-1}  r^{a-1-i} * s[i]) \cdot r^{}\right) \pmod{M}$$
 **Collision:** When two hash values S(r) and T(r) are equal but string S != T.
 We can small probability of collision with testcases.
 
