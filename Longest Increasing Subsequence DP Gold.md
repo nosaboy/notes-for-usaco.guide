@@ -69,7 +69,43 @@ In other words, for each i we gte the number of ways by summing up all ways for 
 
 **Example 2:** https://cses.fi/105/submit/C
 We essentially want to find the minimum set of circuts such that for each set, all wires do not intersect. 
-We note that two wires i and j where $l_i < l_j$do not intersect if $r_i < r_j$ as well. For each set, we want this property to be satisfied for all i and j. Thus we want to find the minimum number of increasing subsequences for pairs to cover all wires. 
+We note that two wires i and j where $l_i < l_j$do not intersect if $r_i < r_j$ as well. For each set, we want this property to be satisfied for all i and j. The greedy strategy is to sort pairs of left, then look at increasing subsequences for right values. This will increase our chances into getting a longer increasing subsequence. Thus we want to find the minimum number of increasing subsequences for r_i after sorting l_i. 
 
+#### Minimum number of increasing subsequences to colour the whole array
+Claim:
+The minimum number of increasing subsequences required to cover $A$ is equal to the size of **longest non-increasing subsequence** of $A$.
+We calculate longest non-increasing subsequence by reversing array then calculate longest non-decreasing subsequence.
+```cpp
+void solve(){
+    int n;cin>>n;
+    vector <pi> v;
+    rep(i,0,n){
+        int l,r;cin>>l>>r;v.pb({l,r});
+    }
+    
+    sort(v.begin(),v.end()); // sort by l
+    vi a; // contains r in order
+    rep(i,0,n){
+        a.pb(v[i].second);
+    }
+    // Longest non-increasing subsequence 
+    // = reverse(Longest non-decreasing subsequence)
+    reverse(a.begin(),a.end());
 
-This means we want to 
+    // perform find longest non-decreasing subsequence
+
+    vi dp; // store current L values: min ending element of LIS length j
+    rep(i,0,n){
+        int pos = upper_bound(dp.begin(), dp.end(), a[i]) - dp.begin();
+        // position of the j+1 such that L[j+1] > a[i]
+        if(pos == dp.size()){ // j+1 not in array
+            dp.pb(a[i]); // first time j+1 length, make new value in L
+        }
+        else{
+            dp[pos] = a[i]; // we just set curr L[j+1] = a[i]
+        }
+    }
+    cout<<dp.size()<<endl;
+} 
+```
+
