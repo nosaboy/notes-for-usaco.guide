@@ -40,4 +40,11 @@ void solve(){
 
 
 ### Better brute force way(using RMQ)
+- Easier to understand and derive on the spot
+- Slower constant factor than smart way
 
+Consider brute force solution. We want all j before it such that $a[j] < a[i]$. We can achieve this using RMQ updates and query. We store the max dp of every $a[i]$ in the segment tree. Looping through i, for each $a[i]$ we get the max element $mx$ from 1 to $a[i]-1$ since these numbers are all smaller. Then, we update the value of $a[i]$ in the segment tree with $max(prev, mx+1).$
+
+```cpp
+
+```
