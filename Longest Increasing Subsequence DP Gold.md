@@ -1,10 +1,18 @@
+## Usage
+- Find LIS in O(nlogn)
+- Longest non-decreasing subsequence
+    - LIS except we can use same numbers in a sequence
+    - Just modify the inequalities of code for LIS
+- Number of longest increasing subsequences    
 **Example 1:** https://cses.fi/problemset/task/1145
 Given an array of integers, calculate longest increasing subsequence.
 
 O(n^2) solution: For every i we calculate LIS that ends at position i. The LIS that ends at i is 
 $dp[i] = max(dp[j])+1$ if $j < i$ and $a[j] < a[i].$ In other words, we are ending at position i at value $a[i]$ so we want the previous $a[j]$ that is smaller than $a[i]$ and has the longest subsequence already. Then we just add $a[i]$ to the end of the sequence.
 
-**NOTE:** We can also restore the sequence by implementing parent array(pointing to previous element that had max dp)
+Remember, we must first set every dp value to 1 since the smallest LIS ending at i is just $a[i]$ itself.
+
+**NOTE:** We can also restore the sequence by implementing parent array $p[n]$ which points to previous element that gave the max $dp[j]$ for valid $j$.
 
 ## Fast Solution to Calculation LIS in O(nlogn)
 ### Smart Way
@@ -45,6 +53,14 @@ void solve(){
 
 Consider brute force solution. We want all j before it such that $a[j] < a[i]$. We can achieve this using RMQ updates and query. We store the max dp of every $a[i]$ in the segment tree. Looping through i, for each $a[i]$ we get the max element $mx$ from 1 to $a[i]-1$ since these numbers are all smaller. Then, we update the value of $a[i]$ in the segment tree with $max(prev, mx+1).$
 
+```cpp
+
+```
+
+#### Number of possible LIS
+This task can only be achieved using RMQ.
+Using RMQ approach, we store segtree in pair {length, the number of LIS ending at i}. The transition from j to i is then {mx+1, the sum of all $pair[j].second$ whose $pair[j].first = mx$}.
+In other words, for each i we gte the number of ways by summing up all ways for all $j$ that have the mx value.
 ```cpp
 
 ```
