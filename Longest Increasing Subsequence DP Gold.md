@@ -48,3 +48,12 @@ Consider brute force solution. We want all j before it such that $a[j] < a[i]$. 
 ```cpp
 
 ```
+
+
+
+**Example 2:** https://cses.fi/105/submit/C
+We essentially want to find the minimum set of circuts such that for each set, all wires do not intersect. 
+We note that two wires i and j where $l_i < l_j$do not intersect if $r_i < r_j$ as well. For each set, we want this property to be satisfied for all i and j. Thus we want to find the minimum number of increasing subsequences for pairs to cover all wires. 
+
+
+This means we want to 
