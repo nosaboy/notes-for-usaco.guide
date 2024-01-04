@@ -141,3 +141,13 @@ void solve(){
 ```
 
 ### Bitmask over Primes
+
+We can set each prime number as bits. Therefore, some numbers can be represented using bits where each bit represents a unique prime factor(2,3,5,7,11,...). Note there can be at most 1 prime factor since bit is either 0 or 1 for each prime.
+Then, we can compare two numbers:
+- Here, iterating over each bit of the prime binary representation is iterating through each prime
+- GCD of two numbers = bitwise AND of their prime binary representation
+- LCM of two numbers = bitwise OR
+- Iterating over submasks = iterating over a subset of primes = iterating over divisors
+- Choosing a set of numbers with GCD = 1 means the AND of these numbers = 0 since all numbers cannot share a common factor.
+
+
