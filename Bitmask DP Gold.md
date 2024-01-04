@@ -77,5 +77,67 @@ Each subset S is assigned an integer value. Calculate for each S the sum of the 
 
 Brute force: Go through each pair of subsets, then see if one is a subset of the other and add value: O((2^n)^2)
 
-DP: 
+DP: Why dont we just iterate through every subset and see if current subset is in desired subset? It is also O(n2^n)?? 
 
+For every element  at position k(in binary) in the set, we either keep k or dont keep the k. Thus, the dp relation is:
+- If element not in set, then dp[subset][k] = dp[subset][k-1]
+- Else if elemen in set, then dp[subset][k] = dp[subset][k-1] + dp[subset_with_k][k-1]
+```cpp
+for (int k = 0; k < n; k++) { // for every position
+    for (int s = 0; s < (1<<n); s++) { // for every subset
+        if (s&(1<<k)) sum[s] += sum[s^(1<<k)]; // if pos k in subset
+        // we add sum[subset_without_k]
+    }
+}
+```
+
+
+ya idk what this complicated logic is like bro just do it so simply i dont get why you have to do it like this its so weird.
+
+###  Hamiltonian paths
+A path that visits each node exactly once.
+Determine if there is a Hamiltonian path:
+• Dirac’s theorem: If the degree of each node is at least n/2, the graph
+contains a Hamiltonian path.
+• Ore’s theorem: If the sum of degrees of each non-adjacent pair of nodes is
+at least n, the graph contains a Hamiltonian path.
+
+**Example 1:** https://cses.fi/problemset/task/1690
+
+Let $dp[S][x]$ be the number of paths that visit all nodes in subset S exactly once **and** the path ends at node x. 
+The DP transition would then be the sum of $dp[S_without_x][i]$ where $i$ is a node in $S$ and $i$ is a neighbour of $x$. This is because all of these paths that end at a neighbour of x can just go to x to create a path with nodes in S that ends at x.
+
+**Implementation:**
+We precalculate sets from smallest to largest in binary. This way, if we delete any node x and do $dp[S_without_x]$, it will already be calculated.
+
+For this problem, we may also use optimizations like only including subsets with 1st city and only include subsets with the last city if the subset has every node((1<<n) - 1) which may save TLE.
+```cpp
+void solve(){
+    int n,m;cin>>n>>m;
+    vi aj[n];
+    rep(i,0,m){
+        int a,b;cin>>a>>b; a--; b--;
+        aj[b].pb(a); // a goes to b 
+    }
+    int dp[(1<<n)][n]={0}; // {nsubset of nodes, last node}
+    dp[1][0] = 1; // base case, start at node 1
+    rep(i,0,(1<<n)){
+        if(i%2==0){continue;} // only consider subsets with node 1: optimization else TLE
+
+        rep(j,0,n){ // for every node
+            if(i&(1<<j)){ // if node in subset i
+                rep(l,0,aj[j].size()){
+                    if(i&(1<<aj[j][l])){ // if neighbour also in i
+                        // dp[i without jth element][end at neighbour]
+                        dp[i][j] = add(dp[i][j],dp[i-(1<<j)][aj[j][l]]);
+                    }
+                   
+                }
+            }
+        }
+    }
+    cout<<dp[(1<<n)-1][n-1]<<"\n"; // dp[all nodes][nth node]
+}   
+```
+
+### Bitmask over Primes
