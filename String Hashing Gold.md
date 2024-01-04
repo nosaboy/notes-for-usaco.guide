@@ -39,3 +39,11 @@ long long getHash(int start, int end) {
 Probability of collision by hashing with mod M and string length n is at most $\frac{n}{M}$
 Thus, it is better to choose large primes to decrease hash value.
 
+**Generating Base:** To avoid collisions, we can generate a random base(r) so the solution is unhackable
+```cpp
+mt19937 RNG((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
+const ll M = (1LL << 61) - 1; // large prime
+const ll B = uniform_int_distribution<ll>(0, M - 1)(RNG);
+```
+
+**Example 1:** https://dmoj.ca/problem/ccc20s3
