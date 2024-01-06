@@ -281,3 +281,8 @@ void solve(){
 
 // NOTE: IN THE MAIN FUNCTION, PRECOMPUTE FACTORIAL. WRITE: precompute(100005);
 ```
+
+**Problem 11:** https://codeforces.com/problemset/problem/1606/E
+After 30 minutes, no clue on how to start the problem
+Hint 1: Let's calculate the following dynamic programming dp(i,j) — the number of ways to choose the initial health if there are i heroes still alive, and they already received j damage.
+
