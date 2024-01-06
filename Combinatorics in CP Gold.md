@@ -159,7 +159,35 @@ void solve(){
 }   
 ```
 
+**Problem 3:** https://codeforces.com/problemset/problem/888/D
 
+Self Editorial:
+For every k, we can choose 1,2,...,k positions, then set all positions as bad. That is just the derangement of length i. Then, the answer is just we add them all up. Since k <= 4, we can just calculate nCk the dumb way.
+```cpp
+ll nCk(ll n,ll k) {
+    ll ans = 1;
+    int cnt = 0;
+    rep(i,0,k){
+        ans *= n-cnt;
+        cnt++; 
+    }
+    rep(i,1,k+1){
+        ans /= i;
+    }
+    return ans;
+}
+void solve(){
+    int n,k;cin>>n>>k;
+    precompute(n);
+    ll osa[5]={0}; // prefix of derangement length k
+    osa[0] = 1; osa[1]=0; osa[2] = 1; osa[3] = 2; osa[4] = 9;
+    rep(i,1,5){
+        osa[i] *= nCk(n,i);
+        osa[i] += osa[i-1];
+    }
+    cout<<osa[k]; // add k = 0 case: 1
+}
+```
 **Problem 4:** https://codeforces.com/contest/1462/problem/E2
 
 Time: 20 minutes
@@ -217,4 +245,39 @@ void solve(){
 }
 
 // NOTE: IN THE MAIN FUNCTION, PRECOMPUTE FACTORIAL. WRITE: precompute(200005);
+```
+
+
+**Problem 7:** https://codeforces.com/gym/104520/problem/K
+
+Look at what each condition means:
+MEX = x means that if the good subarray value is x, then the subarray must contain 1,2,...,x-1,_not x_, ...
+Median = x: Since x is the median and the previous number x-1 must be in the subarray, the next number is x+1. Moreover, there must also be x-1 numbers bigger than x. So x-2 numbers bigger than x+1 and they can be any number from x+2 to n. Therefore, the length of the good subarray is 2 * (x-1).
+
+We can thus construct a permutation based on a good subarray. First we count the permutation of the good subarray itself. For each x, we must pick 1,2,...,x-1,x+1. Then, we can pick any x-2 numbers. There will be n-x-1 choose x-2 ways to do this. After choosing the numbers in the subarray, there are (2 * (x-1))! ways to permute this subarray. Then lets construct the permutation(the numbers outside the subarray). View the good subarray as a block. Then there are n - 2*(i+1) numbers/blocks left + this big block =  n - 2*(i+1) + 1 blocks. Thus, there are (n - 2*(i+1) + 1)! ways to permute the entire array such that the subarray is good.
+To not get 60 points partial, we need to make sure everything doesnt go out of bound. Specifically dont let n- 2*(i-1)+1 < 0 occur. Thus its divided into even and odd cases.
+```cpp
+void solve(){
+    int n;cin>>n;
+    if(n%2==0){
+        rep(i,1,n/2+1){
+            cout<<mult(mult(nCk(n-i-1,i-2), fact[2*(i-1)]),fact[n-2*(i-1)+1])<<" ";
+        }
+        rep(i,n/2+1,n+1){
+            cout<<0<<" ";
+        }
+    }
+    else{
+        rep(i,1,n/2+2){
+            cout<<mult(mult(nCk(n-i-1,i-2), fact[2*(i-1)]),fact[n-2*(i-1)+1])<<" ";
+        }
+        rep(i,n/2+2,n+1){
+            cout<<0<<" ";
+        }
+    }
+    
+    cout<<"\n";
+}
+
+// NOTE: IN THE MAIN FUNCTION, PRECOMPUTE FACTORIAL. WRITE: precompute(100005);
 ```
