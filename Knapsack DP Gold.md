@@ -157,7 +157,7 @@ void solve(){
 }
 ```
 
-**Problem 8:**
+**Problem 8:** https://codeforces.com/contest/687/problem/C
 
 **NOT FINISHED**
 ```cpp
