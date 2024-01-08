@@ -298,26 +298,26 @@ Thus, we actually do not care about what the previous heros health was. All we k
 In this round, we can let any amount from 0 to k heros be alive after. After this, well push DP to k people alive and i-1+j damage dealt, since each hero gets i-1 damage dealt after the round. To get to our current position we had dp(i,j) choices to calculate the ways such that n-i people died after j damage was dealt. Then we just multiply this with the number of ways to choose i-k people to die after dealing damage i+j and push DP to the new k.
 
 Now, we will not know what the health of these k people are cause we cant estimate it since they live on. However, we know what the health of the i-k people who will be dead are. This is because we would have dealt j+i-1 damage after this. Thus, these people must have health between j+1 to j+i-1. Of course, the max health is x so their health ranges from j+1 to min(j+i-1,x). We have i choose i-k choices to choose the i-k people who will die this round. For each of these people we have min(j+i-1,x) - j choices to choose the health such that they will die in this round since j+1 <= ai <= j+i-1. Since there are i-k people it total ways is (min(j+i-1,x) - j)^(i-k). Thus, the transition is 
-$$DP(k,i+j) = \binom{i}{i-k} * (min(j+i-1,x) - j)^{i-k} * DP(i,j).$$
+$$DP[k][i+j] = \binom{i}{i-k} * (min(j+i-1,x) - j)^{i-k} * DP[i][j].$$
 The base case is obviously we have n heros remaining, 0 damage dealt, and there is 1 way to arrange this which is just the start.
 ```cpp
 void solve(){
     ll n,x;cin>>n>>x;
-    precompute(505);
-    ll dp[505][505]; 
-    memset(dp,0LL,sizeof(dp));
+    precompute(505); // precompute n choose k
+    ll dp[505][505]; // max is 505
+    memset(dp,0LL,sizeof(dp)); 
     
-    dp[n][0] = 1LL;
+    dp[n][0] = 1LL; // base case
  
     
-    for(ll i = n;i>1;i--){
-        for(ll j = 0;j<x;j++){
+    for(ll i = n;i>1;i--){ // calculate from n people left first(max ppl to min)
+        for(ll j = 0;j<x;j++){ // calculate from 0 damage done to x damage done(min dmg to max)
             
-            ll ok = (min(j+i-1,x) - j);
+            ll ok = (min(j+i-1,x) - j); 
             ll prod = 1;
             for(ll k = i;k>=0;k--){
                 dp[k][min(x,i-1+j)] = add(dp[k][min(x,i-1+j)],mult(nCk(i,i-k), mult(prod, dp[i][j]))); // formula
-                prod = mult(prod, ok); // for num_of_possible_a[i]^(i-k)
+                prod = mult(prod, ok); // for num_of_possible_a[i]^(i-k), calculate power fast
                 
                 
             }
