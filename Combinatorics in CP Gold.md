@@ -298,7 +298,7 @@ Thus, we actually do not care about what the previous heros health was. All we k
 In this round, we can let any amount from 0 to k heros be alive after. After this, well push DP to k people alive and i-1+j damage dealt, since each hero gets i-1 damage dealt after the round. To get to our current position we had dp(i,j) choices to calculate the ways such that n-i people died after j damage was dealt. Then we just multiply this with the number of ways to choose i-k people to die after dealing damage i+j and push DP to the new k.
 
 Now, we will not know what the health of these k people are cause we cant estimate it since they live on. However, we know what the health of the i-k people who will be dead are. This is because we would have dealt j+i-1 damage after this. Thus, these people must have health between j+1 to j+i-1. Of course, the max health is x so their health ranges from j+1 to min(j+i-1,x). We have i choose i-k choices to choose the i-k people who will die this round. For each of these people we have min(j+i-1,x) - j choices to choose the health such that they will die in this round since j+1 <= ai <= j+i-1. Since there are i-k people it total ways is (min(j+i-1,x) - j)^(i-k). Thus, the transition is 
-$$DP(k,i+j) = i choose i-k * (min(j+i-1,x) - j)^(i-k) * DP(i,j).$$
+$$DP(k,i+j) = \binom{i}{i-k} * (min(j+i-1,x) - j)^{i-k} * DP(i,j).$$
 The base case is obviously we have n heros remaining, 0 damage dealt, and there is 1 way to arrange this which is just the start.
 ```cpp
 void solve(){
