@@ -286,3 +286,47 @@ void solve(){
 After 30 minutes, no clue on how to start the problem
 Hint 1: Let's calculate the following dynamic programming dp(i,j) — the number of ways to choose the initial health if there are i heroes still alive, and they already received j damage.
 
+After thinking, my question is: If we do push DP, how would we transition states. From dp(i,j), we know the next damage done is j + i, but how do we keep track of i? 
+Ok, so we iterate through k. But this wouldnt work, because everyone is different for each k?
+
+nah I just have no clue how to do the transition I give up.
+
+Ok I get it. We actually just do not care about the people who are dead at all. We instead just conquer the problem when we are at it.
+Assume that currently, there are i people left alive and the total damage dealt is j. Now, we dont know what these i people are packing(health wise), all we know is that all of them have > j health. We have already previously calculated some DP which **erased all previous heros** with some arrangements.
+Thus, we actually do not care about what the previous heros health was. All we know is that currently dp(i,j) stores the number of ways to choose n-i heros such that they have all died after j damage. However, this doesnt affect the health of any of the i heros remaining since we dont know their health yet and they havent died. **We can then construct the health of this current round from here**.
+
+In this round, we can let any amount from 0 to k heros be alive after. After this, well push DP to k people alive and i-1+j damage dealt, since each hero gets i-1 damage dealt after the round. To get to our current position we had dp(i,j) choices to calculate the ways such that n-i people died after j damage was dealt. Then we just multiply this with the number of ways to choose i-k people to die after dealing damage i+j and push DP to the new k.
+
+Now, we will not know what the health of these k people are cause we cant estimate it since they live on. However, we know what the health of the i-k people who will be dead are. This is because we would have dealt j+i-1 damage after this. Thus, these people must have health between j+1 to j+i-1. Of course, the max health is x so their health ranges from j+1 to min(j+i-1,x). We have i choose i-k choices to choose the i-k people who will die this round. For each of these people we have min(j+i-1,x) - j choices to choose the health such that they will die in this round since j+1 <= ai <= j+i-1. Since there are i-k people it total ways is (min(j+i-1,x) - j)^(i-k). Thus, the transition is 
+$$DP(k,i+j) = i choose i-k * (min(j+i-1,x) - j)^(i-k) * DP(i,j).$$
+The base case is obviously we have n heros remaining, 0 damage dealt, and there is 1 way to arrange this which is just the start.
+```cpp
+void solve(){
+    ll n,x;cin>>n>>x;
+    precompute(505);
+    ll dp[505][505]; 
+    memset(dp,0LL,sizeof(dp));
+    
+    dp[n][0] = 1LL;
+ 
+    
+    for(ll i = n;i>1;i--){
+        for(ll j = 0;j<x;j++){
+            
+            ll ok = (min(j+i-1,x) - j);
+            ll prod = 1;
+            for(ll k = i;k>=0;k--){
+                dp[k][min(x,i-1+j)] = add(dp[k][min(x,i-1+j)],mult(nCk(i,i-k), mult(prod, dp[i][j]))); // formula
+                prod = mult(prod, ok); // for num_of_possible_a[i]^(i-k)
+                
+                
+            }
+        }
+    }
+    ll ans = 0;
+    rep(i,0,505){
+        ans = add(ans, dp[0][i]);
+    }
+    cout<<ans<<"\n";
+}
+```
