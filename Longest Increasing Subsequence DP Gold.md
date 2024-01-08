@@ -112,3 +112,45 @@ void solve(){
 } 
 ```
 
+
+**Problem 3:** https://codeforces.com/gym/102951/problem/C
+Restate problem: Given two permutations length n A and B, find the longest common subsequence.
+
+**Self Editorial:** 
+Since n <= 10^5, we must do O(n). In a common sequence, x is before y only if $pos[x] < pos[y]$ in both permutations A and B.
+Thus, we turn this into a LIS problem, where we want to find the longest increasing subsequence of pairs. Based off of our example problem PCB, we first sort pair by first value, then calculate LIS of second value.
+```cpp
+void solve(){
+    int n;cin>>n;
+    int fir[n+1]; int sec[n+1]; // position of each i
+    rep(i,0,n){
+        int u;cin>>u;fir[u]=i;
+    }
+    rep(i,0,n){
+        int u;cin>>u;sec[u]=i;
+    }
+    vector <pi> v;
+    rep(i,1,n+1){
+        v.pb({fir[i],sec[i]}); // put position into pairs
+    }
+    sort(v.begin(),v.end()); // sort by l
+    vi a; // contains r in order
+    rep(i,0,n){
+        a.pb(v[i].second);
+    }
+    // Longest increasing subsequence 
+    vi dp; // store current L values: min ending element of LIS length j
+    rep(i,0,n){
+        int pos = lower_bound(dp.begin(), dp.end(), a[i]) - dp.begin();
+        // position of the j+1 such that L[j+1] >= a[i]
+        if(pos == dp.size()){ // j+1 not in array
+            dp.pb(a[i]); // first time j+1 length, make new value in L
+        }
+        else{
+            dp[pos] = a[i]; // we just set curr L[j+1] = a[i]
+        }
+    }
+    cout<<dp.size()<<endl;
+}
+```
+
