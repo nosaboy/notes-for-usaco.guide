@@ -33,7 +33,7 @@ We can also only use 1D array since we only have to store sum(above we assume th
 ```cpp
 dp[0]=1; // base case
 rep(j,1,k+1){ // for every weight
-  for(int i = n;i>=1;i--){ // calc largest to smallest since it might affect dp
+  for(int i = n;i>=1;i--){ // for every sum, calc largest to smallest since it might affect dp
     if(i-w[j] >= 0){ // if weight_j is possible
       dp[i] |= dp[i-w[j]];
     }       
