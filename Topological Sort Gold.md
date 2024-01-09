@@ -50,6 +50,8 @@ void solve(){
         vis[i]=0;
         aj[i].clear();
     }
+    sorted.clear();
+
     rep(i,0,m){
         int a,b;cin>>a>>b;
         aj[a].pb(b); // course a points to course b
