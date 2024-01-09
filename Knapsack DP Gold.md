@@ -1,3 +1,4 @@
+## Usage
 Optimize some property by choosing a subset of a set with weights, such that the sum of weights of subset must to exceed some limit.
 - Maximize sum of values of a subsets whose weight does not exceed the limit(0/1 Knapsack)
 - Find all subsets whose weight does not exceed the limit(given set, how many distinct sums can we form?)
@@ -13,27 +14,27 @@ Let $dp[n][k]$ be true if it is possible to construct sum $n$ using only the fir
 
 ```cpp
 int dp[n+1][k+1]={0};
-dp[0][0]=1;
-rep(j,1,k+1){
-  rep(i,1,n+1){
-    if(j > 0){
+dp[0][0]=1; // base case
+rep(j,1,k+1){ // for every weight
+  rep(i,1,n+1){ // for every sum
+    if(j > 0){ // 1 indexed, 0 means weight = empty set
       dp[i][j] |= dp[i][j-1];
     }
-    if(i - w[j] >= 0){
-      dp[i][j] |= dp[i-w[j]][j-1];
+    if(i - w[j] >= 0){ // if previous weight >= 0
+      dp[i][j] |= dp[i-w[j]][j-1]; // we know that current weight i can be created by adding w[j]
     }
     
   }
 }
 ``` 
 
-We can also only use !D array since we only have to store sum(above we assume that its always k = j-1: the previous dp answers). Let $dp[i]$ be the previous answer that sum up to $i$. We can do nothing, and it will still sum to $i$. We can also construct $i$ using $(i - w_j) + w_j$. Thus the two possibilities to get the new $dp[i]$ become $dp[i] |= dp[i]$ and $dp[i] |=  dp[i-w[j]]$. However, we must go from right to left since calculating $dp[x]$ before $dp[y]$ where x < y may affect the answer of $dp[y]$ since it must be based off of the **previous $dp[x]$ sum** but $dp[x]$ is the current sum. Thus we go largest to smallest in order to prevent wrong calculation.
+We can also only use 1D array since we only have to store sum(above we assume that its always k = j-1: the previous dp answers). Let $dp[i]$ be the previous answer that sum up to $i$. We can do nothing, and it will still sum to $i$. We can also construct $i$ using $(i - w_j) + w_j$. Thus the two possibilities to get the new $dp[i]$ become $dp[i] |= dp[i]$ and $dp[i] |=  dp[i-w[j]]$. However, we must go from right to left since calculating $dp[x]$ before $dp[y]$ where x < y may affect the answer of $dp[y]$ since it must be based off of the **previous $dp[x]$ sum** but $dp[x]$ is the current sum. Thus we go largest to smallest in order to prevent wrong calculation.
 
 ```cpp
-dp[0]=1;
-rep(j,1,n+1){
-  for(int i = x;i>=1;i--){
-    if(i-w[j] >= 0){
+dp[0]=1; // base case
+rep(j,1,k+1){ // for every weight
+  for(int i = n;i>=1;i--){ // calc largest to smallest since it might affect dp
+    if(i-w[j] >= 0){ // if weight_j is possible
       dp[i] |= dp[i-w[j]];
     }       
   }
@@ -158,10 +159,19 @@ void solve(){
 ```
 
 **Problem 8:** https://codeforces.com/contest/687/problem/C
+**Restate:**
+For every subset that adds to k, find all subset sum of that subset.
 
-**NOT FINISHED**
+**Self Editorial:**
+We first knapsack normally. For each $dp[n]$, it will store all subset sums possible where the sum of everything is n. This means, $dp[n][i]$ stores if i is a possible sum of a subset whose sum of the set is n.
+Then we will work on transition. We know that $dp[i]$ is related to $dp[i-w[j]]$. Then, from this we are pretty much just adding $w[j]$ to every subset. 
+For every l in teh transition, we can keep the subset that sum to l from $dp[i-w[j]]$.This will be a subset of $i$ since the set that sum up $i-w[j]$ and $w[j]$ will form a sum of $i$.
+Moreover, every $l+w[j]$ is also a subset.
+Then, we can only make $w[j]$ a subset if $i-w[j]$ is a set, meaning it had a subset with that is possible(1).
+These will take care of all the transitions since we are only adding $w[j]$ or not adding $w[j]$ to all previous subsets.
 ```cpp
 void solve(){
+    
     int n,k;cin>>n>>k;
     vi w; 
     w.pb(0); 
@@ -172,38 +182,34 @@ void solve(){
     }
     sort(w.begin(),w.end());
     int dp[k+1][505]={0};
+    memset(dp,0,sizeof(dp));
     dp[0][0]=1;
     
     rep(j,1,n+1){
         for(int i = k;i>=0;i--){
             if(i - w[j] >= 0){
-                dp[i][j]=1;
-                rep(l,1,n+1){
-                    dp[i][l] |= dp[i-w[j]][l];
+                bool yn = false; // is it possible for w[j] to be in a subset by themselves
+                rep(l,0,505){
+                    if(dp[i-w[j]][l]==1){
+                        yn = true;
+                    }
+                    dp[i][l] |= dp[i-w[j]][l]; // dp previous
+                    if(l+w[j]<505){ // we try to add w[j] to l 
+                        dp[i][l+w[j]] |= dp[i-w[j]][l]; // if sum l is possible, then sum l+w[j] is possible
+                        
+                    }
                 }
+                if(yn){ // if there exists a set that adds up to i-w[j]
+                    dp[i][w[j]]=1; // we can put w[j] as a subset by itself. Otherwise we couldnt
+                }   
+
             }
         }
     }
-    vi v; // all numbers that is part of a subset that sums up to k
-    v.pb(0);
-    rep(i,0,n+1){
-        if(dp[k][i]){
-            v.pb(w[i]);
-        }
-    }
-    // second knapsack for new values
-    int dps[sum+1]={0};
-    dps[0]=1;
-    rep(j,1,v.size()+1){
-        for(int i = k;i>=0;i--){
-            if(i - v[j] >= 0){
-                dps[i] |= dps[i-v[j]];
-            }
-        }
-    }
+  // print out answer
     vi ans;
-    rep(i,0,sum+1){
-        if(dps[i]){
+    rep(i,0,505){
+        if(dp[k][i]){ // all subset sum whose total set sum is k
             ans.pb(i);
         }
     }
@@ -211,6 +217,6 @@ void solve(){
     rep(i,0,ans.size()){
         cout<<ans[i]<<" ";
     }
+
 }
- 
 ```
