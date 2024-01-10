@@ -812,3 +812,5 @@ void solve(){
 }
 ```
 
+**Problem 21:** https://codeforces.com/problemset/problem/1486/D
+
