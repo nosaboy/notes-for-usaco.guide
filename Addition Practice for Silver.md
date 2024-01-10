@@ -461,3 +461,71 @@ void solve(){
     
 }
 ```
+
+**Problem 18:** https://codeforces.com/contest/404/problem/C
+We note that the $i$ where $d[i] = 0$ is the node that the guy chose. We have to construct a graph where the distance from $i$ to another node $x$ is $d[x]$.
+
+We also note that this is a tree structure. Any cycle would make the node more probable to have more than k edges and also not help the distance, thus its always less optimal to have cycle.
+
+**Problem 19:** https://codeforces.com/contest/1288/problem/D
+
+**Self Editorial:**
+Since m <= 8, we use bits. 
+We can binary search for answer. We represent every array $a_i$ as number in binary(8 positions). The position is 1 if $a[i][j] >= mid$. We take two arrays, and for each positions we take the max. Thus, if either of the two arrays have a 1 in that position, we know the resulting $b[pos] \ge mid$. Thus, mid works if $binary[a_i] | binary[a_j] = 2^m-1$, meaning the OR of the two binary make every position 1. This means that max of every position must always >= mid.
+**Trick I was stuck on:**
+Comparing pairs takes O(n^2) which is too slow. Instead, we can go through every possible pair of number in binary possible, since the numbers are $0...2^{m}-1$ which means there is at most 256 numbers and 256 * 256 pairs. For each pair i and j, we check if $i|j = 2^m-1$. If it is, we check if i and j are both the binary representation of some array given. If it is, we know an array $a_i$ exists for both i and j meaning that mid is valid.
+```cpp
+void solve(){
+    int n,m;cin>>n>>m;
+    int a[n][m];
+    rep(i,0,n){
+        rep(j,0,m){
+            cin>>a[i][j];
+        }
+    }
+    int lo = 0; int hi = 1000000005;
+    lo--;
+    pi ans;
+    // BINARY SEARCH MAX ANS
+    while (lo < hi) {
+		// find the middle of the current range (rounding up)
+		int mid = lo + (hi - lo + 1) / 2;
+        int arr[(1<<m)]={0}; // indicies of osa value i
+        rep(i,0,n){
+            int two = 1; // power of twos
+            int osa = 0; // a[i] in binary representation
+            rep(j,0,m){
+                if(a[i][j] >= mid){ // max(smth, a[i][j]) >= mid
+                    osa += two; // add 1 to that position
+                }
+                two *=2;
+            }
+            arr[osa]=i+1; // an array with binary = osa exists at index i+1
+
+        }
+        bool yn = false;
+        rep(i,0,(1<<m)){
+            rep(j,0,(1<<m)){
+                if((i|j) == (1<<m)-1 && arr[i] && arr[j]){ // i OR j = 2^m-1, binary representation of i and j both exist for some a[i]
+                    ans = {arr[i],arr[j]}; // we found answer
+                    yn = true;
+                }
+            }
+        }
+		if (yn) {
+			// if mid works, then all numbers smaller than mid also work
+			lo = mid;
+		} else {
+			// if mid does not work, greater values would not work either
+			hi = mid - 1;
+		}
+	}
+    cout<<ans.first<<" "<<ans.second<<endl;
+} 
+```
+
+**Problem 22:** https://codeforces.com/contest/1744/problem/F
+
+Observations:
+Given the mex = x, mex > med if sz/2 <= mex. We know this by testing specific cases.
+Lets go through each mex and find how many subarrays mex > med.
