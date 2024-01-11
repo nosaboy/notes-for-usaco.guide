@@ -814,3 +814,70 @@ void solve(){
 
 **Problem 21:** https://codeforces.com/problemset/problem/1486/D
 
+**Observations:**
+Have no clue, I was thinking we can binary search for median, but I dont know how to find some subarray where smaller, equal, and bigger than mid means that median >= mid. If small and equal <= big, mid must work. Moreover, how to find one whose length >= k?
+After 30 mins - 1 hr, **Hint 1:** If its just -1 and 1, what is the median.
+Ans: the median is 1 if the sum of the subarray is positive, and -1 if its negative.
+Ok, I get how you deal with the small,equal,big cases. Lets set equal and big = 1 and small = -1, so if a_i < mid, a_i = -1, else a_i = 1. Then, it is left to find a subarray length >= k such that its sum is positive. If we can find such a subarray, we know mid works.
+**Tbh i dont know why I didnt think of this, maybe its because I was caught up on what to do with equal. But I didnt look and see that all we have to do is set equal = 1 as well.**
+Like this is an ez observation idk how I missed.
+
+**Self Editorial:**
+After picking mid and setting -1 to $a[i] < mid$ and 1 to $a[i] >= mid$, we can find the maximum length positive subarray and see if its length >= k. 
+We can do this using prefix sums. Given a $pre[r]$ we want to find the smallest index $pre[l]$ such that $pre[r] - pre[l] > 0, pre[r] > pre[l].$ If $pre[r]$ is positive we know that the smallest index is just 0 since we just take 1...r. If $pre[r] <= 0$ we know that $pre[l]$ must be smaller than it. Note that if $pre[i] > pre[j]$ and they are both negative, then $i<j$. This is because by going to $pre[j]$ we must go through $pre[i]$ first then adding some -1. Thus, it is always better to just choose $position[pre[r]-1]$ since if we choose something smaller it will never be before $position[pre[r]-1]$.
+
+**Is there a generalization where we can find the longest length sum subarray with positive sum in O(n)?** Maybe segtree bs idk? Looks like trivial task
+```cpp
+void solve(){
+    int n,k;cin>>n>>k;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    int lo = 0;int hi = n;
+    lo--;
+	while (lo < hi) {
+		// find the middle of the current range (rounding up)
+		int mid = lo + (hi - lo + 1) / 2;
+        int a[n];
+        rep(i,0,n){
+            if(v[i]<mid){
+                a[i]=-1;
+            }
+            else{
+                a[i]=1;
+            }
+        }
+        map <int,int> pos; // smallest position for value i
+        int pre[n+1]; pre[0]=0;
+        rep(i,0,n){
+            pre[i+1] = a[i] + pre[i];
+            if(pos[pre[i+1]]==0){ // havent been filled
+                pos[pre[i+1]]=i+1; // set i+1 as smallest/leftmost position 
+            }
+        }
+        int mx = 0;
+        rep(i,1,n+1){
+            if(pre[i]>0){ // pos
+                mx = max(mx, i);
+            }
+            else{
+                if(pos[pre[i]-1] > 0){
+                    mx = max(mx, i-pos[pre[i]-1]); // we just take smallest position of pre[i]-1
+                }
+            }
+        }
+		if (mx>=k) {
+			// if mid works, then all numbers smaller than mid also work
+			lo = mid;
+		} else {
+			// if mid does not work, greater values would not work either
+			hi = mid - 1;
+		}
+	}
+    cout<<lo<<endl;
+    
+} 
+```
+
+**Is there a generalization where we can find the longest length sum subarray with positive sum in O(n)?**
