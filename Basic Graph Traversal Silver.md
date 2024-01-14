@@ -1124,6 +1124,7 @@ Basically we can avoid checking edges and instead **check based on verticies.**
 We can dfs and **go through nodes instead of edges**.
 For each node we can go through all unvisited verticies. Then, we will pretty much visit all nodes left except for the m cases where the edges arent connected and we dont visit. After visiting a node we'll delete it from our multiset of avaliable nodes. Thus, the time complexity is O(n+m+some log factors for map and multiset) since we will always visit teh n nodes unless we have m cases where we dont visit the node.
 
+**NOTE: There is a second solution involving smart proofs PLS REVIEW**
 
 ```cpp
 map <pi,int> mp; // is there an edge between the two nodes?
@@ -1171,6 +1172,21 @@ void solve(){
 
 }   
 ```
+
+**The above problem is actually an exact copy of this problem(both 2100 too lmao):** https://codeforces.com/problemset/problem/190/E
+The only diff is just you have to print the nodes of each connected component as well which is free.
+
+**However, this will become TOO SLOW as n = 5*10^5.** Thus we must use hashmaps: https://usaco.guide/gold/hashmaps?lang=cpp.
+
+**OK BRO, AFTER HOURS OF DIGGING I GOT IT!**
+This is like the "hard version" of the problem above. This is because the time is tight and we need to actually do hash tables with our previous solution.
+I LEGIT HAD SO MANY TLEs with unordered_map. **I got AC using neals PAIR HASHING function + gp_hash_table**
+So I didnt change anything except change from map to gp_hash_table and have custom pair hashing to make stuff run in O(1).
+
+**NOTE:** Please review the DSU solutions as well as how hashing works: https://usaco.guide/gold/hashmaps?lang=cpp.
+
+
+
 ### Two Colouring Problems
 **Problem 1:** https://codeforces.com/contest/862/problem/B
 We can first find the number of red and blue nodes by simulating colouring as above. Then, we know that it is safe to add an edge to two nodes if they have different colours. In order to maximize edges, we must connect each red node to as many blue nodes possible if they are not connected already. This means the max is just the sum of the number of blue nodes not connected to a red node for every red node. So sum of # of blue - neighbour of x for every red node x.
