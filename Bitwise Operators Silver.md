@@ -454,4 +454,33 @@ void solve(){
 
 ```
 
+**Problem 12:** https://codeforces.com/contest/1088/problem/D
+I thought this required some clever stuff actually, **think theres a cleaner solution tho check ezrafts code.**
 
+**Self Editorial:** 
+We can construct the two numbers bit by bit. To do this we at most do 2 operations for the 30 bits we are constructing.
+For each bit we have one of the following four pairings:
+1   1   0   0
+1   0   1   0
+If we put in any pair of bits for a and b, we can at most eliminate 1 of these choices. Thus, we have to use some previous info.
+For every bit we'll XOR off all bits in front of it(previously thats already processed). Thus we only have to focus on the current bits curr....end.
+We previously find some relationship about the bits curr...end. 
+If from current bit to last bit, A > B:
+Then the pairings of A and B can be
+0   1   0
+1   1   0
+If A = B,
+1   0
+1   0
+If A > B,
+1   1   0
+0   1   0
+Thus we have eliminated 1 pairing by knowing what prev is.
+Then, we'll do 2 questions with the following pairing on the current bit
+0         1
+1   and   0
+Doing these two questions achieves the following:
+
+```cpp
+
+```
