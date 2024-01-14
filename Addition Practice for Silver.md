@@ -529,3 +529,57 @@ void solve(){
 Observations:
 Given the mex = x, mex > med if sz/2 <= mex. We know this by testing specific cases.
 Lets go through each mex and find how many subarrays mex > med.
+
+
+**Problem 24:** https://codeforces.com/contest/412/problem/D
+
+Observations:
+From the n = 3 case, we list out
+123, 132, 213, 231, 312, 321. What im getting at is: choosing any 3 possible pairings still guarentees an answer. But idk how to prove this or how to find this answer.
+
+Working with some cases, it looks like the following strategy will always work:
+Given list of pairs, we flip it so that now we're left with pairs that we WANT. Now, we go through the first number in the pair. We then insert number based on its frequency as the first number. Therefore, if the flipped pairs were
+4,1
+2,3
+4,2
+4,3
+2,1
+1,3
+our answer would be 4213.
+I don't know why this works but I havent found a counter yet. Might as well just code it up and test luck cause its getting late.
+
+Ok i just saw editorial and i think i should actually get a diagonsis like damn how am i so like clueless jeez. idk man its like my brain is just like so tiny its wild bruh.
+This is just like simple bruteforce that completely went over my head. I was tryna come up with some niche smart stuff but actually is just free braindead brute like bruh might just go keep myself safe after this one. 
+**Self Editorial:**
+If two numbers in the permutation are next to each other but are not supposed to be, like in the m pairs we got (a,b) but ab is in the permutation, we can just swap so now we have ba. Then, ba is satisfied since (a,b) and (b,a) cannot be in the m pairs at the same time(in problem statement). Then, the permutation is cba and we only have to worry if (c,b) is in the m pairs. If it is, we can **keep on swapping until we have b at the front**.
+Since everything previous is satisfied, this permutation is satisfied.
+To do this, we append each number one by one. Then, we'll swap until we have everything satisified(adding b and swapping until we have cba where (c,b) is not a pair or adding b until it reaches the front, where all prev pairs is satisfied). 
+Heres the part which broke me from thinking brute force i think but is actually key: there are only m illegal pairs, so at most m swaps needed. This means total time is O(n+m).
+
+**Reflection:**
+I thought this thinking is very straight foward and easy but idk why I couldnt get it. Even now idk if I wouldve gotten it. I think I shouldve thought about what make it illegal and how we can change that if we swap, like a DP thinking ig.
+```cpp
+void solve(){
+    int n,m;cin>>n>>m;
+    map <pi,int> mp; // is pair illegal?
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        mp[{a,b}]=1;
+    }
+    vi ans;
+    rep(i,1,n+1){
+        ans.pb(i);
+        int it = i-2; // number in front of curr
+        while(it >= 0 && mp[{ans[it],i}] == 1){
+            ans[it+1]=ans[it];
+            ans[it]=i;
+            it--;
+        }
+    }
+    rep(i,0,ans.size()){
+        cout<<ans[i]<<" ";
+    }
+    
+
+}  
+```
