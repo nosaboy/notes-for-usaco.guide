@@ -881,3 +881,39 @@ void solve(){
 ```
 
 **Is there a generalization where we can find the longest length sum subarray with positive sum in O(n)?**
+
+**Problem 24:** https://codeforces.com/problemset/problem/818/F
+
+Self Editorial:
+First, lets see what case will an edge be considered a bridge. The edge is a bridge of two nodes if the two nodes are not contained in the same cycle.
+I came to this conclusion after like 10 mins by just playing around and idk thinking: This problem pretty much asks - given a tree where nodes form a line, we pick some x nodes. Then, if we add some edge that connects thre start and end node we'll form a cycle **for all these x nodes**. Thus none of the edges that connects anything between any two of the chosen x nodes will be a bridge. Thus, greedily if we must add the edge from start to end we might as well just add more edges since none of them are gonna be bridge anyway. 
+Thus, we create a complete graph from x nodes. Then the remaining n-x edges will all be bridges since they are not part of the cycle. 
+
+It remains to find what x maximizes the answer. A complete graph with x nodes will have (x-1)x/2 edges. We know that the # of edges in the complete graph is <= n-x. Thus, x is either:
+- the maximum x such that (x-1)x/2 <= n-x. In this case the total edges is just (x-1)x/2 + n-x.
+- the minimum x such that (x-1)x/2 > n-x, or max x from above + 1. In this case total edges is 2*(n-x) since we know the complete graph has more edges, and we must have # of edges of complete graph be <= n-x, so we just let it be n-x as well for a total of 2*(n-x) edges.
+
+```cpp
+void solve(){
+    ll n;cin>>n;
+    ll lo = 0; ll hi = 1000000005;
+    lo--;
+	while (lo < hi) {
+		// find the middle of the current range (rounding up)
+		ll mid = lo + (hi - lo + 1) / 2;
+
+		if (mid * (mid-1) / 2 + n-mid <= 2*(n-mid)) {
+			// if mid works, then all numbers smaller than mid also work
+			lo = mid;
+		} else {
+			// if mid does not work, greater values would not work either
+			hi = mid - 1;
+		}
+	}
+    // lo = greatest value of complete graph nodes such that 
+    // tree edge >= complete graph edges, lo = x, min = lo+1.
+    cout<<max(lo * (lo-1) / 2 + n-lo, 2*(n-(lo+1)))<<endl; 
+}  
+```
+
+
