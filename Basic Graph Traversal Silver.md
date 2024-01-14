@@ -1107,6 +1107,70 @@ void solve(){
     
 }
 ```
+
+**Problem 12:** https://codeforces.com/problemset/problem/920/E
+
+Reword: Given a complete graph, erase m edges. Then, find the size of each connected component of the remaining graph.
+
+This reminds me of reverse DSU except you cant reverse dsu cause (n-1)*n/2 can go up to 10^10.
+
+dk how this is possible, look at editorial we need to do optimizations on DFS to make it faster than our dumb O(n^2).
+
+nah I have no clue gonna look at editorial cause I dont get how you can optimize dfs. Cause for each edge you are forced to check whether that node has been visited so for every node we must go through each of its edges. Also even if we erase as we go we still need to "check" n^2 edges.
+
+
+oh shi--- wait i might just be sped af like damn im kinda dumb ok. 
+Basically we can avoid checking edges and instead **check based on verticies.** 
+We can dfs and **go through nodes instead of edges**.
+For each node we can go through all unvisited verticies. Then, we will pretty much visit all nodes left except for the m cases where the edges arent connected and we dont visit. After visiting a node we'll delete it from our multiset of avaliable nodes. Thus, the time complexity is O(n+m+some log factors for map and multiset) since we will always visit teh n nodes unless we have m cases where we dont visit the node.
+
+
+```cpp
+map <pi,int> mp; // is there an edge between the two nodes?
+// 0 if yes, 1 if no
+multiset<int> ms;
+int cnt;
+void dfs(int n){
+    cnt++;
+    vi v; // nodes to be deleted
+    for(auto it = ms.begin();it!=ms.end();it++){
+        if(mp[{*it,n}] == 0){
+            v.pb(*it);
+        }
+    }
+    rep(i,0,v.size()){ // erase these nodes from multiset
+        ms.erase(ms.find(v[i]));
+    }
+    rep(i,0,v.size()){ // traverse these nodes
+        dfs(v[i]);
+    }
+}
+void solve(){
+    int n,m;cin>>n>>m;
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        mp[{a,b}]=1;
+        mp[{b,a}]=1;
+    }
+    rep(i,1,n+1){
+        ms.insert(i);
+    }
+    vi ans;
+    while(ms.size()){
+        cnt = 0;
+        int x = *ms.begin();
+        ms.erase(ms.find(x));
+        dfs(x);
+        ans.pb(cnt);
+    }
+    sort(ans.begin(),ans.end());
+    cout<<ans.size()<<endl;
+    rep(i,0,ans.size()){
+        cout<<ans[i]<<" ";
+    }
+
+}   
+```
 ### Two Colouring Problems
 **Problem 1:** https://codeforces.com/contest/862/problem/B
 We can first find the number of red and blue nodes by simulating colouring as above. Then, we know that it is safe to add an edge to two nodes if they have different colours. In order to maximize edges, we must connect each red node to as many blue nodes possible if they are not connected already. This means the max is just the sum of the number of blue nodes not connected to a red node for every red node. So sum of # of blue - neighbour of x for every red node x.
