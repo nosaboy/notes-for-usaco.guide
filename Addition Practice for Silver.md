@@ -558,6 +558,8 @@ Heres the part which broke me from thinking brute force i think but is actually 
 
 **Reflection:**
 I thought this thinking is very straight foward and easy but idk why I couldnt get it. Even now idk if I wouldve gotten it. I think I shouldve thought about what make it illegal and how we can change that if we swap, like a DP thinking ig.
+
+**NOTE: PLEASE REVIEW DFS SOLUTION**
 ```cpp
 void solve(){
     int n,m;cin>>n>>m;
