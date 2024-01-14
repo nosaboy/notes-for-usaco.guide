@@ -482,5 +482,74 @@ Then, we'll do 2 questions with the following pairing on the current bit
 Doing these two questions achieves the following:
 
 ```cpp
+void solve(){
+    cout.flush();
+    cout<<"? 0 0"<<endl;
+    int prev; cin>>prev;
+    string ok;
+    int a = 0; int b = 0; // canceling
+    for(int i = 29;i>=0;i--){
+        if(prev==-1){ // A<B
+            /*
+            0   1   0
+            1   1   0
+            */
+            cout<<"? "<<a<<" "<<b+(1<<i)<<endl; // 0 1
+            int osa;cin>>osa;
+            cout<<"? "<<a+(1<<i)<<" "<<b<<endl; // 1 0
+            int nosa;cin>>nosa;
+            if(osa==nosa){ // 0 1
+                b+=(1<<i);
+                prev = osa;
+            }
+            else{
+                if(osa==1){
+                    a+=(1<<i);b+=(1<<i); // 1 1
+                }
+                else{ // -1
+                    // 0 0
+                }
+            }
+        }
+        else if(prev==0){ // A=B
+            /*
+            1   0
+            1   0
+            */
+            cout<<"? "<<a<<" "<<b+(1<<i)<<endl; // 0 1
+            int osa;cin>>osa;
+            if(osa==1){
+                a+=(1<<i); b += (1<<i); // 1 1
+            }
+            else{ // -1
+                // 0 0
+            }
+        }
+        else{ // A>B
+            /*
+            1   1   0
+            0   1   0
+            */
+            cout<<"? "<<a<<" "<<b+(1<<i)<<endl; // 0 1
+            int osa;cin>>osa;
+            cout<<"? "<<a+(1<<i)<<" "<<b<<endl; // 1 0
+            int nosa;cin>>nosa;
+            if(osa==nosa){ // 0 1
+                a+=(1<<i);
+                prev = osa;
+            }
+            else{
+                if(osa==1){
+                    a+=(1<<i); b += (1<<i); // 1 1
+                }
+                else{ // -1
+                    // 0 0
+                }
+            }
+        }
+    }
+    cout<<"! "<<a<<" "<<b<<endl;
+}   
 
 ```
+**NOTE for interactives:** Using "\n" will get "Idleness Limit Exceeded", use <<endl; instead
