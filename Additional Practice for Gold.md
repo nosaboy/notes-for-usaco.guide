@@ -50,3 +50,39 @@ int main(){
 	return 0;
 }  
 ```
+
+
+**Problem 15:** https://codeforces.com/contest/1114/problem/D
+This was actually range DP. I think the reason I was stuck on this problem for a long time was because I didnt really know how to approach. Is it greedy? What is it?
+Finally, I found a O(n^2) range DP solution. First, notice that We will always make one move per different cc unless after changing some range, the left and right ranges are coincidentally the same number. Therefore we just eliminated one move since we just checked off 2 cc in one move. Thus we essentially try to find the move that yields the above case the maximum number of times. So the case where we eliminate 2 cc at once happens the max times. To do this, we use range DP. We first compress cc so they are only one number, since numbers in same cc doesnt matter. For every range $dp[l][r]$ we find min moves to make l...r the same. If the two borders are the same, we can just eliminate 2 cc at once. Thus, its just $dp[l+1][r-1]+1$, eliminating the left and right cc, using 1 move. Else, we can just do min(dp[l+1][r]+1, dp[l][r-1]+1), eliminating either left or right cc, using 1 move. 
+I used lengths dp instead of left and right since we must calculate all smaller lengths before calculating current length. Then at the end we just print $dp[0][v.size()]$, the whole array.
+
+```cpp
+void solve(){
+    int n;cin>>n;
+    vi v;
+    int ar[n];
+    rep(i,0,n){
+        cin>>ar[i];
+    }
+    // compress connected components
+    v.pb(ar[0]);
+    rep(i,1,n){
+        if(ar[i] != ar[i-1]){
+            v.pb(ar[i]);
+        }
+    }
+    int dp[v.size()][v.size()+1]={0}; // start,length
+    memset(dp,0,sizeof(dp)); // everything set to 0, base
+    rep(i,2,v.size()+1){
+        rep(j,0,v.size()-i+1){
+            dp[j][i]=1000000005;
+            if(v[j] == v[j+i-1]){ // left right is same
+                dp[j][i] = dp[j+1][i-2]+1; // we eliminate both cc
+            }
+            dp[j][i] = min(dp[j][i], min(dp[j][i-1],dp[j+1][i-1])+1); // we eliminate 1 cc
+        }
+    }
+    cout<<dp[0][v.size()]<<endl;
+} 
+```
