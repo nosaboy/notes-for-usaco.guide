@@ -441,3 +441,8 @@ void solve(){
 
 
 ```
+
+
+**Problem 12:** https://codeforces.com/problemset/problem/1805/F1
+This can be done in O(n^2)
+I dont really get how we can implement F in O(n), imma check hint
