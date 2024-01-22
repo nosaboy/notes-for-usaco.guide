@@ -156,7 +156,15 @@ int main(){
 	return 0;
 }  
 ```
+**Problem 12:** https://codeforces.com/contest/835/problem/D
+Pretty much a k palindrome is just one such that if we divide it by half k times, the left and right will always be palindromes.
 
+First thought: I genuinly think we do range DP on this too or some, cause we can easily combine palindromes. Ya this is literally free instasolve.
+We can just see for every rage l...r, whatever $DP[firsthalf], DP[secondhalf]$ is, where DP stores maximum k such that l...r is a k-palindrome. If string firsthalf == secondhalf, we can convert l...r to a $min(DP[firsthalf], DP[secondhalf])+1$ palindrome. To compare strings we just use hashing. Else $DP[l...r]=0$ since its not a palindrome. Overall free idk since n = 5000 so O(n^2) is possible.
+
+```cpp
+
+```
 
 **Problem 15:** https://codeforces.com/contest/1114/problem/D
 This was actually range DP. I think the reason I was stuck on this problem for a long time was because I didnt really know how to approach. Is it greedy? What is it?
