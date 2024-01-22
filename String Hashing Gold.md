@@ -57,6 +57,33 @@ const ll M = (1LL << 61) - 1; // large prime for mod
 const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
 ```
 
+**PUTTING IT TOGETHER WE GET:**
+```cpp
+const ll M = (1LL << 61) - 1; // large prime for mod
+const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
+ll hsh[200005]={0}; // LENGTH OF STRING 
+vector <ll> pw = {1LL};
+__int128 mul(ll a, ll b) { return (__int128)a * b; }
+ll mod_mul(ll a, ll b) { return mul(a, b) % M; }
+void calchash(string s){
+    // precalc pow
+    while (pw.size() < s.size()) {
+        pw.push_back(mod_mul(pw.back(), P) % M);
+    }
+    hsh[0] = 0;
+		for (int i = 0; i < s.size(); i++) {
+			hsh[i + 1] = (mul(hsh[i], P) + s[i]) % M;
+		}
+}
+long long gethash(int start, int end) { // inclusive: string [start...end]
+	ll raw_val =
+		    hsh[end + 1] - mod_mul(hsh[start], pw[end - start + 1]);
+		return (raw_val + M) % M;
+}
+```
+
+**NOTE THAT FOR ANY MULTIPLE STRINGS THE SAME HASH WILL WORK AND EQUAL STRINGS WILL ALWAYS BE EQUAL EVEN IF THEY HAVE ARE NOT HASHED TOGETHER IN A SINGLE STRING**
+
 **Example 1:** https://dmoj.ca/problem/ccc20s3
 
 We first note that a permutation A of a string B means that A will have the same number of characters as B for each character a - z.
