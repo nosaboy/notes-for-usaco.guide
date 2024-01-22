@@ -10,6 +10,7 @@ Then, we know that LL closest to wall 0 will always explode first since closest 
 Then, at the end of explosion if there is 1 L or R left, we can do -1. If both size is odd( so one L and R is left and not paired up and exploded), we can pairs and explode these two.
 
 Impl kinda brutal tho no cap.
+- The main takeaway is that when everything is happening and looks messy, we try to break down into cases & steps and solve
 ```cpp
 int ans[300005]={0};
 int n,m;
