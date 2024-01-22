@@ -164,6 +164,8 @@ We can just see for every rage l...r, whatever $DP[firsthalf], DP[secondhalf]$ i
 
 **NOTE:** Using int DP will MLE. We can **cheese memory using short type** since short only needs 2 bytes but can only hold up to like 30000 or smth. We only need this much case k can be at most 20 cause as k increases by 1 length increases by 2x. 
 
+
+**NOTEx2:** Check Editorial, We actually dont even have to use hashing.
 ```cpp
 const ll M = (1LL << 61) - 1; // large prime for mod
 const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
