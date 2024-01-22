@@ -66,28 +66,28 @@ If its a valid permutation, it will have the same characters. Thus, we can just 
 ```cpp
 const ll M = (1LL << 61) - 1; // large prime for mod
 const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
-ll hsh[200005]={0};
+ll hsh[200005]={0}; // LENGTH OF STRING 
 vector <ll> pw = {1LL};
 __int128 mul(ll a, ll b) { return (__int128)a * b; }
 ll mod_mul(ll a, ll b) { return mul(a, b) % M; }
 void calchash(string s){
-    
+    // precalc pow
+    while (pw.size() < s.size()) {
+        pw.push_back(mod_mul(pw.back(), P) % M);
+    }
     hsh[0] = 0;
 		for (int i = 0; i < s.size(); i++) {
 			hsh[i + 1] = (mul(hsh[i], P) + s[i]) % M;
 		}
 }
-long long gethash(int start, int end) {
+long long gethash(int start, int end) { // inclusive: string [start...end]
 	ll raw_val =
 		    hsh[end + 1] - mod_mul(hsh[start], pw[end - start + 1]);
 		return (raw_val + M) % M;
 }
 void solve(){
     string a,s;cin>>a>>s;
-    // precalc pow
-    while (pw.size() < s.size()) {
-        pw.push_back(mod_mul(pw.back(), P) % M);
-    }
+    
     int cnt[26]={0}; // count of # of each character in needle
     int pre[s.size()+1][26]={0}; // prefix sum of # of each character in haystack
     // calc prefix sum
@@ -120,3 +120,123 @@ void solve(){
 ```
 
 #### Two Hashes
+
+
+
+**Problem 4:** https://codeforces.com/problemset/problem/1056/E
+
+Hint 1: We should brute force length of "0" and use that to find valid string.
+We can have length x if (|t|-c_0 * x) / c_1 where c_0 is number of 0 in string s and c_1 is the number of 1 in s. (|t|-c_0 * x) represents the length of the resulting string after eliminating the "0" from s. If this is divisible, we can note that the length of string "1" is = (|t|-c_0 * x) / c_1 since we split the remaining string into c_1 strings of the same. Thus, we go through s and find the first occurance of "1", then we mark current pos...pos+(|t|-c_0 * x) / c_1 as our string for "1". This takes O(|s|) time since we go through every character in s.
+Here, I will give up because I have no clue why this time complexity is acceptable and I wouldnt have came up with this in contest.
+On second thought, I think the time complexity is not that bad.
+First note we can get the hash of any length string in O(1). Now lets find the upper bound for the length of our string.
+We want c_0 * x <= |t|. We do WLOG let c_0 >= c_1( We can just invert 1s and 0s in s if this is not satisfied). Then we want x such that x <= |t|/c_0. We don't know how big c_0 is relatively to whats given, but we know c_0 >= |s|/2. Thus, x <= 2*|t|/|s|. Then for each length x we can calculate whether it satisifies in O(|s|) time. Thus total complexity is 2*|t|/|s| * |s| = 2*t = O(|t|) since we are first looping through length of x, then checking if it satisifes.
+- The main takeaway is that in these problem where it seems like brute force is the only option, **try to play around with time complexity formula and minimize as much as possible.** Then **convert this minimum back to something given like n**. Maybe this will return a good time complexity in the end.
+- In other words, dont be afraid to play with time complexity equations
+
+```cpp
+const ll M = (1LL << 61) - 1; // large prime for mod
+const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
+ll hsh[1000005]={0};
+vector <ll> pw = {1LL};
+__int128 mul(ll a, ll b) { return (__int128)a * b; }
+ll mod_mul(ll a, ll b) { return mul(a, b) % M; }
+void calchash(string s){
+    // precalc pow
+    while (pw.size() < s.size()) {
+        pw.push_back(mod_mul(pw.back(), P) % M);
+    }
+    hsh[0] = 0;
+		for (int i = 0; i < s.size(); i++) {
+			hsh[i + 1] = (mul(hsh[i], P) + s[i]) % M;
+		}
+}
+long long gethash(int start, int end) {
+	ll raw_val =
+		    hsh[end + 1] - mod_mul(hsh[start], pw[end - start + 1]);
+		return (raw_val + M) % M;
+}
+void solve(){
+    string s,a;cin>>s>>a;
+    ll z = 0; ll o = 0;
+    rep(i,0,s.size()){
+        if(s[i]=='0'){
+            z++;
+        }
+        else{
+            o++;
+        }
+    }
+    if(z < o){ // want to make c_0 >= c_1
+        // swap
+        z=o;
+        o=int(s.size())-z;
+        rep(i,0,s.size()){
+            if(s[i]=='0'){
+                s[i]='1';
+            }
+            else{
+                s[i]='0';
+            }
+        }
+    }
+    calchash(a);
+    ll ans = 0;
+    rep(i,1,2*a.size()/int(s.size())){ // 2*|t|/|s|
+        ll lenz = i; // length for "0"
+        if(z*lenz < a.size() && (a.size()-z * lenz)%o==0){ // (|t|-c_0 * x) / c_1
+            ll leno = (a.size()-z * lenz)/o; // length for "0"
+            ll valz; // hash val for "0"
+            ll valo; // hash val for "1"
+		// get the strings valz and valo
+            if(s[0]=='0'){ 
+                valz = gethash(0,lenz-1LL);
+                ll it = 0;
+                int j = 0;
+                while(j<s.size() && s[j]=='0'){
+                    j++;
+                    it+=lenz;
+                }
+                valo = gethash(it,it+leno-1LL);
+            }
+            else{
+                valo = gethash(0,leno-1LL);
+                ll it = 0;
+                int j = 0;
+                while(j<s.size() && s[j]=='1'){
+                    j++;
+                    it+=leno;
+                }
+                valz = gethash(it,it+lenz-1LL);
+            }
+		// go through s to see if it works
+            bool ok = true;
+            ll it = 0;
+            rep(j,0,s.size()){
+                if(s[j] == '0'){
+                    if(gethash(it,it+lenz-1LL) != valz){
+                        ok = false;
+                        break;
+                    }
+                    it+=lenz;
+                }
+                else{
+                    if(gethash(it,it+leno-1LL) != valo){
+                        ok = false;
+                        break;
+                    }
+                    it+=leno;
+                }
+            }
+            if(ok && valo != valz && leno > 0LL){ // strings cant be the same, strings cant be empty
+                ans++;
+            }
+        }
+        
+        
+        
+    }
+    cout<<ans<<"\n";
+   
+}   
+```
