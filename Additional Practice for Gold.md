@@ -162,8 +162,73 @@ Pretty much a k palindrome is just one such that if we divide it by half k times
 First thought: I genuinly think we do range DP on this too or some, cause we can easily combine palindromes. Ya this is literally free instasolve.
 We can just see for every rage l...r, whatever $DP[firsthalf], DP[secondhalf]$ is, where DP stores maximum k such that l...r is a k-palindrome. If string firsthalf == secondhalf, we can convert l...r to a $min(DP[firsthalf], DP[secondhalf])+1$ palindrome. To compare strings we just use hashing. Else $DP[l...r]=0$ since its not a palindrome. Overall free idk since n = 5000 so O(n^2) is possible.
 
-```cpp
+**NOTE:** Using int DP will MLE. We can **cheese memory using short type** since short only needs 2 bytes but can only hold up to like 30000 or smth. We only need this much case k can be at most 20 cause as k increases by 1 length increases by 2x. 
 
+```cpp
+const ll M = (1LL << 61) - 1; // large prime for mod
+const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
+ll hsh[5005]={0};
+ll revhsh[5005]={0};
+vector <ll> pw = {1LL};
+__int128 mul(ll a, ll b) { return (__int128)a * b; }
+ll mod_mul(ll a, ll b) { return mul(a, b) % M; }
+void calchash(string s){
+    while (pw.size() < s.size()) {
+        pw.push_back(mod_mul(pw.back(), P) % M);
+    }
+    hsh[0] = 0;
+		for (int i = 0; i < s.size(); i++) {
+			hsh[i + 1] = (mul(hsh[i], P) + s[i]) % M;
+		}
+    reverse(s.begin(),s.end());
+    revhsh[0] = 0;
+		for (int i = 0; i < s.size(); i++) {
+			revhsh[i + 1] = (mul(revhsh[i], P) + s[i]) % M;
+		}
+}
+long long gethash(int start, int end) {
+	ll raw_val =
+		    hsh[end + 1] - mod_mul(hsh[start], pw[end - start + 1]);
+		return (raw_val + M) % M;
+}
+long long getrevhash(int start, int end, int n) { // hash reverse string
+    end = n-end;
+    start = n-start;
+	ll raw_val =
+		    revhsh[start + 1] - mod_mul(revhsh[end], pw[start - end + 1]);
+		return (raw_val + M) % M;
+}
+void solve(){
+    
+    string s;cin>>s;
+    int n = int(s.size());
+    calchash(s);
+    short dp[5005][5005]={0};
+    int osa[n+1]={0};
+    rep(i,0,n){ // base case
+        dp[i][i]=1;
+        osa[1]++;
+    }
+    rep(i,2,n+1){ // length
+        rep(j,0,n-i+1){ // left
+            int len = i/2;
+            if(gethash(j,j+len-1) == getrevhash(j+i-len,j+i-1,n-1)){ // first half == second half
+                dp[j][j+i-1] = min(dp[j][j+len-1], dp[j+i-len][j+i-1])+1; // min(firsthalf,sechalf)+1
+            }
+            
+            osa[dp[j][j+i-1]]++;
+        }
+        
+    }
+// calc prefix sum cause every k-palindrome is also a k-1 palindrome, k-2 palindrome, etc.
+    for(int i = n-1;i>=1;i--){
+        osa[i]+=osa[i+1];
+    }
+    rep(i,1,n+1){
+        cout<<osa[i]<<" ";
+    }
+    cout<<endl;
+}  
 ```
 
 **Problem 15:** https://codeforces.com/contest/1114/problem/D
