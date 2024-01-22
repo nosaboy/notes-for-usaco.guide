@@ -240,3 +240,98 @@ void solve(){
    
 }   
 ```
+**Problem 5:** https://codeforces.com/gym/104048/problem/K
+
+Again impl was lowkey brutal :/
+
+The idea is actually not that hard. We notice n = 10, so it must mean some brute force with permutations. Immediately, we can first eliminate any string that is contained as a substring as another. Since including that string will include this string anyway so we dont have to add extra. Then, we can eliminate characters only if some prefix of a string and suffix of another string is the same. We thus calculate the max prefix=suffix length and suffix=prefix length for every pair of string and store in nosa, which is done by hashing in O(|s|). Then, we can just go through every permutation, then eliminate neighbouring prefix=suffix length, then find the min total.
+
+Idea is not that hard its just impl + debugging that took a while :(
+Key is to just notice we can do 10! + hashing prefix=suffix.
+```cpp
+const ll M = (1LL << 61) - 1; // large prime for mod
+const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
+ll hsh[20][10005]={0};
+vector <ll> pw = {1LL};
+__int128 mul(ll a, ll b) { return (__int128)a * b; }
+ll mod_mul(ll a, ll b) { return mul(a, b) % M; }
+void calchash(int osa,string s){
+    
+    hsh[osa][0] = 0;
+		for (int i = 0; i < s.size(); i++) {
+			hsh[osa][i + 1] = (mul(hsh[osa][i], P) + s[i]) % M;
+		}
+}
+long long gethash(int osa, int start, int end) {
+	ll raw_val =
+		    hsh[osa][end + 1] - mod_mul(hsh[osa][start], pw[end - start + 1]);
+		return (raw_val + M) % M;
+}
+void solve(){
+    // precalc pow
+    while (pw.size() < 10005) {
+        pw.push_back(mod_mul(pw.back(), P) % M);
+    }
+    int n;cin>>n;
+    vector <pair<int,string>> c;
+    
+    ll sum = 0;
+    rep(i,0,n){
+        string s;cin>>s;c.pb({s.size(),s});
+        
+    }
+	// eliminate strings that are contained in another substring
+    sort(c.rbegin(),c.rend()); // sort by length biggest to smallest
+    vector <string> v;
+    rep(i,0,n){
+        string s = get<1>(c[i]);
+        calchash(v.size(),s);
+         // check if v[i] is contained in a previous substring already
+        bool yes = false;
+        rep(j,0,v.size()){
+           
+            rep(l,0,int(v[j].size())-int(s.size())+1){
+                if(gethash(v.size(),0,s.size()-1) == gethash(j,l,l+s.size()-1)){
+                    yes = true;
+                }
+            }
+        }
+        if(!yes){
+            v.pb(s);
+        }
+        
+    }
+    int a[v.size()]; // permutation
+    rep(i,0,v.size()){
+        a[i]=i;
+        calchash(i,v[i]);
+        sum += ll(v[i].size());
+    }
+    ll nosa[n][n]; memset(nosa,0,sizeof(nosa)); // max same characters
+    rep(i,0,v.size()){
+        rep(j,i+1,v.size()){
+            // i back, j front, prefix = suffix
+            rep(l,0,min(v[i].size(),v[j].size())){
+                if(gethash(i,v[i].size()-1-l,v[i].size()-1) == gethash(j,0,l)){
+                    nosa[i][j]=l+1;
+                }
+            }
+            // i front j back, suffix = prefix
+            rep(l,0,min(v[i].size(),v[j].size())){
+                if(gethash(j,v[j].size()-1-l,v[j].size()-1) == gethash(i,0,l)){
+                    nosa[j][i]=l+1;
+                }
+            }
+        }
+    }
+    ll ans = 1000000005;
+    do {
+        ll sad = sum; 
+        rep(i,1,v.size()){
+            sad -= nosa[a[i-1]][a[i]];
+        }
+        ans = min(ans,sad);
+    } while (next_permutation(a, a + v.size()));
+    cout<<ans<<endl;
+}   
+```
