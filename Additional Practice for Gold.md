@@ -1,3 +1,108 @@
+**Problem 3:** https://codeforces.com/problemset/problem/1525/C
+Tim: 1 - 2 hours
+Hint 1(kinda knew this alr): Odds and Even positions never collide, consider odd and even seperately, which they will always collide.
+
+OKOK, we then do by greedy. Note we always want RL to pair with each other before we pair up LL or RR. This is because RL will alwasy explode sooner.
+
+Bruh the impl is kinda bad but ya gg. This problem I did **O(n)** since I thought logic would be way easier. **I still dont know how you solve this with sets in O(nlogn) pls review editorial.**
+Basically we know that the closest RL combinations will always explode first before LL or RR combinations. Then RRLL will be pairs like (1,4) and (2,3) since (2,3) explodes first. We use stack to simulate and explode this. Then we add all LL and RR left.
+Then, we know that LL closest to wall 0 will always explode first since closest L will explode with second closest L. We thus just explode pairs of LL. RR explosions follow similar logic where we always explode closest R to m.
+Then, at the end of explosion if there is 1 L or R left, we can do -1. If both size is odd( so one L and R is left and not paired up and exploded), we can pairs and explode these two.
+
+Impl kinda brutal tho no cap.
+```cpp
+int ans[300005]={0};
+int n,m;
+void osa(vector<tuple<int,int,int>> &a){
+    tuple<int,int,int> endleft; // position of element if size odd
+    tuple<int,int,int> endright; // position of last element size odd
+    vector <tuple<int,int,int>> left;
+    vector <tuple<int,int,int>> right;
+    stack <tuple<int,int,int>> st; // montonic stack to simulate RL elimination
+    rep(i,0,a.size()){
+        
+        if(get<1>(a[i]) == 'R'){
+            st.push(a[i]);
+        }
+        else{
+            if(st.size()){
+                tuple<int,int,int> ok = st.top(); st.pop();
+                ans[get<2>(a[i])]=(get<0>(a[i])-get<0>(ok))/2;
+                ans[get<2>(ok)]=(get<0>(a[i])-get<0>(ok))/2;
+            }
+        }
+    }
+    rep(i,0,a.size()){
+        if(ans[get<2>(a[i])]==0){
+ 
+            if(get<1>(a[i]) == 'L'){
+                left.pb(a[i]);
+            }
+            else{
+                right.pb(a[i]);
+            }
+        }
+    }
+    if(left.size()%2){
+        endleft = left[left.size()-1];
+    }
+    if(right.size()%2){
+        endright = right[0];
+    }
+    for(int i = 1;i<left.size();i+=2){ // merge lefts two at a time
+        ans[get<2>(left[i])] = (get<0>(left[i]) + get<0>(left[i-1]))/2;
+        ans[get<2>(left[i-1])] = (get<0>(left[i]) + get<0>(left[i-1]))/2;
+    }
+    for(int i = right.size()-2;i>=0;i-=2){ // merge rights 
+        ans[get<2>(right[i])] = (2*m-(get<0>(right[i]) + get<0>(right[i+1])))/2;
+        ans[get<2>(right[i+1])] = (2*m-(get<0>(right[i]) + get<0>(right[i+1])))/2;
+    }
+ 
+    if(left.size()%2 && right.size()%2){ // both has 1 left over
+        ans[get<2>(endleft)] = (get<0>(endleft) + (m-get<0>(endright)) + m)/2;
+        ans[get<2>(endright)] = (get<0>(endleft) + (m-get<0>(endright)) + m)/2;
+    }
+    else if(left.size()%2){ // only left has 1 left over
+        ans[get<2>(endleft)] = -1; // cant collide
+    }
+    else if(right.size()%2){ // only right has 1 left over
+        ans[get<2>(endright)] = -1;
+    }
+    
+}
+void solve(){
+    cin>>n>>m;
+    vi v;
+    char c[n];
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+    memset(ans,0,sizeof(ans));
+    vector <tuple<int,int,int>> a;
+    vector <tuple<int,int,int>> b;
+    multiset <int> ms;
+    rep(i,0,n){
+        cin>>c[i];
+        if(v[i]%2){ // odd position
+            a.pb({v[i],c[i],i});
+        }
+        else{
+            b.pb({v[i],c[i],i});
+        }
+    }
+    sort(a.begin(),a.end());
+    sort(b.begin(),b.end());
+    // odd 
+    osa(a);
+    // even
+    osa(b);
+    rep(i,0,n){
+        cout<<ans[i]<<" ";
+    }
+    cout<<endl;
+   
+}  
+```
 **Problem 6:** https://codeforces.com/gym/103886/problem/E
 I did exact same as editorial.
 This problem was actually quite challenging to approach since I thought it was some complex combo proof. Actually its not bad.
