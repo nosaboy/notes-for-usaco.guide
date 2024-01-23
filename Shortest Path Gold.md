@@ -427,7 +427,7 @@ While going through each prev ladder we'll update the answer. To updat, we compa
 For "NO ESCAPE" we just see if for every level there is some prev ladder that goes up to this level. If there isnt then none of the ladders in this level is used.
 Every level calculation is linear so we get around O(k) since we go through each letter once or twice, then multiply logk complexity cause we using dp map + sorting.
  
-Bro this was like so grueling cause the impl is ez but I spent so much time on it guess gotta work on coding cause man that was tuff 2.5 hrs of non stop coding.
+Bro this was like so grueling cause the impl is not that hard in theory but I spent so much time on it guess gotta work on coding cause man that was tuff 2.5 hrs of non stop coding. Like the ideas actually not even bad and the impl not that crazy easier but I was lost cause I was using tuple + map = lots of code so ya I didnt do well. Overall I probably should organized code a little bit, I guess using a struct or smth makes this code so much cleaner but oh well.
 **NOTE:** I solved this using purely DP and no Shortest path whatsoever **PLS CHECK SHORTEST PATH SOLUTION???**
 
 ```cpp
