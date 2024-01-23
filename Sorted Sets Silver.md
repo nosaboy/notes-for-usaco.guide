@@ -41,16 +41,25 @@ Ordered(sorted) Sets and Maps supports
 - auto it = st.upper_bound(x): returns iterator to the smallest value/key **greater** than x
 
 #### Priority Queue(heap)
-Supports all operations of sets: insertion of element, deletion of highest priority element, retrieval of highest priority element.
+Supports all operations of sets: insertion of element, deletion of **highest priority element**, retrieval of highest priority element.
+Default is sort LARGEST to SMALLEST
 ```cpp
 priority_queue<int> pq;
 pq.push(2); // [2]
+pq.push(1); // [2,1]
+pq.push(3); // [3,2,1]
+cout<<pq.top()<<endl; // 3
+pq.pop(); // [2,1]
+```
+**Min pq**
+```cpp
+priority_queue<int, vector<int>, greater<int>> pq;
+pq.push(2); // [2]
 pq.push(1); // [1,2]
 pq.push(3); // [1,2,3]
-cout<<pq.top()<<endl // 3
-pq.pop(); // [1,2]
+cout<<pq.top()<<endl; // 1
+pq.pop(); // [2,3]
 ```
-
 ### Problems
 
 **Problem 1:** https://cses.fi/problemset/task/1091
