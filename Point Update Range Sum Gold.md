@@ -1333,5 +1333,63 @@ void solve(){
 
 ```
 
+**Problem 5:** https://codeforces.com/contest/1181/problem/D
+
+There are 3 things that make it not approachable. A brute force solution obviously TLEs. We will use "coord compression" in a sense where we can calculate the cities that are in rotation at any point in time. Thus when we get some time for query, we can see at that time how many cities are already in rotation and what they are ig.
+Second thing is we have to get the specific city number. To do this we can use **orderedmultiset** that stores all current cities in order. Then, we perform time calculation mod # of cities in array to determine which city hosts on this day.
+Third, this part was the one that actually took thinking: Adding cities using orderedmultisets naively for every query gets TLE. 
+We note that adding cities is monotonic increasing as time increases. Thus, we **dont process per query**. Instead we get all queries, sort by time, then add extra cities only if we need and as we go up. This way, we never add same city to multiset twice. After this we just fill answer to its previous query position, then output.
+
+```cpp
+void solve(){
+    int n,m,q;cin>>n>>m>>q;
+    int cnt[m+1]={0};
+    rep(i,0,n){
+        int u;cin>>u;cnt[u]++;
+    }
+
+    vector <pair<ll,ll>> v;
+    rep(i,1,m+1){
+        v.pb({cnt[i],i});
+    }
+    sort(v.begin(),v.end()); // sort by # of times city hosted
+    vector <pair<ll,ll>> a; // (x,y) - at time x, we will have the first y cities in the array, and we'll get position using mod accordingly
+    // calculating x and y
+    ll osa = 0;
+    rep(i,1,m){
+        if(v[i].first != v[i-1].first){ // lowest
+            a.pb({(osa), i}); 
+            osa = (v[i].first-v[i-1].first)*i;
+        }
+    }
+    a.pb({(osa), m}); // lastly well have osa days have passed and we now have all cities in array
+    rep(i,1,a.size()){ // prefix sum for total number of days past
+        a[i].first += a[i-1].first; 
+    }
+    vector<pair<ll,ll>> srt;
+    ll ans[q]; // store query answers
+    rep(i,0,q){ 
+        ll k;cin>>k;srt.pb({k,i});
+    }
+    sort(srt.begin(),srt.end());// sort queries so we can process in order and thus not add to multiset every time which TLE
+    orderedMultiset<ll> ms;
+    rep(i,0,q){
+        ll k = srt[i].first;
+        k-=n; pair<ll,ll> find = {k,0};
+        auto it = upper_bound(a.begin(),a.end(),find);
+        --it;
+        pair<ll,ll> nosa = *it;
+        ll md = (k-nosa.first-1+nosa.second)%nosa.second; // get mod for position
+        rep(i,ms.size(),nosa.second){ // add nessary cities if needed
+            ms.insert(v[i].second);
+        }
+        auto itr = ms.find_by_order(md);
+        ans[srt[i].second]=*itr;
+    }
+    rep(i,0,q){
+        cout<<ans[i]<<"\n";
+    }
+}   
+```
 
 
