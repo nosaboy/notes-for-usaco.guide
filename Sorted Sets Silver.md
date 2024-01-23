@@ -445,4 +445,12 @@ void solve(){
 
 **Problem 12:** https://codeforces.com/problemset/problem/1805/F1
 This can be done in O(n^2)
-I dont really get how we can implement F in O(n), imma check hint
+I dont really get how we can implement F in O(n), imma check hint. Ya, even without the overflow + mod I dont understand how you can possibly get the n smallest sums in O(n) time. Gonna read editorial.
+
+Ok I get it. Basically we make the following observation:
+If a_i + a_j is in the final array where WLOG i<j, then a_i+a_l is in the array where l < j. This is because a_i+a_l is always <= a_i + a_j.
+Then we use a greedy strat. First sort array. Then insert every pair a_i + a_{i+1} into a priority queue. Then, we always pick the smallest pair in pq, then this sum a_i + a_j will be the next best number to add to F. After this, we'll add a_i + a_{j+1} to the pq.
+This is because this is currently the smallest a_i + a_j such that all its previous a_i + a_l has been added to F and its the smallest current pair.
+The main issue I had was there is no way to optimally decide to choose a_w + a_z or a_x + a_y where w<x<y<z. But this strat solves this issue since we dont care, we just pick the smallest everytime.
+**^I still think this is pretty mind blowing for me, I thought it was impossible to do this in < O(n^2), greedy in O(nlogn) is wild.**
+Then, we need to account for determining how big a number is accounting for overflow + mod. Since it could be that x mod m < y mod m, but x > y.
