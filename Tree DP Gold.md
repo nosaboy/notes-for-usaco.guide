@@ -50,7 +50,7 @@ Solution 2 Greedy:
 We can just greedily fill edges, since not filling edges will only make the answer worse since filling the closest edge possible will at most damage one other pairing(if filling another edge is more optimal, we damaged this pairing, so we can just pick any edge to fill). Just keep pairing up closest until its not possible.
 
 
-## Solving For All Roots
+## Rerooting (Solving For All Roots)
 
 ### All longest path in O(n): https://cses.fi/problemset/task/1132
 Calculate for every node the maximum length of a path beginning at that node: If we can find the maximum length starting at every node, the tree diameter problem turns into the max of these lengths.
