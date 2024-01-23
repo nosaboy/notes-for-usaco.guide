@@ -463,3 +463,52 @@ This is because this is currently the smallest a_i + a_j such that all its previ
 The main issue I had was there is no way to optimally decide to choose a_w + a_z or a_x + a_y where w<x<y<z. But this strat solves this issue since we dont care, we just pick the smallest everytime.
 **^I still think this is pretty mind blowing for me, I thought it was impossible to do this in < O(n^2), greedy in O(nlogn) is wild.**
 Then, we need to account for determining how big a number is accounting for overflow + mod. Since it could be that x mod m < y mod m, but x > y.
+We do this first by thinking about how we can preserve the order of elements while not making it overflow. To do this, we want to subtract some number from every element in the array, so that it will account for overflow if it does happen. We then want to adjust for this subtracting error after and we realize hint 2.2: $F([a1,a2,…,an])=F([a1−x,a2−x,…,an−x])+x\cdot2^{n−1}.$ This way, whenever two sums overflow we want to substract some number $x$ so it doesnt overflow. Now we just want to choose a suitable $x$. If we pick $x$ too high it might create negative numbers which will never become positive and overflow in the other(negative) direction. Thus all numbers must remain >= 0. We want to subtract $x$ such that the min sum is >= 0 and max sum does not overflow. The max $x$ must just be min pair sum going into the next array so thats what I put but I didnt prove.
+**Proof:** We note that the given v, the final F array must have all its elements <= $v_n.$ Note in this case we assume first element is 0 cause thats what we subtracted. This is because there will always be $n-1$ elements <= $v_n$: $0 + a+1, 0 + a_2, ..., 0+a_n.$ Thus, the maximum pair sum must be <= a_n if the first element is 0. Thus after subtracting first pair sum, whats left must be smaller value than the original a_n which means the max sum will always stay <= 10^9( in problem statement).
+
+Overall this problem uses two smart observation + First red problem gg.
+```cpp
+void solve(){
+    int n;cin>>n;
+    vector<ll> v;
+    ll two[n];
+    two[0]=1;
+    ll ok = 0; // sum of error
+    rep(i,1,n){
+        two[i]=mult(two[i-1],2);
+    }
+    rep(i,0,n){
+        ll u;cin>>u;v.pb(u);
+    }
+    sort(v.begin(),v.end());
+    ll mn = v[0]; // curr minimum pair sum
+    rep(i,0,n-1){
+        
+        priority_queue<tuple<ll,ll,ll>, vector<tuple<ll,ll,ll>>, greater<tuple<ll,ll,ll>>> pq;
+        rep(i,0,v.size()){ 
+            v[i]-=mn; // subtract x from all elements
+        }
+        ok = add(ok,mult(mn,two[v.size()-1])); // ok += x * 2^{n-1}
+        rep(i,0,v.size()-1){
+            pq.push({v[i]+v[i+1],i,i+1});
+        }
+        mn = v[0]+v[1]; // next minimum pair sum
+        // Greedily Getting array F
+        vector<ll> a; // array F
+        while(a.size() < v.size()-1){
+            tuple<ll,ll,ll> x = pq.top(); 
+            pq.pop();
+            a.pb(get<0>(x));
+            pq.push({v[get<1>(x)] + v[get<2>(x)+1], get<1>(x), get<2>(x)+1});
+        }
+        // insert array F to v
+        v.clear();
+        rep(i,0,a.size()){
+            v.pb(a[i]);
+        }
+
+    }
+    cout<<add(v[0],ok)<<endl; // add final and account for error
+
+}   
+```
