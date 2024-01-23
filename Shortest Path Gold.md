@@ -416,6 +416,101 @@ void solve(){
 }   
  
 
-``` 
+**Problem 6:** https://codeforces.com/contest/1627/problem/E
 
+I dont rlly get how to do this cause ladders can be positive, which means negative weights. Imma check editorial cause idrk. Wai a minute we dont even have to use shortest path what am I on. 
+For every ladder we just need min number. 
+I can think of the O(n^2) solution where we go through every level and for every ladder starting at this level we brute force all ladders that reached this level and find the max health form each prev ladder to curr ladder.
+Actually this problem isnt too bad. We can make the following optimization: We sort the prev ladders, then we go through each prev and update the best answer for current ladder.
+We do this by checking the most optimal prev ladder for all prev ladders to the left of the current ladder, then reverse that array and get most optimal ans for all prev ladders to the right.
+While going through each prev ladder we'll update the answer. To updat, we compare the current prev ladder to the best ladder we've found. If the current prev ladder dp < prev ladder dp + dist from prev best ladder to current prev ladder * x_i we know our current prev ladder is more optimal and so we update.
+For "NO ESCAPE" we just see if for every level there is some prev ladder that goes up to this level. If there isnt then none of the ladders in this level is used.
+Every level calculation is linear so we get around O(k) since we go through each letter once or twice, then multiply logk complexity cause we using dp map + sorting.
+ 
+Bro this was like so grueling cause the impl is ez but I spent so much time on it guess gotta work on coding cause man that was tuff 2.5 hrs of non stop coding.
+**NOTE:** I solved this using purely DP and no Shortest path whatsoever **PLS CHECK SHORTEST PATH SOLUTION???**
+
+```cpp
+bool cmp(tuple<ll,ll,ll,ll,ll> a, tuple<ll,ll,ll,ll,ll> b){
+    return get<3>(a) < get<3>(b);
+
+}
+void solve(){
+    ll n,m,k;cin>>n>>m>>k;
+    vector<ll> x; vector<tuple<ll,ll,ll,ll,ll>> v;
+    x.pb(0); // we add smth to make it 1 indexed
+    map <pair<ll,ll>,ll> dp;
+    rep(i,0,n){
+        ll u;cin>>u;x.pb(u);
+    }
+    vector<tuple<ll,ll,ll,ll,ll>> ast[n+1]; // ladder starts at this row
+    vector<tuple<ll,ll,ll,ll,ll>> aen[n+1]; // ladder ends at this row
+    rep(i,0,k){
+        ll a,b,c,d,h;
+        cin>>a>>b>>c>>d>>h;
+        v.pb({a,b,c,d,h});
+        ast[a].pb({a,b,c,d,h});
+        aen[c].pb({a,b,c,d,h});
+        dp[{c,d}]=1000000000000000005;
+        
+    }
+    sort(v.begin(),v.end()); // sort by height(row), then left to right
+    sort(ast[1].begin(),ast[1].end());
+    sort(aen[1].begin(),aen[1].end());
+    rep(i,0,ast[1].size()){
+        
+        dp[{get<2>(ast[1][i]),get<3>(ast[1][i])}]=min(dp[{get<2>(ast[1][i]),get<3>(ast[1][i])}],x[1]*(get<1>(ast[1][i])-1)-get<4>(ast[1][i]));
+    }
+    rep(i,2,n+1){ // current row
+        if(aen[i].size()){ // if we can even reach current floor from some ladder
+            sort(ast[i].begin(),ast[i].end());
+            sort(aen[i].begin(),aen[i].end(),cmp);
+            int it = 0;
+            tuple <ll,ll,ll,ll,ll> best = aen[i][0];
+            rep(j,0,ast[i].size()){
+                while(it < aen[i].size() && get<3>(aen[i][it]) <= get<1>(ast[i][j])){
+                // update best
+                if(abs(get<3>(aen[i][it]) - get<3>(best))*x[i] + dp[{get<2>(best),get<3>(best)}] > dp[{get<2>(aen[i][it]), get<3>(aen[i][it])}]){
+                        best = aen[i][it];
+                } 
+                it++;
+                }
+                dp[{get<2>(ast[i][j]),get<3>(ast[i][j])}]=min(dp[{get<2>(ast[i][j]),get<3>(ast[i][j])}],x[i]*abs(get<1>(ast[i][j]) - get<3>(best))-get<4>(ast[i][j])+ dp[{get<2>(best),get<3>(best)}]);
+                // cout<<i<<" "<<get<2>(ast[i][j])<<" "<<get<3>(ast[i][j])<<" "<<dp[{get<2>(ast[i][j]),get<3>(ast[i][j])}]<<" "<<x[i]<<" "<<(get<1>(ast[i][j]) - get<3>(best))<<" "<<get<4>(ast[i][j])<<" "<< dp[{get<2>(best),get<3>(best)}]<<endl;
+            }   
+            
+            reverse(ast[i].begin(),ast[i].end());
+            reverse(aen[i].begin(),aen[i].end());
+            it = 0;
+            
+            best=aen[i][0];
+            
+            
+            rep(j,0,ast[i].size()){
+                
+                while(it < aen[i].size() && get<3>(aen[i][it]) >= get<1>(ast[i][j])){
+                // update best
+                // cout<<(get<3>(aen[i][it]) - get<3>(best))*x[i] + dp[{get<2>(best),get<3>(best)}]<<"FUCK\n";
+                if(abs(get<3>(aen[i][it]) - get<3>(best))*x[i] + dp[{get<2>(best),get<3>(best)}] > dp[{get<2>(aen[i][it]), get<3>(aen[i][it])}]){
+                        best = aen[i][it];
+                } 
+                it++;
+                }
+                // cout<<dp[{get<2>(ast[i][j]),get<3>(ast[i][j])}]<<" "<<x[i]<<" "<<(get<1>(ast[i][j]) - get<3>(best))<<" "<<get<4>(ast[i][j])<<" "<< dp[{get<2>(best),get<3>(best)}]<<endl;
+                dp[{get<2>(ast[i][j]),get<3>(ast[i][j])}]=min(dp[{get<2>(ast[i][j]),get<3>(ast[i][j])}],x[i]*abs(get<1>(ast[i][j]) - get<3>(best))-get<4>(ast[i][j])+ dp[{get<2>(best),get<3>(best)}]);
+            }
+        }
+    }
+    // cout<<dp[{5,2}]<<endl;
+    ll ans = 100000000000000005;
+    rep(i,0,aen[n].size()){
+        // cout<<dp[{get<2>(aen[n][i]), get<3>(aen[n][i])}] + (m-get<3>(aen[n][i]))*x[n]<<" ";
+        ans = min(ans, dp[{get<2>(aen[n][i]), get<3>(aen[n][i])}] + (m-get<3>(aen[n][i]))*x[n]);
+    }
+    if(ans >= 100000000000000005){
+        cout<<"NO ESCAPE\n";
+        return;
+    }
+    cout<<ans<<endl;
+}   
 ```
