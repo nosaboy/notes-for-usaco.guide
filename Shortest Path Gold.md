@@ -415,7 +415,7 @@ void solve(){
     cout<<ans<<"\n";
 }   
  
-
+```
 **Problem 6:** https://codeforces.com/contest/1627/problem/E
 
 I dont rlly get how to do this cause ladders can be positive, which means negative weights. Imma check editorial cause idrk. Wai a minute we dont even have to use shortest path what am I on. 
