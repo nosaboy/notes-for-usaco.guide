@@ -172,3 +172,9 @@ rep(i,0,k){
         fir[u]=0; // make dist = 0(normal)
 }
 ```
+
+**Problem 1:** https://codeforces.com/contest/1187/problem/E
+Observations:
+Using normal tree DP, we can brute force solve in O(n^2). We go through all nodes and mark as starting, then its regular tree DP.
+
+So what im thinking is we actually do a "All longest Distance" logic but the dp is getting the score instead of calculating dist. However, idk how to implement that.
