@@ -1249,6 +1249,8 @@ void solve(){
     
 }
 ```
+
+
 ## BIT/Fenwick Tree
 Same operations as segtree, just different impl.
 Common technique unrelated: Given that steps of an operation can be both x and n/x, it is best to set x = sqrt(n) to minimize worst case.
