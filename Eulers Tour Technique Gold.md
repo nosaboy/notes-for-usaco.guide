@@ -791,3 +791,8 @@ void solve(){
 }
 
 ```
+
+
+**Problem 12:** https://codeforces.com/contest/838/problem/B
+
+Lazy segtree
