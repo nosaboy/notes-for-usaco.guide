@@ -7,12 +7,13 @@ sqrt(n). Worst case scenario(longest dist), the graph is a line. After some opti
 
 Then, we know that in the brute force solution, if we visit a node it will take O(deg(node)) time to process & check. For every node that is coloured in, we will update ans by looking at its minium distance to another black node that was coloured in previously. This way, we can get min dist of the new node. Then, we will update this distance for every node as brute force proceeds. 
 
-Second smart observation: we will only visit and change a neighbour y from x if its disty > distx + 1. This is because if the node already has a more optimal solution we dont go visit it. Moreover, we will only change if distx + 1 < ans. This is because we want to find a path such that its length < ans. Else if distx + 1 <= ans, we'll just pick the previous ans(which has already been found), and be done. Here, we are betting that sometimes in the future y will be coloured in and ans is decreased. 
+Second smart observation: we will only visit and change a neighbour y from x if its disty > distx + 1. This is because if the node already has a more optimal solution we dont go visit it. Moreover, we will only change if distx + 1 < ans. This is because we want to find a path such that its length < ans. Else if distx + 1 >= ans, we'll just pick the previous ans(which has already been found), and be done. Here, we are betting that sometimes in the future y will be coloured in and ans is decreased. 
 We can run BFS solution that ony visits a node satisfying these two constrains. Because of the distx+1<ans constraint, we will only update disty at most sqrt(n) times since ans <= sqrt(n) as proven previously.
 Since each visit adds deg(x) to time, we have in total O(sum(deg(x) for all x) * sqrt(n)) = O(nsqrt(n)) as sum(deg(x) for all x) = 2n-2 since there are 2n-2 edges in a tree.
 
 For simplicity, well run BFS brute force for the whole thing since we know time works out.
 Since both cases run in O(nsqrt(n)) time, the total algorithm is O(nsqrt(n)) which is passable
+NOTE: This property of not filling unless distx+1<disty anddistx+1<ans helps us eliminate the need for using bool vis in our BFS. If we need vis, then for every i 1...n we need to reset vis meaning O(n^2) solution. Without vis and no resetting, for every i we only have around sqrt(n) time amortized.
 
 **Learned**
 - Slick sqrt(n) brute force trick on trees
@@ -36,6 +37,7 @@ void solve(){
         aj[b].pb(a);
     }
     int ans = 1000000005;
+    int vis[n+1];
     rep(i,0,n){
         ans = min(ans,dist[c[i]]); // before colouring it we get max dist
         if(i>0){
@@ -46,24 +48,24 @@ void solve(){
  
         // update dist based off ans
         queue <int> q; q.push(c[i]);
-        int vis[n+1]={0};
+        // memset(vis,0,sizeof(vis));
         while(!q.empty()){
             int x = q.front();q.pop();
-            vis[x]=true;
+            // vis[x]=true;
             rep(i,0,aj[x].size()){
                 
-                if(!vis[aj[x][i]]){
+                // if(!vis[aj[x][i]]){
                     if(dist[x]+1<dist[aj[x][i]] && dist[x]+1<ans){
                         dist[aj[x][i]]=dist[x]+1; // update
                         q.push(aj[x][i]);
                     }
-                }
+                // }
             }
         }
         
     }
     cout<<endl;
     
-}   
+}  
  
 ```
