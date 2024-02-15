@@ -224,8 +224,8 @@ Essentially, we want to divide an array of numbers into segements such that the 
 
 If we can loop through all rectangles that have h_i as the shortest for all curr i, we can run dp. This process will probably be similar to largest histogram.
 
-The dp will go as such, $dp[i]$ will be the maximum sum for subarray 1...i. To calculate the dp, we look at the last element in array ${h[i],a[i]}.$ There are two cases. Either this is encompassed by some prev number($h[j]<h[i])$, or this is the minimum height of the last photo.
-For the first case, we will just store the max prev dp value with $h[j]<h[i]$ in the stack. Thne, the ans will be just that.
+The dp will go as such, $dp[i]$ will be the maximum sum for subarray 1...i. To calculate the dp, we look at the last element in array ${h[i],a[i]}.$ There are two cases. Either this is encompassed by some prev number h_j<h_i, or this is the minimum height of the last photo.
+For the first case, we will just store the max prev dp value with h_j<h_i in the stack. Thne, the ans will be just that.
 For the second case, the segment start must be from $[prev_pos+1...i]$, thus we will get the max dp from 1 element previous, then add $a[i]$ to this. We can query this using maximum segtree. If we go anywhere below prev_pos, our current photo encompasses and element whose h_i is smaller than it so it would fall under first case.
 
 
