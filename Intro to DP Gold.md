@@ -192,3 +192,80 @@ void solve(){
 }
 
 ```
+
+**Problem 8:** https://codeforces.com/contest/1472/problem/G
+
+This is dp because we realize the "brute forcing" can be based off of further values on the dfs. Thus, we can just do a "smart brute force". First, we can calculate min dist from 1 to every node using BFS.
+Then, for every node, we will run dfs and try to update dp values. The states are defined as $[node][ok]$ where $ok$ just means "have we used the 2nd operation yet coming into this node?" If there is already an dp value calculated we will return that dp value. If this state was not visited, we will go through all it neighbours. 
+If currently ok == 1, this means that we cannot perform any more of the 2nd operation. Thus, if $dp[n] < dp[aj[n][i]]$ we will just use 1st operation which doesnt affect anything, and keep our state. Otherwise, we must not perform any more 2nd operation so we just end our dfs and say $dp[n][ok]=dist[n]$.
+If currently ok == 0, this means we havent used the 2nd operation, so we can go further in the dfs() if we come across $dp[n]>=dp[aj[n][i]]$.
+Then we are updating and storing the best dp value for each node. This is obvious dp so we just print $dfs(node,0)$.
+
+This was def the easier 2100s as I didnt consult editorial.
+```cpp
+vi aj[200005];
+int dp[200005][2];
+int d[200005]; // dist from 1 to i
+int dfs(int n, int ok){
+    if(dp[n][ok]!=1000000005){
+        return dp[n][ok];
+    }
+    dp[n][ok]=d[n];
+    rep(i,0,aj[n].size()){
+        
+            if(d[n]<d[aj[n][i]]){
+                dp[n][ok]=min(dp[n][ok],dfs(aj[n][i],ok));  
+            }
+            else if(ok==0){ // must use 2nd step since d[x]>=d[y]
+                dp[n][ok] = min(dp[n][ok],dfs(aj[n][i],1));
+            }
+            else{
+                dp[n][ok]=min(dp[n][ok],d[n]);
+            }
+        
+ 
+    }
+    return dp[n][ok];
+}
+void solve(){
+    
+    int n,m;cin>>n>>m;
+ 
+    // reset
+    rep(i,0,n){
+        aj[i].clear();
+        dp[i][0]=1000000005;
+        dp[i][1]=1000000005;
+        d[i]=1000000005;
+    }
+ 
+    rep(i,0,m){
+        int a,b;cin>>a>>b;
+        a--; b--;
+        aj[a].pb(b);
+    }
+    // get min dist
+    queue<int>q;q.push(0);
+    d[0]=0;
+    while(!q.empty()){
+        int x = q.front();q.pop();
+        for(auto y: aj[x]){
+            if(d[y]==1000000005){
+                d[y]=d[x]+1;
+                q.push(y);
+            }
+        }
+    }
+    dp[0][0]=0;
+    dp[0][1]=0;
+    rep(i,0,n){
+        
+            dfs(i,0);
+        
+    }
+    rep(i,0,n){
+        cout<<dp[i][0]<<" ";
+    }
+    cout<<endl;
+}   
+```
