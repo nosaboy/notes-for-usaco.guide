@@ -330,3 +330,67 @@ void solve(){
     cout<<ans<<"\n";
 }
 ```
+
+**Problem 13:** https://codeforces.com/problemset/problem/1666/F
+
+This is prob dp of some sort
+Hint 1(I knew this was coming): Solve the problem with no repetition values of a_i.
+Go from largest to smallest value. We visualize the positions as being initially empty.
+Define $dp_{i,j}$ as filling $j$ values to even positions from the first $i$ values from largest to smallest. Then, the transition from i to i+1 will be if the i+1th value gets picked as even or odd.
+If we set the i+1 value as even, we must place it at the next avaliable even spot. Because we are going from largest to smallest value and b_i must decrease, so if its not at the next even spot then that spot will have a smaller value than curr. So there is only 1 way to place it to the next even spot, so # of ways is just $dp[i+1][j+1] = dp[i][j]$. 
+If we set i+1 value as odd, we note that the number of odd spots possible must be j-1 (+1 if j == 2 since we must place a number in 1st position when we reach end). This is because there are currently j spots occupied, and we must place this value between two even values that are larger. If we place it at the front, the next even value will be smaller(cause we are going from large to small) so sequence is invalid. Then, since there are already i-j values in these j-1 spots we must not place it in any of these spots. Thus, it has max(0,j-1)-(i-j)-(i==n?). Since each placement is weighted the same(doesnt matter which spot we pick the ways will always be multipled by $dp[i][j]$), we have in total $dp[i+1][j] = (max(0,j-1)-(i-j)-(i==n?)) * dp[i][j]$ ways.
+
+Now we consider if there are repetition of values. For each value, we will process everything all at once with similar transition:
+- All elements that have same value goes to odd positions
+- One element will go to the next even value and all other element goes to odd positions
+Thus, we essentially just do the old dp transitions, but we process same elements at the same time. That is, if all values go to odd position there are n = (max(0,j-1)-(i-j)-(i==n?)) positions and k = cnt elements with this value so its nCk.
+If one element is at even spot, there n = (max(0,j-1)-(i-j)-(i==n?)) positions and k = cnt elements with this value but we minus 1 since one is at a even spot so its nC(k-1).
+
+**Relfection**
+This was rlly hard and I had to consult editorial several times. Probably wouldve not solved in contest.
+
+```cpp
+void solve(){
+    int n;cin>>n;
+    vi v;
+    rep(i,0,n){
+        int u;cin>>u;v.pb(u);
+    }
+	int dp[n+1][n+1];
+	memset(dp,0,sizeof(dp));
+	sort(v.rbegin(),v.rend());
+    v.pb(-1);
+    vector<pi> a;
+    int cnt = 1;
+    rep(i,0,n){
+        if(v[i]==v[i+1]){
+            cnt++;
+        }
+        else{
+            a.pb({v[i],cnt});
+            cnt= 1;
+        }
+    }
+    int sz=0;
+    dp[0][0]=1;
+    rep(i,0,a.size()){
+        rep(j,0,n+1){
+            if(j<=n/2){ // can add to it
+                dp[sz+a[i].second][j] =add( dp[sz+a[i].second][j], mult(nCk(max(0,j-1)-(sz-j)+(j==n/2),a[i].second), dp[sz][j]));
+            }
+            if(j+1<=n/2){ // can add to it
+                /*
+                We place curr value as the next even position. There will be max(0,j-1) + (j==n/2) odd positions such that the sequence is valid. However, sz-j of these spots are already placed so we subtract that. That is the total number of choices. We then choose a[i]-1 of these spots and fill it with our curr value. We then multiply all that by the previous number of ways which is just dp[sz][j].
+                */
+                dp[sz+a[i].second][j+1] = add(dp[sz+a[i].second][j+1],mult(nCk(max(0,j-1)-(sz-j)+(j==n/2),a[i].second-1) , dp[sz][j]));
+            }
+            
+           
+        }
+        sz += a[i].second;
+    }
+    cout<<dp[n][n/2]<<endl;
+}   
+```
+
+
