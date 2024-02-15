@@ -218,4 +218,51 @@ void solve(){
 }
 ```
 
-**Problem 
+**Problem 11:** https://codeforces.com/contest/1482/problem/E
+
+Essentially, we want to divide an array of numbers into segements such that the sum of the b_i(where i is the min of all h_i in that segment) is maximum. 
+
+If we can loop through all rectangles that have h_i as the shortest for all curr i, we can run dp. This process will probably be similar to largest histogram.
+
+The dp will go as such, $dp[i]$ will be the maximum sum for subarray 1...i. To calculate the dp, we look at the last element in array ${h[i],a[i]}.$ There are two cases. Either this is encompassed by some prev number($h[j]<h[i])$, or this is the minimum height of the last photo.
+For the first case, we will just store the max prev dp value with $h[j]<h[i]$ in the stack. Thne, the ans will be just that.
+For the second case, the segment start must be from $[prev_pos+1...i]$, thus we will get the max dp from 1 element previous, then add $a[i]$ to this. We can query this using maximum segtree. If we go anywhere below prev_pos, our current photo encompasses and element whose h_i is smaller than it so it would fall under first case.
+
+
+Reflection: This was pretty free, **pls review O(n) solution without segtree.**
+
+```cpp
+void solve(){
+    
+    ll n;cin>>n;
+    ll h[n];
+    ll a[n];
+    rep(i,0,n){
+        cin>>h[i];
+    }
+    rep(i,0,n){
+        cin>>a[i];
+    }
+    stack <tuple<ll,ll,ll>> st;
+    ll dp[n+1]={0}; // dp[0]=0 base case
+    rep(i,1,n+1){ // everything else is -inf
+        dp[i]=-1000000000000000000LL;
+    }
+    segtree s; // query MAXIMUM segtree
+    s.init(n);
+    s.set(0,dp[0]);
+    st.push({0,0,-1000000000000000000}); // base case to prevent empty stack
+    rep(i,1,n+1){
+        while(!st.empty() && get<0>(st.top()) > h[i-1]){
+            st.pop();
+        }
+        ll pos = get<1>(st.top()); // prev pos
+        ll prev = get<2>(st.top());
+        dp[i] = max(prev, s.dfs(pos,i)+a[i-1]); // must be either prev dp encompass or max of dp from [prev...i) + curr a[i]
+        s.set(i,dp[i]);
+        st.push({h[i-1], i, max(dp[i], prev)});
+    }
+    cout<<dp[n]<<endl;
+    
+}
+```
