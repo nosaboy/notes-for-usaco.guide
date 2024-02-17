@@ -695,8 +695,8 @@ void solve(){
 ```
 **Example 8:** https://codeforces.com/edu/course/2/lesson/4/3/practice/contest/274545/problem/E
 **Range update problem:** 
-This problem is pretty much halbale stacking, but now you must calculate prefix sum(to add all value l...r with x) and query the value of a single element both in logn time.
-We can achieve calculating prefix sum using segtree.
+This problem is pretty much haybale stacking, but now you must calculate prefix sum(to add all value l...r with x) and query the value of a single element both in logn time.
+We can calculate prefix sum using segtree.
 To process the first query, we just do the same thing for prefix sums and add x to l and subtract x from r(since we add x to all in range l...r-1).
 To process the second query, we just calculate the sum of all values from 1...i. If i is included in some range, we will add that value x to the sum. Otherwise, we sum up + x - x = 0 if i is not in that range.
 ```cpp
