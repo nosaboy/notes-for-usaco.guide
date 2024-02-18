@@ -439,7 +439,8 @@ Define two operations:
 - Updateposition $i$ to $u$ for given $i$ and $u$
 - Find the minimum position $i$ such that $a[i] >= x$ AND $i >= l$ for given $x$ and $l$
 
-This is problem 3 but we  have restrictions
+This is problem 3 but we  have restrictions.
+We will still visit a path if its maximum is >= u. However, whenever we find that our segment is not in range [l...n), we will break immediately. However, we are unsure whether a segment will produce a valid answer because the max element might be outside the range. Unexpectedly, this runs on time because if the left encompasses the range, then the right is in range. Thus, we will only have to visit the left range at most logn times.
 
 ```cpp
 typedef ll item;
