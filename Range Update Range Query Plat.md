@@ -261,7 +261,74 @@ void solve(){
 ```
 
 
+**Problem 4:** https://codeforces.com/edu/course/2/lesson/5/2/practice/contest/279653/problem/A
+
+Support the following operation:
+- Add v to all elements in range $[l,r)$
+- Get min val of all elements in range $[l,r)$
+
+We can just use a normal segtree. Since they are both communiative and associative, we dont have to use lazy propagation. Instead, we update the sum based on val array: what add operations are on this specific node. Eberytime we get the sum we dfs up. 
+To get min, we get the min of two sides. Then, we must add on the sum of the operations done on this node.
+
+```cpp
+struct segtree{
+    int sz;
+    vector <ll> val; // store sum of nodes
+    vector <ll> mn;
+    long long no = 1000000000000000005; // node does not have operation
+    // CODE FOR IMPL
+    
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        val.assign(2*sz,0); // create empty segtree size 2*sz and fill with 0s
+        mn.assign(2*sz,0); // assign MAX
+    }
+ 
+    void modify(int l, int r, int v){
+        modify(l,r,v,0,0,sz);
+    }
+    void modify(int l, int r, int v, int x, int lx, int rx){ // modify segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+ 
+        // we'll propogate/clear this node to clear path
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            //perform operation
+            val[x]+=v;
+            mn[x]+=v;
+            return; // break
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        modify(l,r,v,2*x+1,lx,m);
+        modify(l,r,v,2*x+2,m,rx);
+        mn[x]=min(mn[2*x+1],mn[2*x+2])+val[x]; // min of child + operation of node x
+    }
+        
+    ll get(int l, int r){
+        return get(l,r,0,0,sz);
+    }
+ 
+    ll get(int l, int r, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return no; // MAX
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return mn[x];
+        }
+        int m = (lx+rx)/2; // mid
+        return min(get(l,r, 2*x+1,lx,m),get(l,r, 2*x+2,m,rx))+val[x];
+    }
+};
+ 
+```
 
 
 
-
+**Problem 5:** 
