@@ -695,31 +695,31 @@ struct segtree{
  
 };
  
-
+ 
 void solve(){
     int n,m;cin>>n>>m;
     segtree st;
     st.init(m); // fill with 0s
-    vi v; // added value for [a,b]
-    vi start[n+1]; vi end[n+2];
+    vector<ll> v; // added value for [a,b]
+    vector<ll> start[n+1]; vector<ll> end[n+2];
     rep(i,0,m){
-        int a,b,x;cin>>a>>b>>x;
+        ll a,b,x;cin>>a>>b>>x;
         a--;b--;
         v.pb(x);
         start[a].pb(i);
         end[b+1].pb(i);
     }
     int q;cin>>q;
-    vector<tuple<int,int,int,int>> a;
+    vector<tuple<ll,ll,ll,ll>> a;
     for(int i = 0;i<q;i++){
-        int l,r,k;cin>>k>>l>>r;
+        ll l,r,k;cin>>k>>l>>r;
         l--;r--;k--;
         a.pb({k,l,r,i});
     
     }   
     ll ans[q]={0};
     sort(a.begin(),a.end()); // sort by k to process ranges
-
+ 
     int itr = 0;
     rep(i,0,n){
         // add and eliminate operations
@@ -737,13 +737,14 @@ void solve(){
             
             ans[it] = st.query(l,r+1).seg;
             itr++;
-
+ 
         }
-
+ 
     }
     rep(i,0,q){
         cout<<ans[i]<<"\n";
     }
-}   
-
+}  
 ```
+
+**NOTE:** If you dont change the vector from int to long long it will TLE.
