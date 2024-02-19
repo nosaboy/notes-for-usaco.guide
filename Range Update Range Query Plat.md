@@ -86,7 +86,7 @@ void solve(){
 
 ```
 
-**Problem 2:**
+**Problem 2:** https://codeforces.com/edu/course/2/lesson/5/1/practice/contest/279634/problem/B
 
 The above code does range update point query for all associative and commutative operations such as gcd/lcm, xor, add/multiply, max/min, etc.
 
@@ -150,7 +150,11 @@ struct segtree{
 };
  
 ```
+### Lazy Propagation
+**Problem 3:** https://codeforces.com/edu/course/2/lesson/5/1/practice/contest/279634/problem/C
+We want to apply a non communiative operation on segtree. One example is querying following operations:
+- Assign all values from l to r-1 as x
+- Get the value at position i
 
-**Problem 3:** 
-
+This means we must maintain the order of operations: we must apply x before y if x node is further down than y.
 
