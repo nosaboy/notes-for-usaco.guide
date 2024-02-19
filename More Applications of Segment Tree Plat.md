@@ -593,4 +593,157 @@ void solve(){
 
 
 **Problem of Interest:** https://codeforces.com/problemset/problem/1906/F
-We look at every $k$. For every query, we calculate for that point the maximum subarray 
+We look at every $k$. For every query, we calculate for that point the maximum subarray. This is because then, we can process the ranges of the operations in increasing order. Thus, we know when an operation will affect a_k and when it wont. For every position i, we can eliminate all operations who was in the segtree, whose range does not include i - make all of them 0. Moreover, we can add every new operation whose range includes i( only add operations that start with i) into the segtree. And we will do this for every position. Then, if there is some query whose k = i, we want to process this current query. To do so, we just find the maximum subarray sum of teh curr segtree of the given query range in O(logn) using above implementation. Note that neutral =  {-1000000000,-1000000000,-1000000000,0} and at the start everything is 0 so we set everything to {0,0,0,0}.
+
+
+
+
+```cpp
+// MAX SUBARRAY SUM SEGTREE GIVEN INTERVAL
+struct item{
+ 
+    ll seg, pref, suf, sum;
+};
+ 
+struct segtree{
+    int sz;
+    vector <item> val; // store sum of nodes
+ 
+    // CAN BE CHANGED
+ 
+    item neutral = {-1000000000,-1000000000,-1000000000,0}; // EMPTY SEGMENT: we can add this element 
+    // to anything and get the original result 
+ 
+    item merge(item a, item b){ // merge two nodes( their items)
+        return { // use formula to merge two items
+            max(max(a.seg, b.seg), a.suf + b.pref), // mx
+            max(a.pref, a.sum+b.pref), // pref
+            max(b.suf,a.suf+b.sum), // suf
+            a.sum + b.sum // sum
+        };
+    }
+ 
+    item single(ll v){ // we are left with single node( base case)
+        // v is our current single element( length 1)
+       
+        return {v,v,v,v}; // since its optimal to just pick this element
+     
+ 
+    }
+ 
+    // CODE FOR IMPL
+ 
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        val.assign(2*sz,{0,0,0,0}); // create empty segtree size 2*sz and fill with 0s
+    }
+    void build(vector <ll> &a){
+        build(a,0,0,sz);
+    }
+    void build(vector <ll> &a, ll x, int lx, int rx){ // optimize: build segtree in linear time
+        if(rx - lx == 1){
+            if(lx < (int)a.size()){ // number is inside arr
+                val[x] = single(a[lx]);
+            }
+            // else we just fill with 0 so dont do anything
+            return;
+        }
+        int m = (lx + rx)/2;
+        build(a,2*x+1,lx,m);
+        build(a,2*x+2,m,rx);
+        val[x] = merge(val[2*x+1], val[2*x+2]);
+    }
+    void set(int i, ll u){
+        set(i,u,0,0,sz);
+    }
+    void set(int i, ll u, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(rx-lx==1){ // current node is a leaf
+            val[x] = single(u);
+            return;
+        }
+        int m = (lx+rx)/2; // mid
+        if(i < m){ // if desired position < mid, we go to left subtree
+            set(i, u, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            set(i, u, 2*x+2,m,rx);
+        }
+        // recalculate current node sum after recursion
+        val[x] = merge(val[2*x+1], val[2*x+2]);
+    }
+    item query(int l, int r){
+        return query(l,r,0,0,sz);
+    }
+    item query(int l, int r, int x, int lx, int rx){ // sum of segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return neutral;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return val[x];
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        item osa = query(l,r,2*x+1,lx,m);
+        item nosa = query(l,r,2*x+2,m,rx);
+        return merge(osa, nosa);
+    }
+ 
+};
+ 
+
+void solve(){
+    int n,m;cin>>n>>m;
+    segtree st;
+    st.init(m); // fill with 0s
+    vi v; // added value for [a,b]
+    vi start[n+1]; vi end[n+2];
+    rep(i,0,m){
+        int a,b,x;cin>>a>>b>>x;
+        a--;b--;
+        v.pb(x);
+        start[a].pb(i);
+        end[b+1].pb(i);
+    }
+    int q;cin>>q;
+    vector<tuple<int,int,int,int>> a;
+    for(int i = 0;i<q;i++){
+        int l,r,k;cin>>k>>l>>r;
+        l--;r--;k--;
+        a.pb({k,l,r,i});
+    
+    }   
+    ll ans[q]={0};
+    sort(a.begin(),a.end()); // sort by k to process ranges
+
+    int itr = 0;
+    rep(i,0,n){
+        // add and eliminate operations
+        for(auto x : start[i]){
+            st.set(x,v[x]);
+        }
+        for(auto x : end[i]){
+            st.set(x,0);
+        }
+        // check if there is query here
+        while(itr < a.size() && get<0>(a[itr]) == i){
+            int l = get<1>(a[itr]);
+            int r = get<2>(a[itr]);
+            int it = get<3>(a[itr]);
+            
+            ans[it] = st.query(l,r+1).seg;
+            itr++;
+
+        }
+
+    }
+    rep(i,0,q){
+        cout<<ans[i]<<"\n";
+    }
+}   
+
+```
