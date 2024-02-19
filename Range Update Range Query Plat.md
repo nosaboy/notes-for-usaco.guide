@@ -153,7 +153,7 @@ struct segtree{
 ### Lazy Propagation
 **Problem 3:** https://codeforces.com/edu/course/2/lesson/5/1/practice/contest/279634/problem/C
 We want to apply a **assosicative** but **non-communiative** operation on segtree. One example is querying following operations:
-- Assign all values from l to r-1 as x
+- Modify/Assign all values from l to r-1 as x
 - Get the value at position i
 
 This means we must maintain the order of operations: Applying function x after y differs from y after x.
@@ -166,8 +166,102 @@ All in all, our lazy updates allows us to:
 
 The implementation is simple. For the assign function, we will go through segtree normally and update nodes. However, we want to clear all nodes that are in the path from x to root. We do this by **pushing its current lazy value/function down to its two children**, so that one of the child keeps its ordering while we go down the other child and eventually come to x, in which we can perform x after y.
 
+**NOTE:** Since doing propagation is only O(1), we can do it on both get() and modify() since time doesnt matter.
 ```cpp
-
+struct segtree{
+    int sz;
+    vector <ll> val; // store sum of nodes
+    
+    long long no = 1000000000000000005; // node does not have operation
+    // operation MUST BE associative
+    ll operation(ll a, ll b){ // do function b on a(assign b to a)
+        if(b==no){ // no operation for b
+            return a;
+        }
+        return b; // else in this case we are replacing a with b( assigning b to a)
+    }
+    // CODE FOR IMPL
+    
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        val.assign(2*sz,0); // create empty segtree size 2*sz and fill with 0s
+    }
+ 
+    void propagate(int x, int lx, int rx){ // clear node x
+        // apply function orders to its two children
+        if(rx-lx==1) return; // x is leaf node, doesnt have children
+        val[2*x+1] = operation(val[2*x+1],val[x]); // apply "assignment function" to child1 
+        val[2*x+2] = operation(val[2*x+2],val[x]); // apply to child2
+        val[x]=no; // node x is cleared, thus it has no operation
+        // this way we wont care about it when going from node -> root
+ 
+    }
+    void modify(int l, int r, int v){
+        modify(l,r,v,0,0,sz);
+    }
+    void modify(int l, int r, int v, int x, int lx, int rx){ // modify segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        propagate(x,lx,rx); // at every instance in the path until we reach desired node, 
+        // we'll propogate/clear this node to clear path
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            val[x] = operation(val[x], v); // we have found node x, so apply operation
+            // after this, we know that all nodes above on the path will be cleared
+            return; // thus we stop going down as this is the last operation
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        modify(l,r,v,2*x+1,lx,m);
+        modify(l,r,v,2*x+2,m,rx);
+    }
+        
+    ll get(int i){
+        return get(i,0,0,sz);
+    }
+ 
+    ll get(int i, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        propagate(x,lx,rx); // at every instance in the path until we reach desired node, 
+        if(rx-lx==1){ // current node is a leaf
+            return val[x];
+        }
+        int m = (lx+rx)/2; // mid
+        ll ans = 0;
+        if(i < m){ // if desired position < mid, we go to left subtree
+            ans = get(i, 2*x+1,lx,m);
+        }
+        else{ // we go to right subtree
+            ans = get(i, 2*x+2,m,rx);
+        }
+        return operation(val[x], ans);
+    }
+};
+ 
+ 
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st; st.init(n);
+    while(q--){
+        int op;cin>>op;
+        if(op==1){
+            int l,r,v;cin>>l>>r>>v;
+            st.modify(l,r,v);
+        }
+        else{
+            int i;cin>>i;
+            cout<<st.get(i)<<endl;
+        }
+    }
+}   
 ```
+
+
+
+
 
 
