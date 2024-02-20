@@ -560,3 +560,9 @@ void solve(){
 }   
 
 ```
+**Problem 10:** https://codeforces.com/edu/course/2/lesson/5/3/practice/contest/280799/problem/A
+
+This is similar to finding max subarray sum using segtree. However, we must now apply range update operations, so we will change a segment instead of a single element. To change a segment we will still maintain seg, pref, suf, and sum, but we will also use lazy propagation to maintain the operation applied at each node. 
+
+
+
