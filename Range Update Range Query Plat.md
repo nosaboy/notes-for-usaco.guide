@@ -331,4 +331,232 @@ struct segtree{
 
 
 
-**Problem 5:** 
+**Problem 5:** https://codeforces.com/edu/course/2/lesson/5/2/practice/contest/279653/problem/B
+
+We can essentially do the same thing as previous since this modify = "*" and calc = "+" is also non-communiative but associative. 
+Make sure to make a build function so that we build it with mn = sum to ensure array has all 1s. Thats why I TLE tcs 9. Then, we just store mn = sum of this segment, val = operation done to this node. For each thing if the desired segment contains curr seg we just return mn = sum. Else we just get the sums of its children by dfs, then we multiply it by its val.
+```cpp
+struct segtree{
+    int sz;
+    vector <ll> val; // store multiply of each node
+    vector <ll> mn; // store sum of nodes
+    long long no = 0; // node does not have operation
+    // CODE FOR IMPL
+    
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        val.assign(2*sz,1); // create empty segtree size 2*sz and fill with 0s
+        rep(i,0,2*sz) mn.pb(0); // filled with 0s at the start
+    }
+    void build(){
+        build(0,0,sz);
+    }
+    void build(int x, int lx, int rx){ // build segtree with everything 1 at the start
+        if(rx-lx==1){
+            mn[x]=1LL;
+            return;
+        }
+
+        int m = (lx+rx)/2;
+        build(2*x+1,lx,m);
+        build(2*x+2,m,rx);
+        mn[x]=mult(add(mn[2*x+1],mn[2*x+2]),val[x]);
+        //mn[x]=1;
+    }
+    void display(){
+        rep(i,0,2*sz){
+            cout<<mn[i]<<" ";
+        }
+        cout<<endl;
+    }
+    void modify(int l, int r, int v){
+        modify(l,r,v,0,0,sz);
+    }
+    void modify(int l, int r, int v, int x, int lx, int rx){ // modify segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            //perform operation
+            val[x]=mult(val[x],v);
+            mn[x]=mult(mn[x],v);
+            return; // break
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2; 
+        modify(l,r,v,2*x+1,lx,m);
+        modify(l,r,v,2*x+2,m,rx);
+        mn[x]=mult(add(mn[2*x+1],mn[2*x+2]),val[x]);
+    }
+        
+    ll get(int l, int r){
+        return get(l,r,0,0,sz);
+    }
+
+    ll get(int l, int r, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return no; 
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return mn[x];
+        }
+        int m = (lx+rx)/2; // mid
+        return mult(add(get(l,r, 2*x+1,lx,m),get(l,r, 2*x+2,m,rx)),val[x]); // find sum, then multiply
+    }
+};
+ 
+
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st; st.init(n);
+    st.build();
+    while(q--){
+        int op;cin>>op;
+        //st.display();
+        if(op==1){
+            int l,r,v;cin>>l>>r>>v;
+            st.modify(l,r,v);
+        }
+        else{
+            int l,r;cin>>l>>r;
+            cout<<st.get(l,r)<<endl;
+        }
+       
+    }
+}   
+
+```
+
+**Problem 6:** https://codeforces.com/edu/course/2/lesson/5/2/practice/contest/279653/problem/c
+
+This is also same cause both functions are communiative and associative.
+Thus, we can just change up our previous code so that modify is | instead of * and calc is & instead of +.
+The only thing that differs is that for every update/modify on range, we have to add it to the segement based on its size, since we're updating 
+
+**Problem 7:**
+Same thing but we just have to account for length since we're adding some v to all values.
+
+**Problem 8:** https://codeforces.com/edu/course/2/lesson/5/2/practice/contest/279653/problem/E
+
+Since assigning a value is non-communative, we have to use **lazy propagation**. Since assignment and min are both associative and distributive, we can do so.
+
+**Problem 9:** https://codeforces.com/edu/course/2/lesson/5/2/practice/contest/279653/problem/F
+
+This is same as above except we have sum, so we have to accomodate for len.
+For each node, we will propagate first, then go in and calculate node value. This will make curr val_x = no operation.
+To propagate, we will for every node, push the val to its two child nodes, then update their answers accordingly since it will be in order, so on the way back the operation will be applied anyway. We then make curr operation = no operation.
+After, we will go back up on some segment like normal.
+
+```cpp
+struct segtree{
+    int sz;
+    vector <ll> val; // store multiply of each node
+    vector <ll> mn; // store sum of nodes
+    long long no = 1000000000000000005; // node does not have operation
+    long long neutral = 0; // wont affect sum
+    // CODE FOR IMPL
+    long long mod_op(long long a, long long b,int len){ // modify function
+        if(b==no) return a;
+        return b*len;
+
+    }
+
+    long long calc_op(long long a, long long b){ // calc function
+    
+        return a + b;
+    }
+
+    void apply_mod_op(long long &a, long long b, int len){
+        a = mod_op(a,b,len);
+    }
+    void init(int n){ // create empty segtree with length at least n increased to closest power of 2(for leaves of binary tree)
+        sz = 1;
+        while(sz < n){
+            sz *= 2;
+        }
+        val.assign(2*sz,0); // create empty segtree size 2*sz and fill with 0s
+        mn.assign(2*sz,0); // filled with 0s at the start
+    }
+
+    // LAZY PROPAGATION
+    void propagate(int x, int lx, int rx){
+        if(rx-lx==1) return; // dont propagate leaf
+        int m = (lx+rx)/2;
+        // move operation to child node ans
+        // move 
+        apply_mod_op(val[2*x+1],val[x],1); 
+        apply_mod_op(val[2*x+2],val[x],1); 
+        apply_mod_op(mn[2*x+1],val[x],(rx-m)); 
+        apply_mod_op(mn[2*x+2],val[x],(m-lx)); 
+        val[x]=no;
+    }
+ 
+    void modify(int l, int r, int v){
+        modify(l,r,v,0,0,sz);
+    }
+    void modify(int l, int r, int v, int x, int lx, int rx){ // modify segement [l...r)
+        // l and r = desired range, x = current node, lx and rx = current range
+        propagate(x,lx,rx);
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return;
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            //perform operation
+            apply_mod_op(val[x],v,1);
+            apply_mod_op(mn[x],v,(rx-lx)); // apply to entire range
+            return; // break
+        }
+        // else dfs through left and right node
+        int m = (lx+rx)/2;
+        modify(l,r,v,2*x+1,lx,m);
+        modify(l,r,v,2*x+2,m,rx);
+        mn[x]=calc_op(mn[2*x+1],mn[2*x+2]);
+        // dont have to apply mod to mn since we alredy propagated
+    }
+        
+    ll get(int l, int r){
+        return get(l,r,0,0,sz);
+    }
+
+    ll get(int l, int r, int x, int lx, int rx){ // assign ith element to u and update sums above it
+        // i = desired final position(leaf), u = value we want to assign, x = current node, lx, rx = current range of node
+        propagate(x,lx,rx);
+        if(r <= lx || rx <= l){ // curr range is outside of desired range entirely
+            return neutral; 
+        }
+        if(l <= lx && rx <= r){ // curr range is inside of desired range entirely
+            return mn[x];
+        }
+        int m = (lx+rx)/2; // mid
+        return mod_op(calc_op(get(l,r, 2*x+1,lx,m),get(l,r, 2*x+2,m,rx)),val[x],min(rx,r)-max(lx,l));
+        // note, we must apply this node to be in range of both segments, which is what 
+        // this sum represents. Thus, our left bound must be the max of the two lefts and 
+        // right bound is min. This way our segment is contained in both l...r and lx...rx
+
+    }
+};
+ 
+
+void solve(){
+    int n,q;cin>>n>>q;
+    segtree st; st.init(n);
+    while(q--){
+        int op;cin>>op;
+        if(op==1){
+            int l,r,v;cin>>l>>r>>v;
+            st.modify(l,r,v);
+        }
+        else{
+            int l,r;cin>>l>>r;
+            cout<<st.get(l,r)<<endl;
+        }
+       
+    }
+}   
+
+```
