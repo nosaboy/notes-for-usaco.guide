@@ -59,6 +59,7 @@ const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
 
 **PUTTING IT TOGETHER WE GET:**
 ```cpp
+mt19937 RNG((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 const ll M = (1LL << 61) - 1; // large prime for mod
 const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
 ll hsh[200005]={0}; // LENGTH OF STRING 
@@ -91,6 +92,7 @@ If its a valid permutation, it will have the same characters. Thus, we can just 
 
 **NOTE:** We have |H| strings we want to compare, each with length |N|. Thus, the probability of collision is: $\frac{|H|^2|N|}{M}.$
 ```cpp
+mt19937 RNG((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 const ll M = (1LL << 61) - 1; // large prime for mod
 const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
 ll hsh[200005]={0}; // LENGTH OF STRING 
@@ -162,6 +164,7 @@ We want c_0 * x <= |t|. We do WLOG let c_0 >= c_1( We can just invert 1s and 0s 
 - In other words, dont be afraid to play with time complexity equations
 
 ```cpp
+mt19937 RNG((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 const ll M = (1LL << 61) - 1; // large prime for mod
 const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
 ll hsh[1000005]={0};
@@ -276,6 +279,7 @@ The idea is actually not that hard. We notice n = 10, so it must mean some brute
 Idea is not that hard its just impl + debugging that took a while :(
 Key is to just notice we can do 10! + hashing prefix=suffix.
 ```cpp
+mt19937 RNG((uint32_t)chrono::steady_clock::now().time_since_epoch().count());
 const ll M = (1LL << 61) - 1; // large prime for mod
 const ll P = uniform_int_distribution<ll>(0, M - 1)(RNG); // random base
 ll hsh[20][10005]={0};
